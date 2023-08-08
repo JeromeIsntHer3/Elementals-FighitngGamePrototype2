@@ -11,7 +11,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - Ground
   - 
   - 
   - 
@@ -40,4 +40,10 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: PCs
+    uniqueID: 3806459079
+    locked: 0
+  - name: Projectiles
+    uniqueID: 1782442167
     locked: 0

@@ -148,7 +148,7 @@ Transform:
   m_GameObject: {fileID: 69673983}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.017, y: -2.006, z: 0}
+  m_LocalPosition: {x: -0.417, y: -1.957, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -372,6 +372,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &734202036
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 734202037}
+  m_Layer: 0
+  m_Name: GroundCheck (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &734202037
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 734202036}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.405, y: -2.001, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1477756015}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1230703676
 GameObject:
@@ -613,6 +644,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 69673984}
+  - {fileID: 734202037}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1477756017
@@ -640,45 +672,57 @@ MonoBehaviour:
     Clip: {fileID: 7400000, guid: b77b9ece49e52bf4497365e1ef303df0, type: 2}
     canChangeFaceDirection: 0
     canBeInterrupted: 0
-  - Type: 17
+  - Type: 18
     Clip: {fileID: 7400000, guid: ecdca893297e2154aa89353daa40c5e2, type: 2}
     canChangeFaceDirection: 0
     canBeInterrupted: 0
-  - Type: 18
+  - Type: 19
     Clip: {fileID: 7400000, guid: 92ed90e9d363e3f4396bf228de7618f9, type: 2}
     canChangeFaceDirection: 0
     canBeInterrupted: 0
-  - Type: 19
+  - Type: 20
     Clip: {fileID: 7400000, guid: 0408063a0b25d1847a4e30423c8873ad, type: 2}
     canChangeFaceDirection: 0
     canBeInterrupted: 0
-  - Type: 4
+  - Type: 6
     Clip: {fileID: 7400000, guid: 0a0858e60869da64bb0517744b08601a, type: 2}
     canChangeFaceDirection: 0
     canBeInterrupted: 0
-  - Type: 8
+  - Type: 10
     Clip: {fileID: 7400000, guid: fad8d107c275d3b41a9ad34acb37bb62, type: 2}
     canChangeFaceDirection: 0
     canBeInterrupted: 0
-  - Type: 6
+  - Type: 8
     Clip: {fileID: 7400000, guid: d22e080fd255fe24089c2cc01c081e49, type: 2}
     canChangeFaceDirection: 0
     canBeInterrupted: 0
-  - Type: 9
+  - Type: 11
     Clip: {fileID: 7400000, guid: ccf3811c05b0146409cac67609d02505, type: 2}
     canChangeFaceDirection: 0
     canBeInterrupted: 0
-  - Type: 5
+  - Type: 7
     Clip: {fileID: 7400000, guid: 882e7f69b33527e469917a0830033253, type: 2}
     canChangeFaceDirection: 1
     canBeInterrupted: 0
-  - Type: 7
+  - Type: 9
     Clip: {fileID: 7400000, guid: 684de89329912a841b8516e9c1d318df, type: 2}
     canChangeFaceDirection: 0
     canBeInterrupted: 0
-  - Type: 15
+  - Type: 17
     Clip: {fileID: 7400000, guid: 67865987377d52547bf08927f6c8e9c0, type: 2}
     canChangeFaceDirection: 0
+    canBeInterrupted: 0
+  - Type: 3
+    Clip: {fileID: 7400000, guid: d8219c35f52b2664e92fcedfdc21c3d5, type: 2}
+    canChangeFaceDirection: 0
+    canBeInterrupted: 0
+  - Type: 4
+    Clip: {fileID: 7400000, guid: be111191ac2ef9249a84bc76cb5262ad, type: 2}
+    canChangeFaceDirection: 0
+    canBeInterrupted: 0
+  - Type: 5
+    Clip: {fileID: 7400000, guid: 7a50f06371ffde542806fcbcc0a10c74, type: 2}
+    canChangeFaceDirection: 1
     canBeInterrupted: 0
   grounded: 1
   attack1: 0
@@ -689,6 +733,10 @@ MonoBehaviour:
   roll: 0
   jumped: 0
   landed: 0
+  option: 0
+  optionTrigger: 0
+  optionCancelTrigger: 0
+  optionCancelCheck: 0
 --- !u!114 &1477756018
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -719,10 +767,12 @@ MonoBehaviour:
   jumpDelay: 0.25
   dashForce: 12
   jumpsAllowed: 2
+  slideMultiplier: 1.1
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
-  groundCheck: {fileID: 69673984}
+  groundCheck1: {fileID: 69673984}
+  groundCheck2: {fileID: 734202037}
   groundCheckRadius: 0.05
 --- !u!50 &1477756020
 Rigidbody2D:
@@ -783,7 +833,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.060007095, y: -1.2125697}
+  m_Offset: {x: -0.005028039, y: -1.2125697}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -794,7 +844,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.487113, y: 1.5285616}
+  m_Size: {x: 0.81508356, y: 1.5285616}
   m_EdgeRadius: 0
 --- !u!1 &2133653301
 GameObject:

@@ -17,6 +17,7 @@ public class CharacterInput : MonoBehaviour
     public EventHandler OnUltimate;
     public EventHandler OnRoll;
     public EventHandler OnOption;
+    public EventHandler OnOptionCanceled;
     public EventHandler OnJump;
     public EventHandler OnLand;
 
@@ -78,6 +79,10 @@ public class CharacterInput : MonoBehaviour
         controls.Player.Option.performed += (Ctx obj) =>
         {
             OnOption?.Invoke(this, EventArgs.Empty);
+        };
+        controls.Player.Option.canceled += (Ctx obj) =>
+        {
+            OnOptionCanceled?.Invoke(this, EventArgs.Empty);
         };
     }
 

@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting.FullSerializer.Internal;
 using UnityEngine;
 
 public class CharacterAnimator : MonoBehaviour
@@ -26,13 +25,16 @@ public class CharacterAnimator : MonoBehaviour
         roll,
         jumped,
         landed,
-        option;
+        option,
+        optionTrigger,
+        optionCancelTrigger,
+        optionCancelCheck;
 
     int currentState;
     int previousState;
     float lockedTilTime;
+    float recoveryTime;
     bool moving;
-    bool recovering;
 
     Vector2 movement;
 
@@ -57,6 +59,7 @@ public class CharacterAnimator : MonoBehaviour
         cInput.OnUltimate += OnUltimate;
         cInput.OnRoll += OnRoll;
         cInput.OnOption += OnOption;
+        cInput.OnOptionCanceled += OnOptionCanceled;
     }
 
     void OnDisable()
@@ -72,6 +75,7 @@ public class CharacterAnimator : MonoBehaviour
         cInput.OnUltimate -= OnUltimate;
         cInput.OnRoll -= OnRoll;
         cInput.OnOption -= OnOption;
+        cInput.OnOptionCanceled -= OnOptionCanceled;
     }
 
     void Start()
@@ -102,7 +106,7 @@ public class CharacterAnimator : MonoBehaviour
 
     void OnAttack1(object sender, EventArgs args)
     {
-        if (recovering) return;
+        if (!Recovered()) return;
 
         if (!grounded)
         {
@@ -112,53 +116,71 @@ public class CharacterAnimator : MonoBehaviour
         }
 
         attack1 = true;
-        recovering = true;
-        StartCoroutine(RecoveringCR(GetDuration(AnimationType.Attack1)));
+        SetRecoveryPeriod(GetDuration(AnimationType.Attack1));
     }
 
     void OnAttack2(object sender, EventArgs args)
     {
-        if (!grounded || recovering) return;
+        if (!Recovered()) return;
+
         attack2 = true;
-        recovering = true;
-        StartCoroutine(RecoveringCR(GetDuration(AnimationType.Attack2)));
+        SetRecoveryPeriod(GetDuration(AnimationType.Attack2));
     }
 
     void OnAttack3(object sender, EventArgs args)
     {
-        if (!grounded || recovering) return;
+        if (!Recovered()) return;
+
+        if (!grounded) return;
         attack3 = true;
-        recovering = true;
-        StartCoroutine(RecoveringCR(GetDuration(AnimationType.Attack3)));
+        SetRecoveryPeriod(GetDuration(AnimationType.Attack3));
     }
 
     void OnUltimate(object sender, EventArgs args)
     {
-        if(!grounded || recovering) return;
+        if (!Recovered()) return;
+
+        if (!grounded) return;
         ultimate = true;
-        recovering = true;
-        StartCoroutine(RecoveringCR(GetDuration(AnimationType.Ultimate)));
+        SetRecoveryPeriod(GetDuration(AnimationType.Ultimate));
     }
 
     void OnRoll(object sender, EventArgs args)
     {
-        if (!grounded || recovering) return;
+        if (!Recovered()) return;
+
+        if (!grounded) return;
         roll = true;
-        recovering = true;
-        StartCoroutine(RecoveringCR(GetDuration(AnimationType.Roll)));
+        SetRecoveryPeriod(GetDuration(AnimationType.Roll));
         CancelAnimation();
     }
 
     void OnOption(object sender, EventArgs args)
     {
-        if (!grounded || recovering) return;
+        if (Mathf.Abs(cMovement.HorizontalVelocity()) < 4) return;
+        if (!Recovered()) return;
+
+        if (!grounded) return;
+        optionTrigger = true;
         option = true;
-        recovering = true;
+    }
+
+    void OnOptionCanceled(object sender, EventArgs args)
+    {
+        if (!option) return;
+
+        if (previousState == GetHash(AnimationType.CharacterOptionStart) || 
+            previousState == GetHash(AnimationType.CharacterOptionLoop))
+        {
+            optionCancelTrigger = true;
+            optionCancelCheck = true;
+            SetRecoveryPeriod(GetDuration(AnimationType.CharacterOptionEnd));
+        }
     }
 
     void OnJump(object sender, EventArgs args)
     {
-        if (!grounded || recovering) return;
+        if (!grounded) return;
         jumped = true;
         grounded = false;
     }
@@ -172,15 +194,24 @@ public class CharacterAnimator : MonoBehaviour
 
     void Update()
     {
+        if (Recovered()) {
+            Debug.Log("Recovered");
+        }
+        else {
+            Debug.Log("Recovering");
+        }
+
+        if(option) recoveryTime = Time.time + .333f;
+
         ChangeFaceDirection(cInput.CurrentMovementInput());
 
         var newState = GetAnimState();
 
         SetAnimationConditionsFalse();
 
+        previousState = currentState;
         if (SameState(newState)) return;
         animator.CrossFade(newState, 0, 0);
-        previousState = currentState;
         currentState = newState;
     }
 
@@ -194,12 +225,26 @@ public class CharacterAnimator : MonoBehaviour
         landed = false;
         airAttack = false;
         ultimate = false;
+        optionTrigger = false;
+        optionCancelTrigger = false;
     }
 
     int GetAnimState()
     {
         if (Time.time < lockedTilTime) return currentState;
 
+        if(optionTrigger) return LockState(GetHash(AnimationType.CharacterOptionStart), GetDuration(AnimationType.CharacterOptionStart));
+        if (option)
+        {
+            if (optionCancelCheck)
+            {
+                optionCancelCheck = false;
+                option = false;
+                return LockState(GetHash(AnimationType.CharacterOptionEnd), GetDuration(AnimationType.CharacterOptionEnd));
+            }
+            return GetHash(AnimationType.CharacterOptionLoop);
+        }
+        if(optionCancelTrigger) return LockState(GetHash(AnimationType.CharacterOptionEnd), GetDuration(AnimationType.CharacterOptionEnd));
         if (roll) return LockState(GetHash(AnimationType.Roll), GetDuration(AnimationType.Roll));
         if (landed) return LockState(GetHash(AnimationType.JumpEnd), GetDuration(AnimationType.JumpEnd));
         if(jumped) return LockState(GetHash(AnimationType.JumpStart), GetDuration(AnimationType.JumpStart));
@@ -210,10 +255,10 @@ public class CharacterAnimator : MonoBehaviour
         if (grounded) return movement.x == 0 ? 
                 GetHash(AnimationType.Idle) : GetHash(AnimationType.Run);
 
-        //Non Grounded Animations
+        //Non-Grounded Animations
         if(airAttack) return LockState(GetHash(AnimationType.JumpAttack), GetDuration(AnimationType.JumpAttack));
         if (cMovement.VerticalVelocity() > 1) return LockState(GetHash(AnimationType.JumpPeak), GetDuration(AnimationType.JumpPeak));
-        return cMovement.VerticalVelocity() < 0 ?
+        return cMovement.VerticalVelocity() < -1 ?
             GetHash(AnimationType.JumpFalling)
             : LockState(GetHash(AnimationType.JumpRising), GetDuration(AnimationType.JumpRising));
 
@@ -256,18 +301,18 @@ public class CharacterAnimator : MonoBehaviour
         return animationCanChangeFaceDirection[s];
     }
 
+    bool Recovered()
+    {
+        return Time.time > recoveryTime;
+    }
+
+    void SetRecoveryPeriod(float t)
+    {
+        recoveryTime = Time.time + t;
+    }
+
     public bool IsFacingLeft()
     {
         return spriteRenderer.flipX;
     }
-
-    #region Coroutines
-
-    IEnumerator RecoveringCR(float t)
-    {
-        yield return new WaitForSeconds(t);
-        recovering = false;
-    }
-
-    #endregion 
 }

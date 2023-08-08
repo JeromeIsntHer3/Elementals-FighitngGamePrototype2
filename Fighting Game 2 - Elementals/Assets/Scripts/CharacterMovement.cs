@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using Unity.VisualScripting;
 
 public class CharacterMovement : MonoBehaviour
 {
@@ -13,10 +12,12 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] float jumpDelay;
     [SerializeField] float dashForce;
     [SerializeField] int jumpsAllowed;
+    [SerializeField] float slideMultiplier;
 
     [Header("Ground Check")]
     [SerializeField] LayerMask groundLayer;
-    [SerializeField] Transform groundCheck;
+    [SerializeField] Transform groundCheck1;
+    [SerializeField] Transform groundCheck2;
     [SerializeField] float groundCheckRadius;
 
     Rigidbody2D rb;
@@ -27,6 +28,8 @@ public class CharacterMovement : MonoBehaviour
     bool canMove = true;
     bool jumping;
     bool recovering;
+    bool sliding;
+    float recoveryTime;
 
     void Awake()
     {
@@ -45,6 +48,8 @@ public class CharacterMovement : MonoBehaviour
         cInput.OnAttack3 += OnAttack3;
         cInput.OnUltimate += OnUltimate;
         cInput.OnRoll += OnRoll;
+        cInput.OnOption += OnOptionPerformed;
+        cInput.OnOptionCanceled += OnOptionCanceled;
     }
 
     void OnDisable()
@@ -56,6 +61,8 @@ public class CharacterMovement : MonoBehaviour
         cInput.OnAttack3 -= OnAttack3;
         cInput.OnUltimate -= OnUltimate;
         cInput.OnRoll -= OnRoll;
+        cInput.OnOption -= OnOptionPerformed;
+        cInput.OnOptionCanceled -= OnOptionCanceled;
     }
 
     void OnMovement(object sender, Vector2 args)
@@ -75,6 +82,11 @@ public class CharacterMovement : MonoBehaviour
         }
         else
         {
+            if(!jumping)
+            {
+                jumps -= 1;
+                jumping = true;
+            }
             Jump();
             jumps -= 1;
         }
@@ -82,55 +94,70 @@ public class CharacterMovement : MonoBehaviour
 
     void OnAttack1(object sender, EventArgs args)
     {
-        if (recovering) return;
-        recovering = true;
-        StartCoroutine(RecoveringCR(.85f));
+        if (!Recovered()) return;
+        SetRecoveryTime(.667f);
     }
 
     void OnAttack2(object sender, EventArgs args)
     {
-        if (recovering) return;
-        recovering = true;
-        StartCoroutine(RecoveringCR(1.26f));
+        if (!Recovered()) return;
+        SetRecoveryTime(1f);
     }
 
     void OnAttack3(object sender, EventArgs args)
     {
-        if (recovering) return;
-        recovering = true;
-        StartCoroutine(RecoveringCR(1.1f));
+        if (!Recovered()) return;
+        SetRecoveryTime(.8f);
     }
 
     void OnUltimate(object sender, EventArgs args)
     {
-        if (recovering) return;
-        recovering = true;
-        StartCoroutine(RecoveringCR(1.417f));
+        if (!Recovered()) return;
+        SetRecoveryTime(1.133f);
     }
 
     void OnRoll(object sender, EventArgs args)
     {
-        if (jumping || recovering) return;
-        recovering = true;
-        StartCoroutine(RecoveringCR(0.68f));
+        if(!Recovered()) return;
+        if (jumping) return;
+        SetRecoveryTime(.533f);
         Roll();
     }
 
-    IEnumerator RecoveringCR(float t)
+    void OnOptionPerformed(object sender, EventArgs args)
     {
-        yield return new WaitForSeconds(t);
-        recovering = false;
+        if (Mathf.Abs(HorizontalVelocity()) < 4) return;
+        if (!Recovered()) return;
+        if (jumping || sliding) return;
+        sliding = true;
+        Slide();
+    }
+
+    void OnOptionCanceled(object sender, EventArgs args)
+    {
+        if (!sliding) return;
+        SetRecoveryTime(.267f);
+        rb.velocity = new Vector2(rb.velocity.x / 2, rb.velocity.y);
+        sliding = false;
     }
 
     void Update()
     {
+        Debug.Log(Recovered());
         movement = cInput.CurrentMovementInput();
     }
 
     void FixedUpdate()
     {
-        if (!canMove || recovering) return;
+        if(!canMove) return;
+        if (sliding)
+        {
+            if (Mathf.Abs(HorizontalVelocity()) < 2) cInput.OnOptionCanceled?.Invoke(this, EventArgs.Empty);
+            return;
+        }
 
+        if (!Recovered()) return;
+            
         float targetSpeed = playerSpeed * movement.x;
         float speedDiff = targetSpeed - rb.velocity.x;
         float movementRate = speedDiff * accelerationSpeed;
@@ -153,9 +180,26 @@ public class CharacterMovement : MonoBehaviour
         rb.AddForce(dir * dashForce, ForceMode2D.Impulse);
     }
 
-    bool IsGrounded()
+    void Slide()
     {
-        return Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+        Vector2 dir = cAnimator.IsFacingLeft() ? Vector2.left : Vector2.right;
+        rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y);
+        rb.AddForce(Mathf.Abs(rb.velocity.x) * slideMultiplier * dir, ForceMode2D.Impulse);
+    }
+
+    void SetRecoveryTime(float t)
+    {
+        recoveryTime = Time.time + t;
+    }
+
+    bool Recovered()
+    {
+        return Time.time > recoveryTime;
+    }
+
+    public bool IsGrounded()
+    {
+        return Physics2D.OverlapArea(groundCheck1.position, groundCheck2.position, groundLayer);
     }
 
     void OnCollisionEnter2D(Collision2D collision)
@@ -176,6 +220,19 @@ public class CharacterMovement : MonoBehaviour
     public float VerticalVelocity()
     {
         return rb.velocity.y;
+    }
+
+    void OnDrawGizmos()
+    {
+        Vector3 point1 = groundCheck1.position;
+        Vector3 point2 = new Vector3(groundCheck2.position.x, groundCheck1.position.y);
+        Vector3 point3 = groundCheck2.position;
+        Vector3 point4 = new Vector3(groundCheck1.position.x, groundCheck2.position.y);
+
+        Gizmos.DrawLine(point1, point2);
+        Gizmos.DrawLine(point2, point3);
+        Gizmos.DrawLine(point3, point4);
+        Gizmos.DrawLine(point4, point1);
     }
 
     #region Coroutines

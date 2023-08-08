@@ -3,12 +3,11 @@ public enum AnimationType
     Idle,
     Run,
     Roll,
-    CharacterOption,
+    CharacterOptionStart, CharacterOptionLoop, CharacterOptionEnd,
     JumpStart, JumpEnd, JumpPeak, JumpAttack, JumpRising, JumpFalling,
     DefendStart, DefendEnd, DefendLoop,
     Damaged,
     Death,
     Ultimate,
-    Projectile,
     Attack1, Attack2, Attack3
 }

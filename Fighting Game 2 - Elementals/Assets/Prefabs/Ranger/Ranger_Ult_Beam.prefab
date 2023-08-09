@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8146942147163076147}
   - component: {fileID: 7065311712823357446}
   - component: {fileID: 4123982306512997556}
+  - component: {fileID: 6628246287202306316}
   m_Layer: 0
   m_Name: Ranger_Ult_Beam
   m_TagString: Untagged
@@ -106,3 +107,15 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6628246287202306316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266235970104564890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91bed8b38f4e0304398fab3042520b73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

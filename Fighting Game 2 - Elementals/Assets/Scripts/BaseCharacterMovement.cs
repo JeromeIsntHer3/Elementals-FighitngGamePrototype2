@@ -1,45 +1,45 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
-public class CharacterMovement : MonoBehaviour
+public class BaseCharacterMovement : BaseCharacter
 {
-    [Header("General Values")]
-    [SerializeField] float playerSpeed;
-    [SerializeField] float accelerationSpeed;
-    [SerializeField] float jumpForce;
-    [SerializeField] float jumpDelay;
-    [SerializeField] float dashForce;
-    [SerializeField] int jumpsAllowed;
-    [SerializeField] float slideMultiplier;
+    [SerializeField] protected CharacterMovementData data;
 
     [Header("Ground Check")]
-    [SerializeField] LayerMask groundLayer;
-    [SerializeField] Transform groundCheck1;
-    [SerializeField] Transform groundCheck2;
-    [SerializeField] float groundCheckRadius;
+    [SerializeField] protected LayerMask groundLayer;
+    [SerializeField] protected Transform groundCheck1;
+    [SerializeField] protected Transform groundCheck2;
 
-    Rigidbody2D rb;
-    CharacterInput cInput;
-    CharacterAnimator cAnimator;
-    Vector2 movement;
-    int jumps;
-    bool canMove = true;
-    bool jumping;
-    bool recovering;
-    bool sliding;
-    float recoveryTime;
+    protected readonly Dictionary<AnimationType, float> animationTimes = new();
 
-    void Awake()
+    protected Rigidbody2D rb;
+    protected CharacterInput cInput;
+    protected Vector2 movement;
+    protected int jumps;
+    protected bool canMove = true;
+    protected bool jumping;
+    protected bool option;
+    protected bool isFacingLeft;
+
+    protected delegate void Option();
+    protected delegate bool OptionCondition();
+    protected Option OptionPerformedDelegate;
+    protected Option OptionCanceledDelegate;
+    protected Option OptionUpdate;
+    protected OptionCondition OptionPerformCond;
+    protected OptionCondition OptionCancelCond;
+
+    public override void Awake()
     {
+        base.Awake();
         rb = GetComponent<Rigidbody2D>();
         cInput = GetComponent<CharacterInput>();
-        cAnimator = GetComponent<CharacterAnimator>();
-        jumps = jumpsAllowed;
+        jumps = data.JumpsAllowed;
     }
 
-    void OnEnable()
+    public virtual void OnEnable()
     {
         cInput.OnMovement += OnMovement;
         cInput.OnJump += OnJump;
@@ -50,9 +50,10 @@ public class CharacterMovement : MonoBehaviour
         cInput.OnRoll += OnRoll;
         cInput.OnOption += OnOptionPerformed;
         cInput.OnOptionCanceled += OnOptionCanceled;
+        cInput.OnChangeFaceDirection += OnChangeFaceDirection;
     }
 
-    void OnDisable()
+    public virtual void OnDisable()
     {
         cInput.OnMovement -= OnMovement;
         cInput.OnJump -= OnJump;
@@ -63,6 +64,7 @@ public class CharacterMovement : MonoBehaviour
         cInput.OnRoll -= OnRoll;
         cInput.OnOption -= OnOptionPerformed;
         cInput.OnOptionCanceled -= OnOptionCanceled;
+        cInput.OnChangeFaceDirection -= OnChangeFaceDirection;
     }
 
     void OnMovement(object sender, Vector2 args)
@@ -72,7 +74,8 @@ public class CharacterMovement : MonoBehaviour
 
     void OnJump(object sender, EventArgs args)
     {
-        if (recovering || jumps <= 0) return;
+        if (!Recovered()) return;
+        if (jumps <= 0) return;
         if (IsGrounded())
         {
             canMove = false;
@@ -94,107 +97,103 @@ public class CharacterMovement : MonoBehaviour
 
     void OnAttack1(object sender, EventArgs args)
     {
-        if (!Recovered()) return;
-        SetRecoveryTime(.667f);
+        if (!Recovered() || jumping) return;
+        SetRecoveryDuration(GetDuration(AnimationType.Attack1));
     }
 
     void OnAttack2(object sender, EventArgs args)
     {
-        if (!Recovered()) return;
-        SetRecoveryTime(1f);
+        if (!Recovered() || jumping) return;
+        SetRecoveryDuration(GetDuration(AnimationType.Attack2));
     }
 
     void OnAttack3(object sender, EventArgs args)
     {
-        if (!Recovered()) return;
-        SetRecoveryTime(.8f);
+        if (!Recovered() || jumping) return;
+        SetRecoveryDuration(GetDuration(AnimationType.Attack3));
     }
 
     void OnUltimate(object sender, EventArgs args)
     {
-        if (!Recovered()) return;
-        SetRecoveryTime(1.133f);
+        if (!Recovered() || jumping) return;
+        SetRecoveryDuration(GetDuration(AnimationType.Ultimate));
     }
 
     void OnRoll(object sender, EventArgs args)
     {
         if(!Recovered()) return;
         if (jumping) return;
-        SetRecoveryTime(.533f);
+        SetRecoveryDuration(GetDuration(AnimationType.Roll));
         Roll();
     }
 
     void OnOptionPerformed(object sender, EventArgs args)
     {
-        if (Mathf.Abs(HorizontalVelocity()) < 4) return;
+        if (OptionPerformCond()) return;
         if (!Recovered()) return;
-        if (jumping || sliding) return;
-        sliding = true;
-        Slide();
+        if (jumping || option) return;
+        OptionPerformedDelegate?.Invoke();
+        option = true;
     }
 
     void OnOptionCanceled(object sender, EventArgs args)
     {
-        if (!sliding) return;
-        SetRecoveryTime(.267f);
-        rb.velocity = new Vector2(rb.velocity.x / 2, rb.velocity.y);
-        sliding = false;
+        if (!option) return;
+        SetRecoveryDuration(GetDuration(AnimationType.CharacterOptionEnd));
+        OptionCanceledDelegate?.Invoke();
+        option = false;
+    }
+
+    void OnChangeFaceDirection(object sender, bool e)
+    {
+        isFacingLeft = e;
     }
 
     void Update()
     {
-        Debug.Log(Recovered());
+        if (Recovered()) {
+            Debug.Log("Movement Recovered");
+        }
+        else {
+            Debug.Log("Movement Recovering");
+        }
+
         movement = cInput.CurrentMovementInput();
+
+        if (option) OptionUpdate?.Invoke();
     }
 
     void FixedUpdate()
     {
         if(!canMove) return;
-        if (sliding)
+        if (option)
         {
-            if (Mathf.Abs(HorizontalVelocity()) < 2) cInput.OnOptionCanceled?.Invoke(this, EventArgs.Empty);
+            if (OptionCancelCond()) cInput.OnOptionCanceled?.Invoke(this, EventArgs.Empty);
             return;
         }
 
         if (!Recovered()) return;
             
-        float targetSpeed = playerSpeed * movement.x;
+        float targetSpeed = data.PlayerSpeed * movement.x;
         float speedDiff = targetSpeed - rb.velocity.x;
-        float movementRate = speedDiff * accelerationSpeed;
+        float movementRate = speedDiff * data.AccelerationSpeed;
         rb.AddForce(Vector2.right * movementRate, ForceMode2D.Force);
     }
 
     void Jump()
     {
         rb.velocity = new Vector2(rb.velocity.x, 0);
-        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        rb.AddForce(Vector2.up * data.JumpForce, ForceMode2D.Impulse);
         //if (movement.x == 0) return;
         //Vector2 dir = movement.x < 0 ? Vector2.left : Vector2.right;
-        rb.AddForce(movement * jumpForce/2, ForceMode2D.Impulse);
+        rb.AddForce(movement * data.JumpForce/2, ForceMode2D.Impulse);
     }
 
     void Roll()
     {
-        Vector2 dir = cAnimator.IsFacingLeft() ? Vector2.left : Vector2.right;
+        Vector2 dir = isFacingLeft ? Vector2.left : Vector2.right;
         rb.velocity = new Vector2(0, rb.velocity.y);
-        rb.AddForce(dir * dashForce, ForceMode2D.Impulse);
-    }
-
-    void Slide()
-    {
-        Vector2 dir = cAnimator.IsFacingLeft() ? Vector2.left : Vector2.right;
-        rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y);
-        rb.AddForce(Mathf.Abs(rb.velocity.x) * slideMultiplier * dir, ForceMode2D.Impulse);
-    }
-
-    void SetRecoveryTime(float t)
-    {
-        recoveryTime = Time.time + t;
-    }
-
-    bool Recovered()
-    {
-        return Time.time > recoveryTime;
+        rb.AddForce(dir * data.DashForce, ForceMode2D.Impulse);
     }
 
     public bool IsGrounded()
@@ -207,7 +206,7 @@ public class CharacterMovement : MonoBehaviour
         if (IsGrounded())
         {
             jumping = false;
-            jumps = jumpsAllowed;
+            jumps = data.JumpsAllowed;
             cInput.OnLand?.Invoke(this, EventArgs.Empty);
         }
     }
@@ -225,9 +224,9 @@ public class CharacterMovement : MonoBehaviour
     void OnDrawGizmos()
     {
         Vector3 point1 = groundCheck1.position;
-        Vector3 point2 = new Vector3(groundCheck2.position.x, groundCheck1.position.y);
+        Vector3 point2 = new (groundCheck2.position.x, groundCheck1.position.y);
         Vector3 point3 = groundCheck2.position;
-        Vector3 point4 = new Vector3(groundCheck1.position.x, groundCheck2.position.y);
+        Vector3 point4 = new (groundCheck1.position.x, groundCheck2.position.y);
 
         Gizmos.DrawLine(point1, point2);
         Gizmos.DrawLine(point2, point3);
@@ -239,7 +238,7 @@ public class CharacterMovement : MonoBehaviour
 
     IEnumerator JumpDelayCR()
     {
-        yield return new WaitForSeconds(jumpDelay);
+        yield return new WaitForSeconds(data.JumpDelay);
         canMove = true;
         Jump();
     }

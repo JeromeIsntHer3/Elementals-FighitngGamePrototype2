@@ -1,12 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class BaseCharacterAnimator : BaseCharacter
 {
-    CharacterInput cInput;
-    BaseCharacterMovement cMovement;
+    protected CharacterInput cInput;
+    protected BaseCharacterMovement cMovement;
 
     Animator animator;
     SpriteRenderer spriteRenderer;
@@ -25,7 +24,9 @@ public class BaseCharacterAnimator : BaseCharacter
         option,
         optionTrigger,
         optionCancelTrigger,
-        optionCancelCheck;
+        optionCancelCheck,
+        hit,
+        death;
 
     int currentState;
     int previousState;
@@ -33,6 +34,9 @@ public class BaseCharacterAnimator : BaseCharacter
     bool moving;
 
     Vector2 movement;
+
+    public delegate bool OptionCondition();
+    protected OptionCondition OptionPerformCondition;
 
     public override void Awake()
     {
@@ -49,7 +53,7 @@ public class BaseCharacterAnimator : BaseCharacter
         });
     }
 
-    void OnEnable()
+    public virtual void OnEnable()
     {
         cInput.OnMovement += OnMovement;
         cInput.OnMovementPerformed += OnMovementPerformed;
@@ -63,9 +67,10 @@ public class BaseCharacterAnimator : BaseCharacter
         cInput.OnRoll += OnRoll;
         cInput.OnOption += OnOption;
         cInput.OnOptionCanceled += OnOptionCanceled;
+        cInput.OnHit += OnHit;
     }
 
-    void OnDisable()
+    public virtual void OnDisable()
     {
         cInput.OnMovement -= OnMovement;
         cInput.OnMovementPerformed -= OnMovementPerformed;
@@ -79,6 +84,7 @@ public class BaseCharacterAnimator : BaseCharacter
         cInput.OnRoll -= OnRoll;
         cInput.OnOption -= OnOption;
         cInput.OnOptionCanceled -= OnOptionCanceled;
+        cInput.OnHit -= OnHit;
     }
 
     void OnMovement(object sender, Vector2 args)
@@ -145,7 +151,7 @@ public class BaseCharacterAnimator : BaseCharacter
 
     void OnOption(object sender, EventArgs args)
     {
-        if (Mathf.Abs(cMovement.HorizontalVelocity()) < 4) return;
+        if (OptionPerformCondition()) return;
         if (!Recovered() || !grounded) return;
         optionTrigger = true;
         option = true;
@@ -178,16 +184,23 @@ public class BaseCharacterAnimator : BaseCharacter
         landed = true;
     }
 
+    void OnHit(object sender, float args)
+    {
+        CancelAnimation();
+        hit = true;
+        SetRecoveryDuration(GetDuration(AnimationType.Damaged));
+    }
+
     void Update()
     {
-        if (Recovered()) {
-            Debug.Log("Animator Recovered");
-        }
-        else {
-            Debug.Log("Animator Recovering");
-        }
+        //if (Recovered()) {
+        //    Debug.Log("Animator Recovered");
+        //}
+        //else {
+        //    Debug.Log("Animator Recovering");
+        //}
 
-        if(option) recoveryTime = Time.time + .333f;
+        if(option) recoveryTime = Time.time + GetDuration(AnimationType.CharacterOptionEnd);
 
         ChangeFaceDirection(cInput.CurrentMovementInput());
 
@@ -213,12 +226,15 @@ public class BaseCharacterAnimator : BaseCharacter
         ultimate = false;
         optionTrigger = false;
         optionCancelTrigger = false;
+        hit = false;
     }
 
     int GetAnimState()
     {
         if (Time.time < lockedTilTime) return currentState;
 
+        if (death) return GetHash(AnimationType.Death);
+        if (hit) return LockState(GetHash(AnimationType.Damaged), GetDuration(AnimationType.Damaged));
         if(optionTrigger) return LockState(GetHash(AnimationType.CharacterOptionStart), GetDuration(AnimationType.CharacterOptionStart));
         if (option)
         {
@@ -245,7 +261,7 @@ public class BaseCharacterAnimator : BaseCharacter
         if(airAttack) return LockState(GetHash(AnimationType.JumpAttack), GetDuration(AnimationType.JumpAttack));
         if (cMovement.VerticalVelocity() > 3) return GetHash(AnimationType.JumpRising);
         if (cMovement.VerticalVelocity() > 1) return LockState(GetHash(AnimationType.JumpPeak), GetDuration(AnimationType.JumpPeak));
-        return cMovement.VerticalVelocity() < 0 ?
+        return cMovement.VerticalVelocity() < -1 ?
             GetHash(AnimationType.JumpFalling)
             : LockState(GetHash(AnimationType.JumpRising), GetDuration(AnimationType.JumpRising));
 
@@ -282,11 +298,6 @@ public class BaseCharacterAnimator : BaseCharacter
     bool CanChangeDirection(int s)
     {
         return animationCanChangeFaceDirection[s];
-    }
-
-    public bool IsFacingLeft()
-    {
-        return spriteRenderer.flipX;
     }
 
     #region Classes

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "CharacterMovement", menuName = "Character/PhysicsData")]
-public class CharacterMovementData : ScriptableObject
+public class CharacterMovementSO : ScriptableObject
 {
     public float PlayerSpeed;
     public float AccelerationSpeed;

@@ -9,13 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4496a4c203f419845ad745319fe9b199, type: 3}
+  m_Script: {fileID: 11500000, guid: 108bb3f8852f5994b92c17025afc4201, type: 3}
   m_Name: RangerMovement
   m_EditorClassIdentifier: 
   PlayerSpeed: 10
   AccelerationSpeed: 8
   JumpForce: 12
-  JumpDelay: 0.2
+  JumpDelay: 0.1
   DashForce: 12
   JumpsAllowed: 2
-  SlideMultiplier: 1.1
+  SlideMultiplier: 1.08

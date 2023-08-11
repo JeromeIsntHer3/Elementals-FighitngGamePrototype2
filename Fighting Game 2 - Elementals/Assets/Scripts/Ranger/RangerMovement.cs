@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,10 @@ public class RangerMovement : BaseCharacterMovement
     public override void OnEnable()
     {
         base.OnEnable();
+
+        Debug.Log(cInput);
+
+        cInput.OnUltimate += OnUltimate;
 
         OptionPerformedDelegate += Slide;
         OptionPerformCond += CanSlide;
@@ -20,7 +25,9 @@ public class RangerMovement : BaseCharacterMovement
     public override void OnDisable()
     {
         base.OnDisable();
-        
+
+        cInput.OnUltimate -= OnUltimate;
+
         OptionPerformedDelegate -= Slide;
         OptionPerformCond -= CanSlide;
 
@@ -55,5 +62,19 @@ public class RangerMovement : BaseCharacterMovement
     bool CanSlide()
     {
         return Mathf.Abs(HorizontalVelocity()) < 4;
+    }
+
+    void OnUltimate(object sender, EventArgs e)
+    {
+        if (!Recovered()) return;
+        StartCoroutine(UltimatePushBack());
+    }
+
+    IEnumerator UltimatePushBack()
+    {
+        yield return new WaitForSeconds(GetDuration(AnimationType.Ultimate) / 2);
+        Debug.Log("Pushback");
+        Vector2 dir = isFacingLeft ? Vector2.right : Vector2.left;
+        rb.AddForce(dir * 20f, ForceMode2D.Impulse);
     }
 }

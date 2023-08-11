@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BaseCharacter : MonoBehaviour
 {
-    [SerializeField] protected CharacterAnimationData animationData;
+    [SerializeField] protected CharacterAnimationSO animationData;
 
     protected readonly Dictionary<AnimationType, float> animationDuration = new();
     protected float recoveryTime;

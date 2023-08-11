@@ -5,66 +5,19 @@ using UnityEngine;
 
 public class RangerAttacks : BaseCharacterAttacks
 {
+    [Header("Ranger Prefabs")]
     [SerializeField] Beam ultimateBeamPrefab;
-    [SerializeField] Transform arrowSpawn;
-    [SerializeField] Transform jumpArrowSpawn;
-    [SerializeField] Transform beamSpawn;
+
+    [Header("Ranger Attack Values")]
     [SerializeField] float arrowForce;
     [SerializeField] float multiArrowForce;
     [SerializeField] float arrowLifespan;
+
+    [Header("Ranger Arrow Spawns")]
+    [SerializeField] Transform arrowSpawn;
+    [SerializeField] Transform jumpArrowSpawn;
+    [SerializeField] Transform beamSpawn;
     [SerializeField] List<Transform> multiArrowSpawns = new();
-
-    delegate void DelayShoot();
-    DelayShoot DelayShootDelegate;
-
-    public override void OnEnable()
-    {
-        base.OnEnable();
-        Attack1 += ArrowStab;
-        //Attack2 += ShootArrow;
-        //Attack3 += ShootMultiArrow;
-        //JumpAttack += ShootAirArrow;
-        Ultimate += OnUltimate;
-    }
-
-    public override void OnDisable()
-    {
-        base.OnDisable();
-        Attack1 -= ArrowStab;
-        //Attack2 -= ShootArrow;
-        //Attack3 -= ShootMultiArrow;
-        //JumpAttack -= ShootAirArrow;
-        Ultimate -= OnUltimate;
-    }
-
-    void ArrowStab()
-    {
-        SetRecoveryDuration(GetDuration(AnimationType.Attack1));
-    }
-
-    void ShootArrow()
-    {
-        SetRecoveryDuration(GetDuration(AnimationType.Attack2));
-        DelayShootDelegate = ShootNormal;
-        StartCoroutine(ShootAfterDelay(GetDuration(AnimationType.Attack2)/2));
-    }
-
-    void ShootMultiArrow()
-    {
-        SetRecoveryDuration(GetDuration(AnimationType.Attack3));
-        DelayShootDelegate = ShootAirMulti;
-        StartCoroutine(ShootAfterDelay(GetDuration(AnimationType.Attack3)/2));
-    }
-
-    void ShootAirArrow()
-    {
-        SetRecoveryDuration(GetDuration(AnimationType.JumpAttack));
-    }
-
-    void OnUltimate()
-    {
-        SetRecoveryDuration(GetDuration(AnimationType.Ultimate));
-    }
 
     public void ShootAirMulti()
     {
@@ -77,9 +30,18 @@ public class RangerAttacks : BaseCharacterAttacks
                 FlipSprite = IsFacingLeft,
                 FlightDirection = dir,
                 FlightSpeed = multiArrowForce,
-                Lifespan = arrowLifespan
+                Lifespan = arrowLifespan,
+                Damage = attackData[AnimationType.Attack2].Damage,
+                Owner = this,
+                VerticalKnockback = attackData[AnimationType.Attack2].verticalKnockback,
+                HorizontalKnockback = attackData[AnimationType.Attack2].horizontalKnockback
             });
         }
+    }
+
+    public void ArrowStab()
+    {
+
     }
 
     public void ShootNormal()
@@ -90,7 +52,11 @@ public class RangerAttacks : BaseCharacterAttacks
             FlipSprite = IsFacingLeft,
             FlightDirection = IsFacingLeft ? Vector3.left : Vector3.right,
             FlightSpeed = arrowForce,
-            Lifespan = arrowLifespan
+            Lifespan = arrowLifespan,
+            Damage = attackData[AnimationType.Attack2].Damage,
+            Owner = this,
+            VerticalKnockback = attackData[AnimationType.Attack2].verticalKnockback,
+            HorizontalKnockback = attackData[AnimationType.Attack2].horizontalKnockback
         });
     }
 
@@ -103,7 +69,11 @@ public class RangerAttacks : BaseCharacterAttacks
             FlipSprite = IsFacingLeft,
             FlightDirection = dir,
             FlightSpeed = arrowForce,
-            Lifespan = arrowLifespan
+            Lifespan = arrowLifespan,
+            Damage = attackData[AnimationType.Attack2].Damage,
+            Owner = this,
+            VerticalKnockback = attackData[AnimationType.Attack2].verticalKnockback,
+            HorizontalKnockback = attackData[AnimationType.Attack2].horizontalKnockback
         });
     }
 
@@ -115,11 +85,5 @@ public class RangerAttacks : BaseCharacterAttacks
             FlipSprite = IsFacingLeft,
             Lifespan = .333f
         });
-    }
-
-    IEnumerator ShootAfterDelay(float t)
-    {
-        yield return new WaitForSeconds(t);
-        DelayShootDelegate?.Invoke();
     }
 }

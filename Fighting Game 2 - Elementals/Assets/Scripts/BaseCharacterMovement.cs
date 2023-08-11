@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class BaseCharacterMovement : BaseCharacter
 {
-    [SerializeField] protected CharacterMovementData data;
+    [SerializeField] protected CharacterMovementSO data;
 
     [Header("Ground Check")]
     [SerializeField] protected LayerMask groundLayer;
@@ -51,6 +51,7 @@ public class BaseCharacterMovement : BaseCharacter
         cInput.OnOption += OnOptionPerformed;
         cInput.OnOptionCanceled += OnOptionCanceled;
         cInput.OnChangeFaceDirection += OnChangeFaceDirection;
+        cInput.OnHit += OnHit;
     }
 
     public virtual void OnDisable()
@@ -65,6 +66,7 @@ public class BaseCharacterMovement : BaseCharacter
         cInput.OnOption -= OnOptionPerformed;
         cInput.OnOptionCanceled -= OnOptionCanceled;
         cInput.OnChangeFaceDirection -= OnChangeFaceDirection;
+        cInput.OnHit -= OnHit;
     }
 
     void OnMovement(object sender, Vector2 args)
@@ -149,14 +151,19 @@ public class BaseCharacterMovement : BaseCharacter
         isFacingLeft = e;
     }
 
+    void OnHit(object sender, float e)
+    {
+        SetRecoveryDuration(GetDuration(AnimationType.Damaged));
+    }
+
     void Update()
     {
-        if (Recovered()) {
-            Debug.Log("Movement Recovered");
-        }
-        else {
-            Debug.Log("Movement Recovering");
-        }
+        //if (Recovered()) {
+        //    Debug.Log("Movement Recovered");
+        //}
+        //else {
+        //    Debug.Log("Movement Recovering");
+        //}
 
         movement = cInput.CurrentMovementInput();
 
@@ -203,7 +210,7 @@ public class BaseCharacterMovement : BaseCharacter
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (IsGrounded())
+        if (IsGrounded() && jumping)
         {
             jumping = false;
             jumps = data.JumpsAllowed;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "CharacterAnimation", menuName = "Character/AnimationData")]
-public class CharacterAnimationData : ScriptableObject
+public class CharacterAnimationSO : ScriptableObject
 {
     public List<CharacterAnimation> CharacterAnimations = new();
 

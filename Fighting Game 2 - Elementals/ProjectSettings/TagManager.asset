@@ -14,9 +14,9 @@ TagManager:
   - Ground
   - Character
   - Projectile
-  - 
-  - 
-  - 
+  - Hitbox
+  - Hurtbox
+  - Projectile Hurtbox
   - 
   - 
   - 
@@ -46,4 +46,7 @@ TagManager:
     locked: 0
   - name: Projectiles
     uniqueID: 1782442167
+    locked: 0
+  - name: UI
+    uniqueID: 2361013125
     locked: 0

@@ -22,6 +22,6 @@ public class RangerAnimator : BaseCharacterAnimator
 
     bool SlideCondition()
     {
-        return Mathf.Abs(cMovement.HorizontalVelocity()) < 4;
+        return Mathf.Abs(rb.velocity.x) < 4;
     }
 }

@@ -7,8 +7,9 @@ using UnityEngine;
 public class AttackData
 {
     public AnimationType AnimationType;
-    public float Damage;
     public DamageType DamageType;
-    public float horizontalKnockback;
-    public float verticalKnockback;
+    public float Damage;
+    public float HorizontalKnockback;
+    public float VerticalKnockback;
+    public float StunDuration;
 }

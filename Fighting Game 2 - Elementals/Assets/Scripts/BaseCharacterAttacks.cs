@@ -117,9 +117,9 @@ public class BaseCharacterAttacks : BaseCharacter
         rotater.localScale = IsFacingLeft ? new Vector3(-1,1,1) : new Vector3(1,1,1);
     }
 
-    void OnHit(object sender, float e)
+    void OnHit(object sender, DamageData e)
     {
-        SetRecoveryDuration(GetDuration(AnimationType.Ultimate));
+        SetRecoveryDuration(GetDuration(AnimationType.Damaged));
     }
 
     void SetHitboxData(AttackData data)

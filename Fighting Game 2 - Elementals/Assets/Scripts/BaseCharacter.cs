@@ -5,27 +5,33 @@ using UnityEngine;
 public class BaseCharacter : MonoBehaviour
 {
     [SerializeField] protected CharacterAnimationSO animationData;
+    [SerializeField] protected BaseCharacter enemy;
 
     protected readonly Dictionary<AnimationType, float> animationDuration = new();
-    protected float recoveryTime;
+    float recoveryTime;
 
     public virtual void Awake()
     {
         animationData.AddToDuration(animationDuration);
     }
 
-    public virtual float GetDuration(AnimationType t)
+    public float GetDuration(AnimationType t)
     {
         return animationDuration[t];
     }
 
-    public virtual void SetRecoveryDuration(float t)
+    public void SetRecoveryDuration(float t)
     {
         recoveryTime = Time.time + t;
     }
 
-    public virtual bool Recovered()
+    public bool Recovered()
     {
         return Time.time > recoveryTime;
+    }
+
+    public Vector2 EnemyDirection()
+    {
+        return (enemy.transform.position - transform.position).normalized;
     }
 }

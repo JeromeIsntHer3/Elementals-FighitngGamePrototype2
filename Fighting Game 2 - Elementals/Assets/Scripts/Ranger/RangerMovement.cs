@@ -9,8 +9,6 @@ public class RangerMovement : BaseCharacterMovement
     {
         base.OnEnable();
 
-        Debug.Log(cInput);
-
         cInput.OnUltimate += OnUltimate;
 
         OptionPerformedDelegate += Slide;
@@ -56,12 +54,12 @@ public class RangerMovement : BaseCharacterMovement
 
     bool StopSliding()
     {
-        return Mathf.Abs(HorizontalVelocity()) < 2;
+        return Mathf.Abs(rb.velocity.x) < 2;
     }
 
     bool CanSlide()
     {
-        return Mathf.Abs(HorizontalVelocity()) < 4;
+        return Mathf.Abs(rb.velocity.x) < 4;
     }
 
     void OnUltimate(object sender, EventArgs e)

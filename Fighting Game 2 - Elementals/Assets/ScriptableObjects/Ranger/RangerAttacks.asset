@@ -14,22 +14,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Attacks:
   - AnimationType: 18
-    Damage: 10
     DamageType: 0
-    horizontalKnockback: 5
-    verticalKnockback: 5
+    Damage: 5
+    HorizontalKnockback: 5
+    VerticalKnockback: 5
+    StunDuration: 0.2
   - AnimationType: 19
-    Damage: 2.5
     DamageType: 0
-    horizontalKnockback: 3
-    verticalKnockback: 3
+    Damage: 3
+    HorizontalKnockback: 5
+    VerticalKnockback: 5
+    StunDuration: 0.3
   - AnimationType: 20
-    Damage: 0
     DamageType: 0
-    horizontalKnockback: 0
-    verticalKnockback: 0
+    Damage: 0
+    HorizontalKnockback: 0
+    VerticalKnockback: 0
+    StunDuration: 0
   - AnimationType: 17
-    Damage: 0
     DamageType: 0
-    horizontalKnockback: 0
-    verticalKnockback: 0
+    Damage: 0
+    HorizontalKnockback: 0
+    VerticalKnockback: 0
+    StunDuration: 0

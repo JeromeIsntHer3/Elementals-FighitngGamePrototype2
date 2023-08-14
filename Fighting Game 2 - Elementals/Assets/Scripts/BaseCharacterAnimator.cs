@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -26,13 +27,17 @@ public class BaseCharacterAnimator : BaseCharacter
         optionCancelTrigger,
         optionCancelCheck,
         hit,
-        death;
+        death,
+        defendTrigger,
+        defend,
+        defendCancel;
 
     int currentState;
     int previousState;
     float lockedTilTime;
-    bool moving;
+    float defendLockTime;
 
+    protected Rigidbody2D rb;
     Vector2 movement;
 
     public delegate bool OptionCondition();
@@ -45,6 +50,7 @@ public class BaseCharacterAnimator : BaseCharacter
         cInput = GetComponent<CharacterInput>();
         cMovement = GetComponent<BaseCharacterMovement>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        rb = GetComponent<Rigidbody2D>();
 
         animationData.AddToDicts(new AnimationTransferData()
         {
@@ -68,6 +74,7 @@ public class BaseCharacterAnimator : BaseCharacter
         cInput.OnOption += OnOption;
         cInput.OnOptionCanceled += OnOptionCanceled;
         cInput.OnHit += OnHit;
+        cInput.OnDefend += OnDefend;
     }
 
     public virtual void OnDisable()
@@ -85,6 +92,7 @@ public class BaseCharacterAnimator : BaseCharacter
         cInput.OnOption -= OnOption;
         cInput.OnOptionCanceled -= OnOptionCanceled;
         cInput.OnHit -= OnHit;
+        cInput.OnDefend -= OnDefend;
     }
 
     void OnMovement(object sender, Vector2 args)
@@ -94,12 +102,14 @@ public class BaseCharacterAnimator : BaseCharacter
 
     void OnMovementPerformed(object sender, Vector2 args)
     {
-        moving = true;
+        //moving = true;
     }
 
     void OnMovementCanceled(object sender, Vector2 args)
     {
-        moving = false;
+        //moving = false;
+        //if (!grounded) return;
+        ChangeFaceDirection(EnemyDirection());
     }
 
     void OnAttack1(object sender, EventArgs args)
@@ -184,23 +194,33 @@ public class BaseCharacterAnimator : BaseCharacter
         landed = true;
     }
 
-    void OnHit(object sender, float args)
+    void OnHit(object sender, DamageData args)
     {
         CancelAnimation();
         hit = true;
         SetRecoveryDuration(GetDuration(AnimationType.Damaged));
     }
 
+    void OnDefend(object sender, DamageData data)
+    {
+        if (defend) return;
+        defendTrigger = true;
+        defend = true;
+        defendLockTime = Time.time + GetDuration(AnimationType.DefendStart) + 
+            GetDuration(AnimationType.DefendLoop) + data.StunDuration;
+    }
+
     void Update()
     {
-        //if (Recovered()) {
-        //    Debug.Log("Animator Recovered");
-        //}
-        //else {
-        //    Debug.Log("Animator Recovering");
-        //}
-
-        if(option) recoveryTime = Time.time + GetDuration(AnimationType.CharacterOptionEnd);
+        if (defend)
+        {
+            if (Time.time > defendLockTime)
+            {
+                defend = false;
+                defendCancel = true;
+            }
+        }
+        if (option) SetRecoveryDuration(GetDuration(AnimationType.CharacterOptionEnd));
 
         ChangeFaceDirection(cInput.CurrentMovementInput());
 
@@ -227,6 +247,8 @@ public class BaseCharacterAnimator : BaseCharacter
         optionTrigger = false;
         optionCancelTrigger = false;
         hit = false;
+        defendTrigger = false;
+        defendCancel = false;
     }
 
     int GetAnimState()
@@ -235,7 +257,17 @@ public class BaseCharacterAnimator : BaseCharacter
 
         if (death) return GetHash(AnimationType.Death);
         if (hit) return LockState(GetHash(AnimationType.Damaged), GetDuration(AnimationType.Damaged));
-        if(optionTrigger) return LockState(GetHash(AnimationType.CharacterOptionStart), GetDuration(AnimationType.CharacterOptionStart));
+        if (defendTrigger) return LockState(GetHash(AnimationType.DefendStart), GetDuration(AnimationType.DefendStart));
+        if (defend)
+        {
+            
+            return GetHash(AnimationType.DefendLoop);
+        }
+        if (defendCancel)
+        {
+            return LockState(GetHash(AnimationType.DefendEnd), GetDuration(AnimationType.DefendEnd));
+        }
+        if (optionTrigger) return LockState(GetHash(AnimationType.CharacterOptionStart), GetDuration(AnimationType.CharacterOptionStart));
         if (option)
         {
             if (optionCancelCheck)
@@ -259,9 +291,9 @@ public class BaseCharacterAnimator : BaseCharacter
 
         //Non-Grounded Animations
         if(airAttack) return LockState(GetHash(AnimationType.JumpAttack), GetDuration(AnimationType.JumpAttack));
-        if (cMovement.VerticalVelocity() > 3) return GetHash(AnimationType.JumpRising);
-        if (cMovement.VerticalVelocity() > 1) return LockState(GetHash(AnimationType.JumpPeak), GetDuration(AnimationType.JumpPeak));
-        return cMovement.VerticalVelocity() < -1 ?
+        if (rb.velocity.y > 3) return GetHash(AnimationType.JumpRising);
+        if (rb.velocity.y > 1) return LockState(GetHash(AnimationType.JumpPeak), GetDuration(AnimationType.JumpPeak));
+        return rb.velocity.y < -1 ?
             GetHash(AnimationType.JumpFalling)
             : LockState(GetHash(AnimationType.JumpRising), GetDuration(AnimationType.JumpRising));
 
@@ -289,9 +321,10 @@ public class BaseCharacterAnimator : BaseCharacter
 
     void ChangeFaceDirection(Vector2 v)
     {
-        if (!moving || !grounded) return;
+        if (cInput.CurrentMovementInput() == Vector2.zero) return;
+        if (/*!moving || */!grounded) return;
         if (currentState != 0) { if (!CanChangeDirection(currentState)) return; }
-        spriteRenderer.flipX = v.x < 0;
+        spriteRenderer.flipX = v.x <= 0;
         cInput.OnChangeFaceDirection?.Invoke(this, spriteRenderer.flipX);
     }
 

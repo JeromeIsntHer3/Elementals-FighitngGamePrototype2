@@ -6,6 +6,12 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] int FrameRate;
 
+    #region GlobalGameValues
+
+    public static float HealthAnimationDuration;
+
+    #endregion
+
     void Awake()
     {
         Application.targetFrameRate = FrameRate;

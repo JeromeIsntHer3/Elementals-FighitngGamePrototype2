@@ -25,16 +25,17 @@ public class RangerAttacks : BaseCharacterAttacks
         {
             Vector2 dir = spawn.position - centre.position;
             var arrow = Instantiate(prefab, spawn.position, Quaternion.identity);
-            arrow.GetComponent<Arrow>().Spawn(new Arrow.ArrowData
+            arrow.GetComponent<Arrow>().SpawnArrow(new Arrow.ArrowData
             {
                 FlipSprite = IsFacingLeft,
                 FlightDirection = dir,
                 FlightSpeed = multiArrowForce,
-                Lifespan = arrowLifespan,
+                DeathTime = Time.time + arrowLifespan,
                 Damage = attackData[AnimationType.Attack2].Damage,
-                Owner = this,
-                VerticalKnockback = attackData[AnimationType.Attack2].verticalKnockback,
-                HorizontalKnockback = attackData[AnimationType.Attack2].horizontalKnockback
+                Source = this,
+                VerticalKnockback = attackData[AnimationType.Attack2].VerticalKnockback,
+                HorizontalKnockback = attackData[AnimationType.Attack2].HorizontalKnockback,
+                StunDuration = attackData[AnimationType.Attack2].StunDuration,
             });
         }
     }
@@ -47,16 +48,17 @@ public class RangerAttacks : BaseCharacterAttacks
     public void ShootNormal()
     {
         var arrow = Instantiate(prefab, arrowSpawn.position, Quaternion.identity);
-        arrow.GetComponent<Arrow>().Spawn(new Arrow.ArrowData
+        arrow.GetComponent<Arrow>().SpawnArrow(new Arrow.ArrowData
         {
             FlipSprite = IsFacingLeft,
             FlightDirection = IsFacingLeft ? Vector3.left : Vector3.right,
             FlightSpeed = arrowForce,
-            Lifespan = arrowLifespan,
+            DeathTime = Time.time + arrowLifespan,
             Damage = attackData[AnimationType.Attack2].Damage,
-            Owner = this,
-            VerticalKnockback = attackData[AnimationType.Attack2].verticalKnockback,
-            HorizontalKnockback = attackData[AnimationType.Attack2].horizontalKnockback
+            Source = this,
+            VerticalKnockback = attackData[AnimationType.Attack2].VerticalKnockback,
+            HorizontalKnockback = attackData[AnimationType.Attack2].HorizontalKnockback,
+            StunDuration = attackData[AnimationType.Attack2].StunDuration,
         });
     }
 
@@ -64,16 +66,17 @@ public class RangerAttacks : BaseCharacterAttacks
     {
         var arrow = Instantiate(prefab, jumpArrowSpawn.position, Quaternion.identity);
         Vector2 dir = jumpArrowSpawn.position - centre.position;
-        arrow.GetComponent<Arrow>().Spawn(new Arrow.ArrowData
+        arrow.GetComponent<Arrow>().SpawnArrow(new Arrow.ArrowData
         {
             FlipSprite = IsFacingLeft,
             FlightDirection = dir,
             FlightSpeed = arrowForce,
-            Lifespan = arrowLifespan,
+            DeathTime = Time.time + arrowLifespan,
             Damage = attackData[AnimationType.Attack2].Damage,
-            Owner = this,
-            VerticalKnockback = attackData[AnimationType.Attack2].verticalKnockback,
-            HorizontalKnockback = attackData[AnimationType.Attack2].horizontalKnockback
+            Source = this,
+            VerticalKnockback = attackData[AnimationType.Attack2].VerticalKnockback,
+            HorizontalKnockback = attackData[AnimationType.Attack2].HorizontalKnockback,
+            StunDuration = attackData[AnimationType.Attack2].StunDuration,
         });
     }
 

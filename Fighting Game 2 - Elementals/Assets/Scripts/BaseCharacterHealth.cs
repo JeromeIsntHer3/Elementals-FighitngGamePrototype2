@@ -8,39 +8,34 @@ public class BaseCharacterHealth : BaseCharacter
     [SerializeField] protected float maxHealth;
     [SerializeField] protected float currentHealth;
 
-    CharacterInput cInpit;
-    Rigidbody2D rb;
+    CharacterInput cInput;
+
+    public EventHandler<float> OnDamaged;
 
     public override void Awake()
     {
-        cInpit = GetComponent<CharacterInput>();
+        cInput = GetComponent<CharacterInput>();
         currentHealth = maxHealth;
-        rb = GetComponent<Rigidbody2D>();
     }
 
     public virtual void OnEnable()
     {
-        cInpit.OnHit += OnHit;
+        cInput.OnHit += OnHit;
     }
 
     public virtual void OnDisable()
     {
-        cInpit.OnHit -= OnHit;
+        cInput.OnHit -= OnHit;
     }
 
-    void OnHit(object sender, float e)
+    void OnHit(object sender, DamageData e)
     {
-        currentHealth -= e;
-    }
-
-    void Knockback(float h, float v, Vector2 dir)
-    {
-        rb.AddForce(dir.normalized * new Vector2(h,v), ForceMode2D.Impulse);
+        currentHealth -= e.Damage;
     }
 
     public void Damage(DamageData data)
     {
-        Knockback(data.HorizontalKnockback, data.VerticalKnockback, data.Direction);
-        cInpit.OnHit?.Invoke(this, data.Damage);
+        cInput.OnHit?.Invoke(this, data);
+        OnDamaged?.Invoke(this, currentHealth / maxHealth);
     }
 }

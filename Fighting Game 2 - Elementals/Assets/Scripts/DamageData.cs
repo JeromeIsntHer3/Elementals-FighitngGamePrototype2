@@ -6,11 +6,13 @@ using UnityEngine;
 [Serializable]
 public class DamageData
 {
-    public float Damage;
     public DamageType Type;
+    public float Damage;
     public float VerticalKnockback;
     public float HorizontalKnockback;
     public Vector2 Direction;
+    public float StunDuration;
+    public BaseCharacter Source;
 }
 
 public enum DamageType

@@ -52,6 +52,7 @@ public class BaseCharacterMovement : BaseCharacter
         cInput.OnOptionCanceled += OnOptionCanceled;
         cInput.OnChangeFaceDirection += OnChangeFaceDirection;
         cInput.OnHit += OnHit;
+        cInput.OnDefend += OnDefend;
     }
 
     public virtual void OnDisable()
@@ -67,6 +68,7 @@ public class BaseCharacterMovement : BaseCharacter
         cInput.OnOptionCanceled -= OnOptionCanceled;
         cInput.OnChangeFaceDirection -= OnChangeFaceDirection;
         cInput.OnHit -= OnHit;
+        cInput.OnDefend -= OnDefend;
     }
 
     void OnMovement(object sender, Vector2 args)
@@ -151,22 +153,20 @@ public class BaseCharacterMovement : BaseCharacter
         isFacingLeft = e;
     }
 
-    void OnHit(object sender, float e)
+    void OnHit(object sender, DamageData e)
     {
         SetRecoveryDuration(GetDuration(AnimationType.Damaged));
+        Knockback(e.Direction, e.HorizontalKnockback, e.VerticalKnockback);
+    }
+
+    void OnDefend(object sender, DamageData e)
+    {
+        Knockback(e.Direction, e.HorizontalKnockback, e.VerticalKnockback);
     }
 
     void Update()
     {
-        //if (Recovered()) {
-        //    Debug.Log("Movement Recovered");
-        //}
-        //else {
-        //    Debug.Log("Movement Recovering");
-        //}
-
         movement = cInput.CurrentMovementInput();
-
         if (option) OptionUpdate?.Invoke();
     }
 
@@ -191,8 +191,6 @@ public class BaseCharacterMovement : BaseCharacter
     {
         rb.velocity = new Vector2(rb.velocity.x, 0);
         rb.AddForce(Vector2.up * data.JumpForce, ForceMode2D.Impulse);
-        //if (movement.x == 0) return;
-        //Vector2 dir = movement.x < 0 ? Vector2.left : Vector2.right;
         rb.AddForce(movement * data.JumpForce/2, ForceMode2D.Impulse);
     }
 
@@ -201,6 +199,12 @@ public class BaseCharacterMovement : BaseCharacter
         Vector2 dir = isFacingLeft ? Vector2.left : Vector2.right;
         rb.velocity = new Vector2(0, rb.velocity.y);
         rb.AddForce(dir * data.DashForce, ForceMode2D.Impulse);
+    }
+
+    void Knockback(Vector2 direction, float hForce, float vForce)
+    {
+        Debug.Log(direction);
+        rb.AddForce(direction.normalized * new Vector2(hForce, vForce), ForceMode2D.Impulse);
     }
 
     public bool IsGrounded()
@@ -216,16 +220,6 @@ public class BaseCharacterMovement : BaseCharacter
             jumps = data.JumpsAllowed;
             cInput.OnLand?.Invoke(this, EventArgs.Empty);
         }
-    }
-
-    public float HorizontalVelocity()
-    {
-        return rb.velocity.x;
-    }
-
-    public float VerticalVelocity()
-    {
-        return rb.velocity.y;
     }
 
     void OnDrawGizmos()

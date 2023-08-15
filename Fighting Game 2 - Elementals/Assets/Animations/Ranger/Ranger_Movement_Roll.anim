@@ -249,15 +249,6 @@ AnimationClip:
         weightedMode: 0
         inWeight: 0
         outWeight: 0
-      - serializedVersion: 3
-        time: 0.53333336
-        value: 1
-        inSlope: Infinity
-        outSlope: Infinity
-        tangentMode: 103
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
@@ -286,7 +277,7 @@ AnimationClip:
     - time: 0.46666667
       value: {fileID: 21300000, guid: 96b39c602bce3c340a2f6114e1093a7f, type: 3}
     attribute: m_Sprite
-    path: 
+    path: Avatar
     classID: 212
     script: {fileID: 0}
     flags: 2
@@ -334,7 +325,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 0
+      path: 299595545
       attribute: 0
       script: {fileID: 0}
       typeID: 212
@@ -396,15 +387,6 @@ AnimationClip:
         outWeight: 0
       - serializedVersion: 3
         time: 0.26666668
-        value: 1
-        inSlope: Infinity
-        outSlope: Infinity
-        tangentMode: 103
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 0.53333336
         value: 1
         inSlope: Infinity
         outSlope: Infinity

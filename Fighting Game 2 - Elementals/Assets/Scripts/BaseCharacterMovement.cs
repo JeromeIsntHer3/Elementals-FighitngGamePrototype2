@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 
 public class BaseCharacterMovement : BaseCharacter
 {
@@ -52,7 +53,7 @@ public class BaseCharacterMovement : BaseCharacter
         cInput.OnOptionCanceled += OnOptionCanceled;
         cInput.OnChangeFaceDirection += OnChangeFaceDirection;
         cInput.OnHit += OnHit;
-        cInput.OnDefend += OnDefend;
+        cInput.OnBlockAttack += OnBlockAttack;
     }
 
     public virtual void OnDisable()
@@ -68,7 +69,7 @@ public class BaseCharacterMovement : BaseCharacter
         cInput.OnOptionCanceled -= OnOptionCanceled;
         cInput.OnChangeFaceDirection -= OnChangeFaceDirection;
         cInput.OnHit -= OnHit;
-        cInput.OnDefend -= OnDefend;
+        cInput.OnBlockAttack -= OnBlockAttack;
     }
 
     void OnMovement(object sender, Vector2 args)
@@ -159,8 +160,9 @@ public class BaseCharacterMovement : BaseCharacter
         Knockback(e.Direction, e.HorizontalKnockback, e.VerticalKnockback);
     }
 
-    void OnDefend(object sender, DamageData e)
+    void OnBlockAttack(object sender, DamageData e)
     {
+        SetRecoveryDuration(e.StunDuration + GetDuration(AnimationType.DefendEnd));
         Knockback(e.Direction, e.HorizontalKnockback, e.VerticalKnockback);
     }
 
@@ -203,7 +205,6 @@ public class BaseCharacterMovement : BaseCharacter
 
     void Knockback(Vector2 direction, float hForce, float vForce)
     {
-        Debug.Log(direction);
         rb.AddForce(direction.normalized * new Vector2(hForce, vForce), ForceMode2D.Impulse);
     }
 

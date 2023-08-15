@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -49,7 +50,7 @@ public class BaseCharacterAnimator : BaseCharacter
         animator = GetComponent<Animator>();
         cInput = GetComponent<CharacterInput>();
         cMovement = GetComponent<BaseCharacterMovement>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
 
         animationData.AddToDicts(new AnimationTransferData()
@@ -75,6 +76,7 @@ public class BaseCharacterAnimator : BaseCharacter
         cInput.OnOptionCanceled += OnOptionCanceled;
         cInput.OnHit += OnHit;
         cInput.OnDefend += OnDefend;
+        cInput.OnBlockAttack += OnBlockAttack;
     }
 
     public virtual void OnDisable()
@@ -93,6 +95,7 @@ public class BaseCharacterAnimator : BaseCharacter
         cInput.OnOptionCanceled -= OnOptionCanceled;
         cInput.OnHit -= OnHit;
         cInput.OnDefend -= OnDefend;
+        cInput.OnBlockAttack -= OnBlockAttack;
     }
 
     void OnMovement(object sender, Vector2 args)
@@ -103,13 +106,14 @@ public class BaseCharacterAnimator : BaseCharacter
     void OnMovementPerformed(object sender, Vector2 args)
     {
         //moving = true;
+        //ChangeFaceDirection(args);
     }
 
     void OnMovementCanceled(object sender, Vector2 args)
     {
         //moving = false;
         //if (!grounded) return;
-        ChangeFaceDirection(EnemyDirection());
+        //ChangeFaceDirection(EnemyDirection());
     }
 
     void OnAttack1(object sender, EventArgs args)
@@ -199,15 +203,33 @@ public class BaseCharacterAnimator : BaseCharacter
         CancelAnimation();
         hit = true;
         SetRecoveryDuration(GetDuration(AnimationType.Damaged));
+        spriteRenderer.transform.DOShakePosition(GetDuration(AnimationType.Damaged), new Vector3(GameManager.Instance.strength,
+            GameManager.Instance.strength, 0),
+            GameManager.Instance.vibrato, default, false, true, ShakeRandomnessMode.Harmonic);
     }
 
-    void OnDefend(object sender, DamageData data)
+    void OnDefend(object sender, EventArgs e)
     {
         if (defend) return;
+
+        Debug.Log("Animator: OnDefend");
+
         defendTrigger = true;
         defend = true;
-        defendLockTime = Time.time + GetDuration(AnimationType.DefendStart) + 
-            GetDuration(AnimationType.DefendLoop) + data.StunDuration;
+        defendLockTime = Time.time + GetDuration(AnimationType.DefendStart) + GetDuration(AnimationType.DefendLoop) + .1f;
+    }
+
+    void OnBlockAttack(object sender, DamageData data)
+    {
+        Debug.Log("Animator: OnBlockAttack Stun Duration: " + data.StunDuration);
+
+        float totalKbDuration = GetDuration(AnimationType.DefendStart) + GetDuration(AnimationType.DefendLoop)
+            + data.StunDuration;
+
+        defendLockTime = Time.time + totalKbDuration;
+        spriteRenderer.transform.DOShakePosition(totalKbDuration, new Vector3(GameManager.Instance.strength,
+            GameManager.Instance.strength, 0),
+            GameManager.Instance.vibrato, default, false, true, ShakeRandomnessMode.Harmonic);
     }
 
     void Update()
@@ -222,7 +244,15 @@ public class BaseCharacterAnimator : BaseCharacter
         }
         if (option) SetRecoveryDuration(GetDuration(AnimationType.CharacterOptionEnd));
 
-        ChangeFaceDirection(cInput.CurrentMovementInput());
+        if(cInput.CurrentMovementInput().x == 0)
+        {
+            Vector2 enemyDir = (enemy.transform.position - transform.position).normalized;
+            ChangeFaceDirection(new Vector2(enemyDir.x, 0));
+        }
+        else
+        {
+            ChangeFaceDirection(cInput.CurrentMovementInput());
+        }
 
         var newState = GetAnimState();
 
@@ -258,15 +288,8 @@ public class BaseCharacterAnimator : BaseCharacter
         if (death) return GetHash(AnimationType.Death);
         if (hit) return LockState(GetHash(AnimationType.Damaged), GetDuration(AnimationType.Damaged));
         if (defendTrigger) return LockState(GetHash(AnimationType.DefendStart), GetDuration(AnimationType.DefendStart));
-        if (defend)
-        {
-            
-            return GetHash(AnimationType.DefendLoop);
-        }
-        if (defendCancel)
-        {
-            return LockState(GetHash(AnimationType.DefendEnd), GetDuration(AnimationType.DefendEnd));
-        }
+        if (defendCancel) return LockState(GetHash(AnimationType.DefendEnd), GetDuration(AnimationType.DefendEnd));
+        if (defend) return GetHash(AnimationType.DefendLoop);
         if (optionTrigger) return LockState(GetHash(AnimationType.CharacterOptionStart), GetDuration(AnimationType.CharacterOptionStart));
         if (option)
         {
@@ -321,8 +344,7 @@ public class BaseCharacterAnimator : BaseCharacter
 
     void ChangeFaceDirection(Vector2 v)
     {
-        if (cInput.CurrentMovementInput() == Vector2.zero) return;
-        if (/*!moving || */!grounded) return;
+        if (v == Vector2.zero || !grounded) return;
         if (currentState != 0) { if (!CanChangeDirection(currentState)) return; }
         spriteRenderer.flipX = v.x <= 0;
         cInput.OnChangeFaceDirection?.Invoke(this, spriteRenderer.flipX);

@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class BaseCharacter : MonoBehaviour
 {
+    [SerializeField] int player;
     [SerializeField] protected CharacterAnimationSO animationData;
-    [SerializeField] protected BaseCharacter enemy;
+    protected BaseCharacter enemy;
 
     protected readonly Dictionary<AnimationType, float> animationDuration = new();
     float recoveryTime;
@@ -13,6 +14,18 @@ public class BaseCharacter : MonoBehaviour
     public virtual void Awake()
     {
         animationData.AddToDuration(animationDuration);
+    }
+
+    public void Start()
+    {
+        if (player == 1)
+        {
+            enemy = GameManager.Instance.PlayerTwo;
+        }
+        else if (player == 2)
+        {
+            enemy = GameManager.Instance.PlayerOne;
+        }
     }
 
     public float GetDuration(AnimationType t)

@@ -18,19 +18,19 @@ MonoBehaviour:
     Damage: 5
     HorizontalKnockback: 5
     VerticalKnockback: 5
-    StunDuration: 0.2
+    StunDuration: 0.4
   - AnimationType: 19
     DamageType: 0
     Damage: 3
     HorizontalKnockback: 5
     VerticalKnockback: 5
-    StunDuration: 0.3
+    StunDuration: 0.1
   - AnimationType: 20
     DamageType: 0
-    Damage: 0
-    HorizontalKnockback: 0
-    VerticalKnockback: 0
-    StunDuration: 0
+    Damage: 3
+    HorizontalKnockback: 5
+    VerticalKnockback: 5
+    StunDuration: 0.1
   - AnimationType: 17
     DamageType: 0
     Damage: 0

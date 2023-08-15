@@ -20,8 +20,9 @@ public class CharacterInput : MonoBehaviour
     public EventHandler OnOptionCanceled;
     public EventHandler OnJump;
     public EventHandler OnLand;
-    public EventHandler<DamageData> OnDefend ;
+    public EventHandler OnDefend;
     public EventHandler<DamageData> OnHit;
+    public EventHandler<DamageData> OnBlockAttack;
     public EventHandler<bool> OnChangeFaceDirection;
 
     void Awake()

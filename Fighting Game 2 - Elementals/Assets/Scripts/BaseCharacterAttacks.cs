@@ -129,4 +129,11 @@ public class BaseCharacterAttacks : BaseCharacter
             box.GetComponent<Hitbox>().SetAttackData(data);
         }
     }
+
+    public void AttackImminent()
+    {
+        if (GameManager.Instance.DistBetweenPlayers() > GameManager.Instance.DistanceThreshold) return;
+
+        enemy.GetComponent<CharacterInput>().OnDefend?.Invoke(this, EventArgs.Empty);
+    }
 }

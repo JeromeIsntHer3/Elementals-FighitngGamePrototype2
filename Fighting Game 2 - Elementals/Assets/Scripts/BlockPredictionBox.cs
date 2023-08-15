@@ -11,7 +11,7 @@ public class BlockPredictionBox : GameBox
             if (hitbox.Data().Source.gameObject == owner.gameObject) return;
             Vector2 dir = owner.transform.position - hitbox.Data().Source.transform.position;
             hitbox.Data().Direction = dir;
-            owner.GetComponent<CharacterInput>().OnDefend?.Invoke(this, hitbox.Data());
+            owner.GetComponent<CharacterInput>().OnDefend?.Invoke(this, System.EventArgs.Empty);
         }
     }
 }

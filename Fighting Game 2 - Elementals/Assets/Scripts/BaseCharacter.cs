@@ -14,10 +14,12 @@ public class BaseCharacter : MonoBehaviour
     bool isGrounded = true;
     bool isGuarding = false;
     bool isFacingLeft;
+    bool isAttacking = false;
 
     public bool IsGrounded { get { return isGrounded; } }
     public bool IsGuarding { get {  return isGuarding ; } }
     public bool IsFacingLeft { get { return isFacingLeft; } }
+    public bool IsAttacking { get { return isAttacking ; } }
 
     #region Events
 
@@ -28,7 +30,10 @@ public class BaseCharacter : MonoBehaviour
     public EventHandler OnAttack2;
     public EventHandler OnAttack3;
     public EventHandler OnUltimate;
+    public EventHandler OnTryEnhance;
     public EventHandler OnEnhanceAttack;
+    public EventHandler OnTryCancel;
+    public EventHandler OnCancelAnimation;
     public EventHandler OnRoll;
     public EventHandler OnOption;
     public EventHandler OnOptionCanceled;
@@ -36,6 +41,7 @@ public class BaseCharacter : MonoBehaviour
     public EventHandler OnLand;
     public EventHandler OnBlock;
     public EventHandler OnBlockCanceled;
+    public EventHandler OnBlockActive;
     public EventHandler<DamageData> OnHit;
     public EventHandler<DamageData> OnBlockHit;
     public EventHandler<bool> OnChangeFaceDirection;
@@ -48,7 +54,7 @@ public class BaseCharacter : MonoBehaviour
     void Awake()
     {
         animationData.AddToDuration(animationDuration);
-        OnBlock += (object sender, EventArgs e) =>
+        OnBlockActive += (object sender, EventArgs e) =>
         {
             isGuarding = true;
         };
@@ -74,7 +80,7 @@ public class BaseCharacter : MonoBehaviour
         }
     }
 
-    public float GetDuration(AnimationType t)
+    public float GetAnimationDuration(AnimationType t)
     {
         return animationDuration[t];
     }

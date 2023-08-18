@@ -43,9 +43,4 @@ public class GameManager : MonoBehaviour
         ProjectileActiveDuration = projectileDuration;
         Application.targetFrameRate = FrameRate;
     }
-
-    public float DistBetweenPlayers()
-    {
-        return Vector2.Distance(playerOne.transform.position, playerTwo.transform.position);
-    }
 }

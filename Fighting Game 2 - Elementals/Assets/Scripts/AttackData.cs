@@ -11,5 +11,6 @@ public class AttackData
     public float Damage;
     public float HorizontalKnockback;
     public float VerticalKnockback;
-    public float StunDuration;
+    public float StunDuration = .2f;
+    public int MeterUsage = 50;
 }

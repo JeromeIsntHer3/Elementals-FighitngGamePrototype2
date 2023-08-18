@@ -72,7 +72,7 @@ public class RangerMovement : BaseCharacterMovement
     void OnUltimate(object sender, EventArgs e)
     {
         if (!character.Recovered()) return;
-        Invoke(nameof(UltimatePushBack), character.GetDuration(AnimationType.Ultimate) / 2);
+        Invoke(nameof(UltimatePushBack), character.GetAnimationDuration(AnimationType.Ultimate) / 2);
     }
 
     void UltimatePushBack()

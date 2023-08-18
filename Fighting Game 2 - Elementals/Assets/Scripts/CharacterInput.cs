@@ -43,32 +43,32 @@ public class CharacterInput : MonoBehaviour
         {
             if (!character.Recovered()) return;
             character.OnAttack1?.Invoke(this, EventArgs.Empty);
-            character.SetRecoveryDuration(character.GetDuration(AnimationType.Attack1));
+            character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack1));
         };
         controls.Player.Attack2.performed += (Ctx obj) =>
         {
             if (!character.Recovered()) return;
             character.OnAttack2?.Invoke(this, EventArgs.Empty);
-            character.SetRecoveryDuration(character.GetDuration(AnimationType.Attack2));
+            character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack2));
         };
         controls.Player.Attack3.performed += (Ctx obj) =>
         {
             if (!character.Recovered()) return;
             character.OnAttack3?.Invoke(this, EventArgs.Empty);
-            character.SetRecoveryDuration(character.GetDuration(AnimationType.Attack3));
+            character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack3));
         };
         controls.Player.Ultimate.performed += (Ctx obj) =>
         {
             if (!character.Recovered()) return;
             character.OnUltimate?.Invoke(this, EventArgs.Empty);
-            character.SetRecoveryDuration(character.GetDuration(AnimationType.Ultimate));
+            character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Ultimate));
         };
 
         controls.Player.Roll.performed += (Ctx obj) =>
         {
             if (!character.Recovered()) return;
             character.OnRoll?.Invoke(this, EventArgs.Empty);
-            character.SetRecoveryDuration(character.GetDuration(AnimationType.Roll));
+            character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Roll));
         };
 
         controls.Player.Jump.performed += (Ctx obj) =>
@@ -82,19 +82,28 @@ public class CharacterInput : MonoBehaviour
             if (!character.Recovered()) return;
             character.OnOption?.Invoke(this, EventArgs.Empty);
         };
+
         controls.Player.Option.canceled += (Ctx obj) =>
         {
             character.OnOptionCanceled?.Invoke(this, EventArgs.Empty);
         };
+
         controls.Player.Enhance.performed += (Ctx obj) =>
         {
-            character.OnEnhanceAttack?.Invoke(this, EventArgs.Empty);
+            character.OnTryEnhance?.Invoke(this, EventArgs.Empty);
         };
+        controls.Player.Cancel.performed += (Ctx obj) =>
+        {
+            character.OnTryCancel?.Invoke(this, EventArgs.Empty);
+        };
+
         controls.Player.Block.performed += (Ctx obj) =>
         {
-            if (!character.Recovered() || !character.IsGrounded) return;
+            if (!character.IsGrounded) return;
             character.OnBlock?.Invoke(this, EventArgs.Empty);
         };
+
+
         controls.Player.Block.canceled += (Ctx obj) =>
         {
             character.OnBlockCanceled?.Invoke(this, EventArgs.Empty);
@@ -126,21 +135,21 @@ public class CharacterInput : MonoBehaviour
     {
         if (!character.Recovered()) return;
         character.OnAttack1?.Invoke(this, EventArgs.Empty);
-        character.SetRecoveryDuration(character.GetDuration(AnimationType.Attack1));
+        character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack1));
     }
 
     public void TriggerAttack2()
     {
         if (!character.Recovered()) return;
         character.OnAttack2?.Invoke(this, EventArgs.Empty);
-        character.SetRecoveryDuration(character.GetDuration(AnimationType.Attack2));
+        character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack2));
     }
 
     public void TriggerAttack3()
     {
         if (!character.Recovered()) return;
         character.OnAttack3?.Invoke(this, EventArgs.Empty);
-        character.SetRecoveryDuration(character.GetDuration(AnimationType.Attack3));
+        character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack3));
     }
 }
 

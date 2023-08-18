@@ -17,7 +17,7 @@ public class BaseCharacterAttacks : MonoBehaviour
     [Header("Meter")]
     [SerializeField] int maxMeterValue;
     [SerializeField] int currentMeterValue;
-    [SerializeField] int numberOfMeter;
+    [SerializeField] int meterCount;
 
     protected readonly Dictionary<AttackType, AttackData> attackData = new();
 
@@ -31,41 +31,39 @@ public class BaseCharacterAttacks : MonoBehaviour
     protected Attack Attack3;
     protected Attack JumpAttack;
     protected Attack Ultimate;
-    protected Attack Enhance1;
-    protected Attack Enhance2;
-    protected Attack Enhance3;
-    protected Attack EnhanceJump;
-
-    public EventHandler<OnMeterUsedArgs> OnMeterUsed;
-    public class OnMeterUsedArgs: EventArgs
-    {
-        public int MeterCount;
-        public float MeterValue;
-
-        public OnMeterUsedArgs(int i, float f)
-        {
-            MeterCount = i;
-            MeterValue = f;
-        }
-    }
 
     bool inAir;
+    protected bool enhance;
     float recentAttackTime;
-    float attackTime;
-    AttackData currentAttack;
-    Attacks currentAttackType;
+    float meterUsedTime;
+    float attackingTilTime;
+    AttackType currentAttackType;
+    AnimationType currentAnimationType;
 
-    public enum Attacks
+    public class OnMeterUsedArgs : EventArgs
     {
-        One, Two, Three, Jump
+        public float amount;
+        public int count;
+
+        public OnMeterUsedArgs(float amount, int count)
+        {
+            this.amount = amount;
+            this.count = count;
+        }
     }
+    public EventHandler<OnMeterUsedArgs> OnMeterUsed;
+
 
     public virtual void Awake()
     {
         character = GetComponent<BaseCharacter>();
         cInput = GetComponent<CharacterInput>();
         attacksData.AddToDict(attackData);
-        OnMeterUsed?.Invoke(this, new OnMeterUsedArgs(numberOfMeter ,(float) currentMeterValue/maxMeterValue));
+    }
+
+    void Start()
+    {
+        OnMeterUsed?.Invoke(this, new OnMeterUsedArgs(currentMeterValue / maxMeterValue, meterCount));
     }
 
     public virtual void OnEnable()
@@ -74,10 +72,14 @@ public class BaseCharacterAttacks : MonoBehaviour
         character.OnAttack2 += OnAttack2;
         character.OnAttack3 += OnAttack3;
         character.OnUltimate += OnUltimate;
+
         character.OnJump += OnJump;
         character.OnLand += OnLand;
+
         character.OnChangeFaceDirection += OnChangeFaceDir;
-        character.OnEnhanceAttack += OnEnhanceAttack;
+
+        character.OnTryEnhance += OnTryEnhanceAttack;
+        character.OnTryCancel += OnTryCancelAnimation;
     }
 
     public virtual void OnDisable()
@@ -89,7 +91,8 @@ public class BaseCharacterAttacks : MonoBehaviour
         character.OnJump -= OnJump;
         character.OnLand -= OnLand;
         character.OnChangeFaceDirection -= OnChangeFaceDir;
-        character.OnEnhanceAttack -= OnEnhanceAttack;
+        character.OnTryEnhance -= OnTryEnhanceAttack;
+        character.OnTryCancel -= OnTryCancelAnimation;
     }
 
     void OnAttack1(object sender, EventArgs e)
@@ -97,15 +100,12 @@ public class BaseCharacterAttacks : MonoBehaviour
         if (inAir)
         {
             JumpAttack?.Invoke();
-            character.SetRecoveryDuration(character.GetDuration(AnimationType.JumpAttack));
-            recentAttackTime = Time.time;
-            currentAttackType = Attacks.Jump;
+            SetNewAttack(AnimationType.JumpAttack, AttackType.Jump);
             return;
         }
         Attack1?.Invoke();
         SetHitboxData(GetDamageData(AttackType.One));
-        recentAttackTime = Time.time;
-        currentAttackType = Attacks.One;
+        SetNewAttack(AnimationType.Attack1, AttackType.One);
     }
 
     void OnAttack2(object sender, EventArgs e)
@@ -113,8 +113,7 @@ public class BaseCharacterAttacks : MonoBehaviour
         if (inAir) return;
         Attack2?.Invoke();
         SetHitboxData(GetDamageData(AttackType.Two));
-        recentAttackTime = Time.time;
-        currentAttackType = Attacks.Two;
+        SetNewAttack(AnimationType.Attack2, AttackType.Two);
     }
 
     void OnAttack3(object sender, EventArgs e)
@@ -122,8 +121,7 @@ public class BaseCharacterAttacks : MonoBehaviour
         if (inAir) return;
         Attack3?.Invoke();
         SetHitboxData(GetDamageData(AttackType.Three));
-        recentAttackTime = Time.time;
-        currentAttackType = Attacks.Three;
+        SetNewAttack(AnimationType.Attack3, AttackType.Three);
     }
 
     void OnUltimate(object sender, EventArgs e)
@@ -149,11 +147,22 @@ public class BaseCharacterAttacks : MonoBehaviour
         rotater.localScale = IsFacingLeft ? new Vector3(-1,1,1) : new Vector3(1,1,1);
     }
 
-    void OnEnhanceAttack(object sender, EventArgs e)
+    void OnTryEnhanceAttack(object sender, EventArgs e)
     {
+        if(meterCount == 0 && currentMeterValue <= 0) return;
         if (GameManager.EnhanceAttackThresholdDuration + recentAttackTime < Time.time) return;
-        if (attackTime > Time.time) return;
-        UseMeter();
+        if (meterUsedTime > Time.time) return;
+        meterUsedTime = Time.time + character.GetAnimationDuration(currentAnimationType);
+        UseMeter(GetAttackData(currentAttackType).MeterUsage, false);
+        enhance = true;
+    }
+
+    void OnTryCancelAnimation(object sender, EventArgs e)
+    {
+        if (meterCount == 0 && currentMeterValue <= 0) return;
+        if (attackingTilTime < Time.time) return;
+        meterUsedTime = 0;
+        UseMeter(50,true);
     }
 
     void SetHitboxData(DamageData data)
@@ -164,40 +173,37 @@ public class BaseCharacterAttacks : MonoBehaviour
         }
     }
 
-    public void UseMeter()
+    public void UseMeter(int usage, bool cancel)
     {
-        if (currentMeterValue < 50) return;
-        currentMeterValue -= 50;
+        if (meterCount < 0 || meterCount == 0 && currentMeterValue < 50) return;
+        currentMeterValue -= usage;
         if (currentMeterValue <= 0)
         {
-            if (numberOfMeter > 0)
+            if (meterCount > 0)
             {
-                numberOfMeter--;
+                meterCount--;
                 currentMeterValue = 100;
             }
         }
 
-        switch (currentAttackType)
-        {
-            case Attacks.One:
-                attackTime = Time.time + character.GetDuration(AnimationType.Attack1);
-                Enhance1?.Invoke();
-                break;
-            case Attacks.Two:
-                attackTime = Time.time + character.GetDuration(AnimationType.Attack2);
-                Enhance2?.Invoke();
-                break;
-            case Attacks.Three:
-                attackTime = Time.time + character.GetDuration(AnimationType.Attack3);
-                Enhance3?.Invoke();
-                break;
-            case Attacks.Jump:
-                attackTime = Time.time + character.GetDuration(AnimationType.JumpAttack);
-                EnhanceJump?.Invoke();
-                break;
-        }
+        OnMeterUsed?.Invoke(this,new OnMeterUsedArgs((float) currentMeterValue / maxMeterValue, meterCount));
 
-        OnMeterUsed?.Invoke(this, new OnMeterUsedArgs(numberOfMeter, (float)currentMeterValue/maxMeterValue));
+        if (cancel)
+        {
+            character.OnCancelAnimation?.Invoke(this, EventArgs.Empty);
+        }
+        else
+        {
+            character.OnEnhanceAttack?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    void SetNewAttack(AnimationType anim, AttackType attack)
+    {
+        recentAttackTime = Time.time;
+        attackingTilTime = Time.time + character.GetAnimationDuration(anim);
+        currentAttackType = attack;
+        currentAnimationType = anim;
     }
 
     AttackData GetAttackData(AttackType type)

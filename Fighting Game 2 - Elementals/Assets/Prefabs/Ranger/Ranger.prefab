@@ -821,9 +821,9 @@ GameObject:
   - component: {fileID: 3668499072787781697}
   - component: {fileID: 8601698920724597929}
   - component: {fileID: 9090715947920779465}
+  - component: {fileID: 7967445969706520631}
   - component: {fileID: 1646892394122441442}
   - component: {fileID: 2146295748889023052}
-  - component: {fileID: 7967445969706520631}
   - component: {fileID: 3675216059393867222}
   - component: {fileID: 5942693812805270233}
   m_Layer: 7
@@ -959,7 +959,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: 1
   animationData: {fileID: 11400000, guid: 59b9b19f1c4931843a43135828a482d1, type: 2}
-  Guarding: 0
 --- !u!114 &9090715947920779465
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -970,6 +969,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 12243bd08137b3c409dafe3e627df513, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7967445969706520631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5494376411780763073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a4b76c46af88dd43a63aa96af883b77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &1646892394122441442
@@ -990,6 +1001,7 @@ MonoBehaviour:
     m_Bits: 64
   groundCheck1: {fileID: 3041709040590578594}
   groundCheck2: {fileID: 4942625528058815352}
+  canMove: 1
   pushbackForce: 8
 --- !u!114 &2146295748889023052
 MonoBehaviour:
@@ -1010,7 +1022,7 @@ MonoBehaviour:
   hitboxes: {fileID: 5810519762053959681}
   maxMeterValue: 100
   currentMeterValue: 100
-  numberOfMeter: 5
+  meterCount: 3
   ultimateBeamPrefab: {fileID: 6628246287202306316, guid: 5de746c521a23fe4790fd727e32523c0, type: 3}
   stormPrefab: {fileID: 7280461822294780868, guid: d3b51869dc49d994b87ae892a2340414, type: 3}
   arrowSpeed: 85
@@ -1027,18 +1039,6 @@ MonoBehaviour:
   - {fileID: 8051796286571691721}
   - {fileID: 6268410807500455434}
   - {fileID: 7326293170024510083}
---- !u!114 &7967445969706520631
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5494376411780763073}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a4b76c46af88dd43a63aa96af883b77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &3675216059393867222
 MonoBehaviour:
   m_ObjectHideFlags: 0

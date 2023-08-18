@@ -8,9 +8,9 @@ public class BaseCharacterHealth : MonoBehaviour
     [SerializeField] protected float maxHealth;
     [SerializeField] protected float currentHealth;
 
-    BaseCharacter character;
+    public EventHandler<float> OnHealthChanged;
 
-    public EventHandler<float> OnDamaged;
+    BaseCharacter character;
 
     void Awake()
     {
@@ -36,6 +36,6 @@ public class BaseCharacterHealth : MonoBehaviour
     public void Damage(DamageData data)
     {
         character.OnHit?.Invoke(this, data);
-        OnDamaged?.Invoke(this, currentHealth / maxHealth);
+        OnHealthChanged?.Invoke(this, currentHealth / maxHealth);
     }
 }

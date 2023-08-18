@@ -116,6 +116,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Cancel"",
+                    ""type"": ""Button"",
+                    ""id"": ""5162c187-b12c-4663-adf5-cdda6c0d6bb6"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -250,6 +259,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""Block"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d3a71646-71d4-416f-ada8-7fa2587f5e89"",
+                    ""path"": ""<Keyboard>/semicolon"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Cancel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -274,6 +294,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Player_Option = m_Player.FindAction("Option", throwIfNotFound: true);
         m_Player_Enhance = m_Player.FindAction("Enhance", throwIfNotFound: true);
         m_Player_Block = m_Player.FindAction("Block", throwIfNotFound: true);
+        m_Player_Cancel = m_Player.FindAction("Cancel", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -345,6 +366,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Option;
     private readonly InputAction m_Player_Enhance;
     private readonly InputAction m_Player_Block;
+    private readonly InputAction m_Player_Cancel;
     public struct PlayerActions
     {
         private @PlayerControls m_Wrapper;
@@ -359,6 +381,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         public InputAction @Option => m_Wrapper.m_Player_Option;
         public InputAction @Enhance => m_Wrapper.m_Player_Enhance;
         public InputAction @Block => m_Wrapper.m_Player_Block;
+        public InputAction @Cancel => m_Wrapper.m_Player_Cancel;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -398,6 +421,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Block.started += instance.OnBlock;
             @Block.performed += instance.OnBlock;
             @Block.canceled += instance.OnBlock;
+            @Cancel.started += instance.OnCancel;
+            @Cancel.performed += instance.OnCancel;
+            @Cancel.canceled += instance.OnCancel;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -432,6 +458,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Block.started -= instance.OnBlock;
             @Block.performed -= instance.OnBlock;
             @Block.canceled -= instance.OnBlock;
+            @Cancel.started -= instance.OnCancel;
+            @Cancel.performed -= instance.OnCancel;
+            @Cancel.canceled -= instance.OnCancel;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -470,5 +499,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnOption(InputAction.CallbackContext context);
         void OnEnhance(InputAction.CallbackContext context);
         void OnBlock(InputAction.CallbackContext context);
+        void OnCancel(InputAction.CallbackContext context);
     }
 }

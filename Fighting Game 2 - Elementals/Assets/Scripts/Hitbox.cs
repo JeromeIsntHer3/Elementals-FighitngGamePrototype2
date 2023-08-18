@@ -23,6 +23,9 @@ public class Hitbox : GameBox
         if (col.TryGetComponent(out Hurtbox hurtbox))
         {
             if (CheckHitSelf(hurtbox)) return;
+
+            Vector3 spawnPoint = GetComponent<Collider2D>().ClosestPoint(hurtbox.transform.position);
+            EffectManager.Instance.SpawnHitSplash(spawnPoint, owner.IsFacingLeft);
             hit = true;
             if (hurtbox.BoxOwner.IsGuarding)
             {
@@ -37,7 +40,6 @@ public class Hitbox : GameBox
                 return;
             }
             hurtbox.Hit(DamageData);
-            Debug.Log($"{owner} hit {hurtbox.BoxOwner} with {this}");
         }
     }
 

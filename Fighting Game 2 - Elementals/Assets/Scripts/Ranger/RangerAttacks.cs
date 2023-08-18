@@ -20,47 +20,24 @@ public class RangerAttacks : BaseCharacterAttacks
     [SerializeField] Transform stormSpawn;
     [SerializeField] List<Transform> multiArrowSpawns = new();
 
-    bool enhance;
-
-    public override void Awake()
-    {
-        base.Awake();
-    }
-
-    public override void OnEnable()
-    {
-        base.OnEnable();
-        Enhance1 = () => { enhance = true; };
-        Enhance2 = () => { enhance = true; };
-        Enhance3 = () => { enhance = true; };
-        EnhanceJump = () => { enhance = true; };
-    }
-
-    public override void OnDisable()
-    {
-        base.OnDisable();
-        Enhance1 = null;
-        Enhance2 = null;
-        Enhance3 = null;
-        EnhanceJump = null;
-    }
 
     public void ArrowStab()
     {
-
+        if (!enhance) return;
+        var arrow = Instantiate(prefab, arrowSpawn.position, Quaternion.identity);
+        arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.Two), character,
+            IsFacingLeft, IsFacingLeft ? Vector3.left : Vector3.right, arrowSpeed, 5f);
+        enhance = false;
     }
 
     public void ShootNormal()
     {
-        if (enhance)
-        {
-            enhance = false;
-            ShootNormalEnhance();
-        }
-
         var arrow = Instantiate(prefab, arrowSpawn.position, Quaternion.identity);
         arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.Two), character,
             IsFacingLeft, IsFacingLeft ? Vector3.left : Vector3.right, arrowSpeed, 5f);
+        if (!enhance) return;
+        enhance = false;
+        ShootNormalEnhance();
     }
 
     public void ShootNormalEnhance()

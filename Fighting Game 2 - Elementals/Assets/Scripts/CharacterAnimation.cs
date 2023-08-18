@@ -9,5 +9,4 @@ public class CharacterAnimation
     public AnimationType Type;
     public AnimationClip Clip;
     public bool canChangeFaceDirection;
-    public bool canBeInterrupted;
 }

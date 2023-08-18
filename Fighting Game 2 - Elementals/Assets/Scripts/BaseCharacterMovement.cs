@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class BaseCharacterMovement : MonoBehaviour
 {
@@ -19,7 +20,7 @@ public class BaseCharacterMovement : MonoBehaviour
     protected CharacterInput cInput;
     protected Vector2 movement;
     protected int jumps;
-    protected bool canMove = true;
+    [SerializeField] protected bool canMove = true;
     protected bool jumping;
     protected bool option;
     protected bool isFacingLeft;
@@ -42,12 +43,7 @@ public class BaseCharacterMovement : MonoBehaviour
 
     public virtual void OnEnable()
     {
-        character.OnMovement += OnMovement;
         character.OnJump += OnJump;
-        character.OnAttack1 += OnAttack1;
-        character.OnAttack2 += OnAttack2;
-        character.OnAttack3 += OnAttack3;
-        character.OnUltimate += OnUltimate;
         character.OnRoll += OnRoll;
         character.OnOption += OnOptionPerformed;
         character.OnOptionCanceled += OnOptionCanceled;
@@ -58,12 +54,7 @@ public class BaseCharacterMovement : MonoBehaviour
 
     public virtual void OnDisable()
     {
-        character.OnMovement -= OnMovement;
         character.OnJump -= OnJump;
-        character.OnAttack1 -= OnAttack1;
-        character.OnAttack2 -= OnAttack2;
-        character.OnAttack3 -= OnAttack3;
-        character.OnUltimate -= OnUltimate;
         character.OnRoll -= OnRoll;
         character.OnOption -= OnOptionPerformed;
         character.OnOptionCanceled -= OnOptionCanceled;
@@ -72,24 +63,19 @@ public class BaseCharacterMovement : MonoBehaviour
         character.OnBlockHit -= OnBlockHit;
     }
 
-    void OnMovement(object sender, Vector2 args)
-    {
-        //movement = args;
-    }
-
     void OnJump(object sender, EventArgs args)
     {
         if (jumps <= 0) return;
-        if (IsGrounded())
+        if (IsGrounded() && !jumping)
         {
+            Invoke(nameof(JumpDelay), character.GetAnimationDuration(AnimationType.JumpStart));
             canMove = false;
             jumping = true;
-            StartCoroutine(JumpDelayCR());
             jumps -= 1;
         }
         else
         {
-            if(!jumping)
+            if (!jumping)
             {
                 jumps -= 1;
                 jumping = true;
@@ -99,33 +85,15 @@ public class BaseCharacterMovement : MonoBehaviour
         }
     }
 
-    void OnAttack1(object sender, EventArgs args)
+    void JumpDelay()
     {
-        if (jumping) return;
-    }
-
-    void OnAttack2(object sender, EventArgs args)
-    {
-        if (jumping) return;
-    }
-
-    void OnAttack3(object sender, EventArgs args)
-    {
-        if (jumping) return;
-        //character.SetRecoveryDuration(character.GetDuration(AnimationType.Attack3));
-    }
-
-    void OnUltimate(object sender, EventArgs args)
-    {
-        if (jumping) return;
-        //character.SetRecoveryDuration(character.GetDuration(AnimationType.Ultimate));
+        canMove = true;
+        Jump();
     }
 
     void OnRoll(object sender, EventArgs args)
     {
         if (jumping) return;
-        //character.SetRecoveryDuration(character.GetDuration(AnimationType.Roll));
-        //Debug.Log("Bruh");
         Roll();
     }
 
@@ -140,7 +108,6 @@ public class BaseCharacterMovement : MonoBehaviour
     void OnOptionCanceled(object sender, EventArgs args)
     {
         if (!option) return;
-        //character.SetRecoveryDuration(character.GetDuration(AnimationType.CharacterOptionEnd));
         OptionCanceledDelegate?.Invoke();
         option = false;
     }
@@ -177,7 +144,7 @@ public class BaseCharacterMovement : MonoBehaviour
 
         if (!character.Recovered()) return;
             
-        float targetSpeed = data.PlayerSpeed * movement.x;
+        float targetSpeed = (jumping ? data.PlayerSpeed * 4/5f : data.PlayerSpeed) * movement.x;
         float speedDiff = targetSpeed - rb.velocity.x;
         float movementRate = speedDiff * data.AccelerationSpeed;
         rb.AddForce(Vector2.right * movementRate, ForceMode2D.Force);
@@ -232,15 +199,4 @@ public class BaseCharacterMovement : MonoBehaviour
         Gizmos.DrawLine(point3, point4);
         Gizmos.DrawLine(point4, point1);
     }
-
-    #region Coroutines
-
-    IEnumerator JumpDelayCR()
-    {
-        yield return new WaitForSeconds(data.JumpDelay);
-        canMove = true;
-        Jump();
-    }
-
-    #endregion
 }

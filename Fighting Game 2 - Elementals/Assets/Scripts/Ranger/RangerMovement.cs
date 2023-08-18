@@ -5,11 +5,18 @@ using UnityEngine;
 
 public class RangerMovement : BaseCharacterMovement
 {
+    [SerializeField] float pushbackForce;
+
+    public override void Awake()
+    {
+        base.Awake();
+    }
+
     public override void OnEnable()
     {
         base.OnEnable();
 
-        cInput.OnUltimate += OnUltimate;
+        character.OnUltimate += OnUltimate;
 
         OptionPerformedDelegate += Slide;
         OptionPerformCond += CanSlide;
@@ -24,7 +31,7 @@ public class RangerMovement : BaseCharacterMovement
     {
         base.OnDisable();
 
-        cInput.OnUltimate -= OnUltimate;
+        character.OnUltimate -= OnUltimate;
 
         OptionPerformedDelegate -= Slide;
         OptionPerformCond -= CanSlide;
@@ -49,7 +56,7 @@ public class RangerMovement : BaseCharacterMovement
 
     void Recovery()
     {
-        SetRecoveryDuration(.1f);
+        character.SetRecoveryDuration(.1f);
     }
 
     bool StopSliding()
@@ -64,15 +71,13 @@ public class RangerMovement : BaseCharacterMovement
 
     void OnUltimate(object sender, EventArgs e)
     {
-        if (!Recovered()) return;
-        StartCoroutine(UltimatePushBack());
+        if (!character.Recovered()) return;
+        Invoke(nameof(UltimatePushBack), character.GetDuration(AnimationType.Ultimate) / 2);
     }
 
-    IEnumerator UltimatePushBack()
+    void UltimatePushBack()
     {
-        yield return new WaitForSeconds(GetDuration(AnimationType.Ultimate) / 2);
-        Debug.Log("Pushback");
         Vector2 dir = isFacingLeft ? Vector2.right : Vector2.left;
-        rb.AddForce(dir * 20f, ForceMode2D.Impulse);
+        rb.AddForce(dir * pushbackForce, ForceMode2D.Impulse);
     }
 }

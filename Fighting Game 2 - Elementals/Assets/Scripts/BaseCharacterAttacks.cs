@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaseCharacterAttacks : BaseCharacter
+public class BaseCharacterAttacks : MonoBehaviour
 {
     [Header("Attack Prefabs")]
     [SerializeField] protected GameObject prefab;
@@ -14,8 +14,14 @@ public class BaseCharacterAttacks : BaseCharacter
     [SerializeField] protected CharacterAttackSO attacksData;
     [SerializeField] protected GameBoxes hitboxes;
 
-    protected readonly Dictionary<AnimationType, AttackData> attackData = new();
+    [Header("Meter")]
+    [SerializeField] int maxMeterValue;
+    [SerializeField] int currentMeterValue;
+    [SerializeField] int numberOfMeter;
 
+    protected readonly Dictionary<AttackType, AttackData> attackData = new();
+
+    protected BaseCharacter character;
     protected CharacterInput cInput;
     protected bool IsFacingLeft;
 
@@ -25,84 +31,110 @@ public class BaseCharacterAttacks : BaseCharacter
     protected Attack Attack3;
     protected Attack JumpAttack;
     protected Attack Ultimate;
+    protected Attack Enhance1;
+    protected Attack Enhance2;
+    protected Attack Enhance3;
+    protected Attack EnhanceJump;
+
+    public EventHandler<OnMeterUsedArgs> OnMeterUsed;
+    public class OnMeterUsedArgs: EventArgs
+    {
+        public int MeterCount;
+        public float MeterValue;
+
+        public OnMeterUsedArgs(int i, float f)
+        {
+            MeterCount = i;
+            MeterValue = f;
+        }
+    }
 
     bool inAir;
+    float recentAttackTime;
+    float attackTime;
+    AttackData currentAttack;
+    Attacks currentAttackType;
 
-    public override void Awake()
+    public enum Attacks
     {
-        base.Awake();
+        One, Two, Three, Jump
+    }
+
+    public virtual void Awake()
+    {
+        character = GetComponent<BaseCharacter>();
         cInput = GetComponent<CharacterInput>();
         attacksData.AddToDict(attackData);
+        OnMeterUsed?.Invoke(this, new OnMeterUsedArgs(numberOfMeter ,(float) currentMeterValue/maxMeterValue));
     }
 
     public virtual void OnEnable()
     {
-        cInput.OnAttack1 += OnAttack1;
-        cInput.OnAttack2 += OnAttack2;
-        cInput.OnAttack3 += OnAttack3;
-        cInput.OnUltimate += OnUltimate;
-        cInput.OnJump += OnJump;
-        cInput.OnLand += OnLand;
-        cInput.OnChangeFaceDirection += OnChangeFaceDir;
-        cInput.OnHit += OnHit;
+        character.OnAttack1 += OnAttack1;
+        character.OnAttack2 += OnAttack2;
+        character.OnAttack3 += OnAttack3;
+        character.OnUltimate += OnUltimate;
+        character.OnJump += OnJump;
+        character.OnLand += OnLand;
+        character.OnChangeFaceDirection += OnChangeFaceDir;
+        character.OnEnhanceAttack += OnEnhanceAttack;
     }
 
     public virtual void OnDisable()
     {
-        cInput.OnAttack1 -= OnAttack1;
-        cInput.OnAttack2 -= OnAttack2;
-        cInput.OnAttack3 -= OnAttack3;
-        cInput.OnUltimate -= OnUltimate;
-        cInput.OnJump -= OnJump;
-        cInput.OnLand -= OnLand;
-        cInput.OnChangeFaceDirection -= OnChangeFaceDir;
-        cInput.OnHit -= OnHit;
+        character.OnAttack1 -= OnAttack1;
+        character.OnAttack2 -= OnAttack2;
+        character.OnAttack3 -= OnAttack3;
+        character.OnUltimate -= OnUltimate;
+        character.OnJump -= OnJump;
+        character.OnLand -= OnLand;
+        character.OnChangeFaceDirection -= OnChangeFaceDir;
+        character.OnEnhanceAttack -= OnEnhanceAttack;
     }
 
     void OnAttack1(object sender, EventArgs e)
     {
-        if (!Recovered()) return;
         if (inAir)
         {
             JumpAttack?.Invoke();
-            SetRecoveryDuration(GetDuration(AnimationType.JumpAttack));
+            character.SetRecoveryDuration(character.GetDuration(AnimationType.JumpAttack));
+            recentAttackTime = Time.time;
+            currentAttackType = Attacks.Jump;
             return;
         }
         Attack1?.Invoke();
-        SetRecoveryDuration(GetDuration(AnimationType.Attack1));
-        SetHitboxData(attackData[AnimationType.Attack1]);
+        SetHitboxData(GetDamageData(AttackType.One));
+        recentAttackTime = Time.time;
+        currentAttackType = Attacks.One;
     }
 
     void OnAttack2(object sender, EventArgs e)
     {
-        if (!Recovered()) return;
         if (inAir) return;
         Attack2?.Invoke();
-        SetRecoveryDuration(GetDuration(AnimationType.Attack2));
-        SetHitboxData(attackData[AnimationType.Attack2]);
+        SetHitboxData(GetDamageData(AttackType.Two));
+        recentAttackTime = Time.time;
+        currentAttackType = Attacks.Two;
     }
 
     void OnAttack3(object sender, EventArgs e)
     {
-        if (!Recovered()) return;
         if (inAir) return;
         Attack3?.Invoke();
-        SetRecoveryDuration(GetDuration(AnimationType.Attack3));
-        SetHitboxData(attackData[AnimationType.Attack3]);
+        SetHitboxData(GetDamageData(AttackType.Three));
+        recentAttackTime = Time.time;
+        currentAttackType = Attacks.Three;
     }
 
     void OnUltimate(object sender, EventArgs e)
     {
-        if (!Recovered()) return;
         if (inAir) return;
         Ultimate?.Invoke();
-        SetRecoveryDuration(GetDuration(AnimationType.Ultimate));
-        SetHitboxData(attackData[AnimationType.Ultimate]);
+        SetHitboxData(GetDamageData(AttackType.Ultimate));
     }
 
     void OnJump(object sender, EventArgs e)
     {
-        if(!Recovered()) return;
         inAir = true;
     }
 
@@ -117,23 +149,73 @@ public class BaseCharacterAttacks : BaseCharacter
         rotater.localScale = IsFacingLeft ? new Vector3(-1,1,1) : new Vector3(1,1,1);
     }
 
-    void OnHit(object sender, DamageData e)
+    void OnEnhanceAttack(object sender, EventArgs e)
     {
-        SetRecoveryDuration(GetDuration(AnimationType.Damaged));
+        if (GameManager.EnhanceAttackThresholdDuration + recentAttackTime < Time.time) return;
+        if (attackTime > Time.time) return;
+        UseMeter();
     }
 
-    void SetHitboxData(AttackData data)
+    void SetHitboxData(DamageData data)
     {
         foreach(var box in hitboxes.colliders)
         {
-            box.GetComponent<Hitbox>().SetAttackData(data);
+            box.GetComponent<Hitbox>().SetDamageData(data, character);
         }
     }
 
-    public void AttackImminent()
+    public void UseMeter()
     {
-        if (GameManager.Instance.DistBetweenPlayers() > GameManager.Instance.DistanceThreshold) return;
+        if (currentMeterValue < 50) return;
+        currentMeterValue -= 50;
+        if (currentMeterValue <= 0)
+        {
+            if (numberOfMeter > 0)
+            {
+                numberOfMeter--;
+                currentMeterValue = 100;
+            }
+        }
 
-        enemy.GetComponent<CharacterInput>().OnDefend?.Invoke(this, EventArgs.Empty);
+        switch (currentAttackType)
+        {
+            case Attacks.One:
+                attackTime = Time.time + character.GetDuration(AnimationType.Attack1);
+                Enhance1?.Invoke();
+                break;
+            case Attacks.Two:
+                attackTime = Time.time + character.GetDuration(AnimationType.Attack2);
+                Enhance2?.Invoke();
+                break;
+            case Attacks.Three:
+                attackTime = Time.time + character.GetDuration(AnimationType.Attack3);
+                Enhance3?.Invoke();
+                break;
+            case Attacks.Jump:
+                attackTime = Time.time + character.GetDuration(AnimationType.JumpAttack);
+                EnhanceJump?.Invoke();
+                break;
+        }
+
+        OnMeterUsed?.Invoke(this, new OnMeterUsedArgs(numberOfMeter, (float)currentMeterValue/maxMeterValue));
+    }
+
+    AttackData GetAttackData(AttackType type)
+    {
+        return attackData[type];
+    }
+
+    protected DamageData GetDamageData(AttackType type)
+    {
+        AttackData attackData = GetAttackData(type);
+        return new DamageData
+        {
+            Damage = attackData.Damage,
+            VerticalKnockback = attackData.VerticalKnockback,
+            HorizontalKnockback = attackData.HorizontalKnockback,
+            StunDuration = attackData.StunDuration,
+            DamageType = attackData.DamageType,
+            Source = character
+        };
     }
 }

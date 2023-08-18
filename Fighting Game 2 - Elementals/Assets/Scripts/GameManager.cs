@@ -9,9 +9,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] int FrameRate;
     [SerializeField] BaseCharacter playerOne;
     [SerializeField] BaseCharacter playerTwo;
+    [SerializeField] float healthAnimDuration;
+    [SerializeField] float meterBurnThreshold;
+    [SerializeField] float projectileDuration;
+    [SerializeField] float hitShakeAnim;
     public float DistanceThreshold;
-    public float strength;
-    public int vibrato;
+    public float ShakeStrengthX;
+    public float ShakeStrengthY;
+    public int Vibrato;
 
     #region Getter And Setters
 
@@ -23,12 +28,19 @@ public class GameManager : MonoBehaviour
     #region GlobalGameValues
 
     public static float HealthAnimationDuration;
+    public static float EnhanceAttackThresholdDuration;
+    public static float ProjectileActiveDuration;
+    public static float HitShakeAnimationMultipler;
 
     #endregion
 
     void Awake()
     {
         Instance = this;
+        HitShakeAnimationMultipler = hitShakeAnim;
+        HealthAnimationDuration = healthAnimDuration;
+        EnhanceAttackThresholdDuration = meterBurnThreshold;
+        ProjectileActiveDuration = projectileDuration;
         Application.targetFrameRate = FrameRate;
     }
 

@@ -1,24 +1,53 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class Hitbox : GameBox, IHitbox
+public class Hitbox : GameBox
 {
-    DamageData damageData;
+    protected DamageData DamageData;
+    protected delegate void HitboxExecute(Hurtbox hurtbox);
+    protected HitboxExecute HitSuccessful;
+    protected HitboxExecute HitBlock;
 
-    public void SetAttackData(AttackData data)
+    bool hit;
+
+    public virtual void SetDamageData(DamageData data, BaseCharacter owner)
     {
-        damageData = new DamageData
-        {
-            Damage = data.Damage,
-            HorizontalKnockback = data.HorizontalKnockback,
-            VerticalKnockback = data.VerticalKnockback,
-            Type = data.DamageType,
-            StunDuration = data.StunDuration,
-            Source = owner
-        };
+        hit = false;
+        this.owner = owner;
+        DamageData = data;
     }
 
-    public DamageData Data()
+    public virtual void OnTriggerEnter2D(Collider2D col)
     {
-        return damageData;
+        if (hit) return;
+        if (col.TryGetComponent(out Hurtbox hurtbox))
+        {
+            if (CheckHitSelf(hurtbox)) return;
+            hit = true;
+            if (hurtbox.BoxOwner.IsGuarding)
+            {
+                if (FacingSameDirection(hurtbox))
+                {
+                    hurtbox.Hit(DamageData);
+                    hurtbox.BoxOwner.OnBlockCanceled?.Invoke(this, System.EventArgs.Empty);
+                    return;
+                }
+
+                hurtbox.BlockHit(DamageData);
+                return;
+            }
+            hurtbox.Hit(DamageData);
+            Debug.Log($"{owner} hit {hurtbox.BoxOwner} with {this}");
+        }
+    }
+
+    protected bool CheckHitSelf(Hurtbox hurtbox)
+    {
+        return hurtbox.BoxOwner.gameObject == owner.gameObject;
+    }
+
+    bool FacingSameDirection(Hurtbox box)
+    {
+        return box.BoxOwner.IsFacingLeft && owner.IsFacingLeft;
     }
 }

@@ -3,29 +3,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaseCharacterHealth : BaseCharacter
+public class BaseCharacterHealth : MonoBehaviour
 {
     [SerializeField] protected float maxHealth;
     [SerializeField] protected float currentHealth;
 
-    CharacterInput cInput;
+    BaseCharacter character;
 
     public EventHandler<float> OnDamaged;
 
-    public override void Awake()
+    void Awake()
     {
-        cInput = GetComponent<CharacterInput>();
+        character = GetComponent<BaseCharacter>();
         currentHealth = maxHealth;
     }
 
     public virtual void OnEnable()
     {
-        cInput.OnHit += OnHit;
+        character.OnHit += OnHit;
     }
 
     public virtual void OnDisable()
     {
-        cInput.OnHit -= OnHit;
+        character.OnHit -= OnHit;
     }
 
     void OnHit(object sender, DamageData e)
@@ -35,7 +35,7 @@ public class BaseCharacterHealth : BaseCharacter
 
     public void Damage(DamageData data)
     {
-        cInput.OnHit?.Invoke(this, data);
+        character.OnHit?.Invoke(this, data);
         OnDamaged?.Invoke(this, currentHealth / maxHealth);
     }
 }

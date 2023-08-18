@@ -1,4 +1,5 @@
 using System;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Ctx = UnityEngine.InputSystem.InputAction.CallbackContext;
@@ -6,28 +7,13 @@ using Ctx = UnityEngine.InputSystem.InputAction.CallbackContext;
 public class CharacterInput : MonoBehaviour
 {
     PlayerControls controls;
+    BaseCharacter character;
     Vector2 movement;
-
-    public EventHandler<Vector2> OnMovement;
-    public EventHandler<Vector2> OnMovementPerformed;
-    public EventHandler<Vector2> OnMovementCanceled;
-    public EventHandler OnAttack1;
-    public EventHandler OnAttack2;
-    public EventHandler OnAttack3;
-    public EventHandler OnUltimate;
-    public EventHandler OnRoll;
-    public EventHandler OnOption;
-    public EventHandler OnOptionCanceled;
-    public EventHandler OnJump;
-    public EventHandler OnLand;
-    public EventHandler OnDefend;
-    public EventHandler<DamageData> OnHit;
-    public EventHandler<DamageData> OnBlockAttack;
-    public EventHandler<bool> OnChangeFaceDirection;
 
     void Awake()
     {
         controls = new ();
+        character = GetComponent<BaseCharacter>();
     }
 
     void OnEnable()
@@ -44,49 +30,74 @@ public class CharacterInput : MonoBehaviour
     {
         controls.Player.Movement.performed += (Ctx obj) => 
         {
-            OnMovement?.Invoke(this, obj.ReadValue<Vector2>());
-            OnMovementPerformed?.Invoke(this, obj.ReadValue<Vector2>());
+            character.OnMovement?.Invoke(this, obj.ReadValue<Vector2>());
+            character.OnMovementPerformed?.Invoke(this, obj.ReadValue<Vector2>());
         };
         controls.Player.Movement.canceled += (Ctx obj) =>
         {
-            OnMovement?.Invoke(this, obj.ReadValue<Vector2>());
-            OnMovementCanceled?.Invoke(this, obj.ReadValue<Vector2>());
+            character.OnMovement?.Invoke(this, obj.ReadValue<Vector2>());
+            character.OnMovementCanceled?.Invoke(this, obj.ReadValue<Vector2>());
         };
 
         controls.Player.Attack1.performed += (Ctx obj) =>
         {
-            OnAttack1?.Invoke(this, EventArgs.Empty);
+            if (!character.Recovered()) return;
+            character.OnAttack1?.Invoke(this, EventArgs.Empty);
+            character.SetRecoveryDuration(character.GetDuration(AnimationType.Attack1));
         };
         controls.Player.Attack2.performed += (Ctx obj) =>
         {
-            OnAttack2?.Invoke(this, EventArgs.Empty);
+            if (!character.Recovered()) return;
+            character.OnAttack2?.Invoke(this, EventArgs.Empty);
+            character.SetRecoveryDuration(character.GetDuration(AnimationType.Attack2));
         };
         controls.Player.Attack3.performed += (Ctx obj) =>
         {
-            OnAttack3?.Invoke(this, EventArgs.Empty);
+            if (!character.Recovered()) return;
+            character.OnAttack3?.Invoke(this, EventArgs.Empty);
+            character.SetRecoveryDuration(character.GetDuration(AnimationType.Attack3));
         };
         controls.Player.Ultimate.performed += (Ctx obj) =>
         {
-            OnUltimate?.Invoke(this, EventArgs.Empty);
+            if (!character.Recovered()) return;
+            character.OnUltimate?.Invoke(this, EventArgs.Empty);
+            character.SetRecoveryDuration(character.GetDuration(AnimationType.Ultimate));
         };
 
         controls.Player.Roll.performed += (Ctx obj) =>
         {
-            OnRoll?.Invoke(this, EventArgs.Empty);
+            if (!character.Recovered()) return;
+            character.OnRoll?.Invoke(this, EventArgs.Empty);
+            character.SetRecoveryDuration(character.GetDuration(AnimationType.Roll));
         };
 
         controls.Player.Jump.performed += (Ctx obj) =>
         {
-            OnJump?.Invoke(this, EventArgs.Empty);
+            if (!character.Recovered()) return;
+            character.OnJump?.Invoke(this, EventArgs.Empty);
         };
 
         controls.Player.Option.performed += (Ctx obj) =>
         {
-            OnOption?.Invoke(this, EventArgs.Empty);
+            if (!character.Recovered()) return;
+            character.OnOption?.Invoke(this, EventArgs.Empty);
         };
         controls.Player.Option.canceled += (Ctx obj) =>
         {
-            OnOptionCanceled?.Invoke(this, EventArgs.Empty);
+            character.OnOptionCanceled?.Invoke(this, EventArgs.Empty);
+        };
+        controls.Player.Enhance.performed += (Ctx obj) =>
+        {
+            character.OnEnhanceAttack?.Invoke(this, EventArgs.Empty);
+        };
+        controls.Player.Block.performed += (Ctx obj) =>
+        {
+            if (!character.Recovered() || !character.IsGrounded) return;
+            character.OnBlock?.Invoke(this, EventArgs.Empty);
+        };
+        controls.Player.Block.canceled += (Ctx obj) =>
+        {
+            character.OnBlockCanceled?.Invoke(this, EventArgs.Empty);
         };
     }
 
@@ -99,4 +110,91 @@ public class CharacterInput : MonoBehaviour
     {
         return movement;
     }
+
+    public void TriggerBlock()
+    {
+        if (!character.Recovered() || !character.IsGrounded) return;
+        character.OnBlock?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void CancelBlock()
+    {
+        character.OnBlockCanceled?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void TriggerAttack1()
+    {
+        if (!character.Recovered()) return;
+        character.OnAttack1?.Invoke(this, EventArgs.Empty);
+        character.SetRecoveryDuration(character.GetDuration(AnimationType.Attack1));
+    }
+
+    public void TriggerAttack2()
+    {
+        if (!character.Recovered()) return;
+        character.OnAttack2?.Invoke(this, EventArgs.Empty);
+        character.SetRecoveryDuration(character.GetDuration(AnimationType.Attack2));
+    }
+
+    public void TriggerAttack3()
+    {
+        if (!character.Recovered()) return;
+        character.OnAttack3?.Invoke(this, EventArgs.Empty);
+        character.SetRecoveryDuration(character.GetDuration(AnimationType.Attack3));
+    }
 }
+
+#if UNITY_EDITOR
+
+[CustomEditor(typeof(CharacterInput))]
+public class CharacterInputInspector : Editor
+{
+    SerializedProperty onBlockEvent;
+
+    void OnEnable()
+    {
+        //onBlockEvent = serializedObject.FindProperty(nameof());
+    }
+
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+
+        CharacterInput input = (CharacterInput)target;
+
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Perform Block"))
+        {
+            input.TriggerBlock();
+        }
+
+        if (GUILayout.Button("Cancel Block"))
+        {
+            input.CancelBlock();
+        }
+
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Perform Attack 1"))
+        {
+            input.TriggerAttack1();
+        }
+
+        if (GUILayout.Button("Perform Attack 2"))
+        {
+            input.TriggerAttack2();
+        }
+
+        if (GUILayout.Button("Perform Attack 3"))
+        {
+            input.TriggerAttack3();
+        }
+
+        GUILayout.EndHorizontal();
+    }
+}
+
+#endif

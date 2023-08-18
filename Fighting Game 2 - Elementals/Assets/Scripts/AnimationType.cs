@@ -6,8 +6,10 @@ public enum AnimationType
     CharacterOptionStart, CharacterOptionLoop, CharacterOptionEnd,
     JumpStart, JumpEnd, JumpPeak, JumpAttack, JumpRising, JumpFalling,
     DefendStart, DefendEnd, DefendLoop,
-    Damaged,
+    Hit,
     Death,
     Ultimate,
-    Attack1, Attack2, Attack3
+    Attack1, Attack2, Attack3,
+    RecoveryFromHit,
+    BlockOnHit
 }

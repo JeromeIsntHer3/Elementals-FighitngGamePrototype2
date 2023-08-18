@@ -7,11 +7,11 @@ public class CharacterAttackSO : ScriptableObject
 {
     public List<AttackData> Attacks;
 
-    public void AddToDict(Dictionary<AnimationType, AttackData> dict)
+    public void AddToDict(Dictionary<AttackType, AttackData> dict)
     {
         foreach(var attack in Attacks)
         {
-            dict.Add(attack.AnimationType,attack);
+            dict.Add(attack.AttackType,attack);
         }
     }
 }

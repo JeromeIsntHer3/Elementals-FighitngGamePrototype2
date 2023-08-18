@@ -97,3 +97,11 @@ MonoBehaviour:
     Clip: {fileID: 7400000, guid: 25859a7e98a5ee140857dcd34e5ea456, type: 2}
     canChangeFaceDirection: 0
     canBeInterrupted: 0
+  - Type: 21
+    Clip: {fileID: 7400000, guid: 95fd3337f9512854fb28c6472b356efd, type: 2}
+    canChangeFaceDirection: 0
+    canBeInterrupted: 0
+  - Type: 22
+    Clip: {fileID: 7400000, guid: 343f611fc8f05e643967a124afbd89fe, type: 2}
+    canChangeFaceDirection: 0
+    canBeInterrupted: 0

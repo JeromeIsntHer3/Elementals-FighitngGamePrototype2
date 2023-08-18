@@ -6,7 +6,7 @@ using UnityEngine;
 [Serializable]
 public class AttackData
 {
-    public AnimationType AnimationType;
+    public AttackType AttackType;
     public DamageType DamageType;
     public float Damage;
     public float HorizontalKnockback;

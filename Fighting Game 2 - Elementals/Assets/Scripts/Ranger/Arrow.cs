@@ -2,24 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Arrow : MonoBehaviour, IHitbox
+public class Arrow : Hitbox
 {
-    public class ArrowData : DamageData
-    {
-        public bool FlipSprite;
-        public Vector2 FlightDirection;
-        public float FlightSpeed;
-        public float DeathTime;
-
-        public Vector2 FlightPath()
-        {
-            return FlightSpeed * FlightDirection;
-        }
-    }
-
     Rigidbody2D rb;
     SpriteRenderer sr;
-    ArrowData arrowData;
+    float deathTime;
 
     void Awake()
     {
@@ -29,7 +16,7 @@ public class Arrow : MonoBehaviour, IHitbox
 
     void Update()
     {
-        if (arrowData.DeathTime < Time.time) Destroy(gameObject);
+        if (deathTime < Time.time) Destroy(gameObject);
     }
 
     void FixedUpdate()
@@ -38,23 +25,19 @@ public class Arrow : MonoBehaviour, IHitbox
         transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 
-    void OnTriggerEnter2D(Collider2D col)
+    public override void OnTriggerEnter2D(Collider2D col)
     {
-        if (col.TryGetComponent(out BlockPredictionBox blockBox)) return;
+        base.OnTriggerEnter2D(col);
         Destroy(gameObject);
     }
 
-    public void SpawnArrow(ArrowData arrowData)
+    public void SetupArrow(DamageData data, BaseCharacter owner, bool flipX, Vector2 dir, float speed, float lifespan)
     {
-        sr.flipX = arrowData.FlipSprite;
-        rb.AddForce(arrowData.FlightPath(), ForceMode2D.Impulse);
-        float angle = Mathf.Atan2(arrowData.FlightDirection.y, arrowData.FlightDirection.x) * Mathf.Rad2Deg;
+        base.SetDamageData(data, owner);
+        sr.flipX = flipX;
+        rb.AddForce(dir * speed,ForceMode2D.Impulse);
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-        this.arrowData = arrowData;
-    }
-
-    public DamageData Data()
-    {
-        return arrowData;
+        deathTime = Time.time + lifespan;
     }
 }

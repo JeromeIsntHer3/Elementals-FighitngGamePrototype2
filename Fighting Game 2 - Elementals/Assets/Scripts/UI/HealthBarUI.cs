@@ -10,14 +10,10 @@ public class HealthBarUI : MonoBehaviour
     [SerializeField] Image healthImg;
     [SerializeField] BaseCharacterHealth owner;
 
-    void Start()
+    public void Setup(BaseCharacterHealth owner)
     {
-        
-    }
-
-    void OnEnable()
-    {
-        owner.OnDamaged += OnDamaged;
+        this.owner = owner;
+        this.owner.OnDamaged += OnDamaged;
     }
 
     void OnDisable()
@@ -28,10 +24,5 @@ public class HealthBarUI : MonoBehaviour
     void OnDamaged(object sender, float currHealth)
     {
         healthImg.DOFillAmount(currHealth, GameManager.HealthAnimationDuration);
-    }
-
-    void Update()
-    {
-        
     }
 }

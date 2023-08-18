@@ -14,11 +14,11 @@ TagManager:
   - Ground
   - Character
   - Projectile
-  - Hitbox
-  - Hurtbox
+  - Character Hitbox
+  - Character Hurtbox
   - Projectile Hurtbox
-  - Blockbox
-  - Prediction
+  - 
+  - 
   - 
   - 
   - 

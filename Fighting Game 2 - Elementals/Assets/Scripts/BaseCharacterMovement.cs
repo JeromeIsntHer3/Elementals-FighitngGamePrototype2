@@ -2,9 +2,8 @@ using System.Collections;
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using DG.Tweening;
 
-public class BaseCharacterMovement : BaseCharacter
+public class BaseCharacterMovement : MonoBehaviour
 {
     [SerializeField] protected CharacterMovementSO data;
 
@@ -15,6 +14,7 @@ public class BaseCharacterMovement : BaseCharacter
 
     protected readonly Dictionary<AnimationType, float> animationTimes = new();
 
+    protected BaseCharacter character;
     protected Rigidbody2D rb;
     protected CharacterInput cInput;
     protected Vector2 movement;
@@ -32,9 +32,9 @@ public class BaseCharacterMovement : BaseCharacter
     protected OptionCondition OptionPerformCond;
     protected OptionCondition OptionCancelCond;
 
-    public override void Awake()
+    public virtual void Awake()
     {
-        base.Awake();
+        character = GetComponent<BaseCharacter>();
         rb = GetComponent<Rigidbody2D>();
         cInput = GetComponent<CharacterInput>();
         jumps = data.JumpsAllowed;
@@ -42,34 +42,34 @@ public class BaseCharacterMovement : BaseCharacter
 
     public virtual void OnEnable()
     {
-        cInput.OnMovement += OnMovement;
-        cInput.OnJump += OnJump;
-        cInput.OnAttack1 += OnAttack1;
-        cInput.OnAttack2 += OnAttack2;
-        cInput.OnAttack3 += OnAttack3;
-        cInput.OnUltimate += OnUltimate;
-        cInput.OnRoll += OnRoll;
-        cInput.OnOption += OnOptionPerformed;
-        cInput.OnOptionCanceled += OnOptionCanceled;
-        cInput.OnChangeFaceDirection += OnChangeFaceDirection;
-        cInput.OnHit += OnHit;
-        cInput.OnBlockAttack += OnBlockAttack;
+        character.OnMovement += OnMovement;
+        character.OnJump += OnJump;
+        character.OnAttack1 += OnAttack1;
+        character.OnAttack2 += OnAttack2;
+        character.OnAttack3 += OnAttack3;
+        character.OnUltimate += OnUltimate;
+        character.OnRoll += OnRoll;
+        character.OnOption += OnOptionPerformed;
+        character.OnOptionCanceled += OnOptionCanceled;
+        character.OnChangeFaceDirection += OnChangeFaceDirection;
+        character.OnHit += OnHit;
+        character.OnBlockHit += OnBlockHit;
     }
 
     public virtual void OnDisable()
     {
-        cInput.OnMovement -= OnMovement;
-        cInput.OnJump -= OnJump;
-        cInput.OnAttack1 -= OnAttack1;
-        cInput.OnAttack2 -= OnAttack2;
-        cInput.OnAttack3 -= OnAttack3;
-        cInput.OnUltimate -= OnUltimate;
-        cInput.OnRoll -= OnRoll;
-        cInput.OnOption -= OnOptionPerformed;
-        cInput.OnOptionCanceled -= OnOptionCanceled;
-        cInput.OnChangeFaceDirection -= OnChangeFaceDirection;
-        cInput.OnHit -= OnHit;
-        cInput.OnBlockAttack -= OnBlockAttack;
+        character.OnMovement -= OnMovement;
+        character.OnJump -= OnJump;
+        character.OnAttack1 -= OnAttack1;
+        character.OnAttack2 -= OnAttack2;
+        character.OnAttack3 -= OnAttack3;
+        character.OnUltimate -= OnUltimate;
+        character.OnRoll -= OnRoll;
+        character.OnOption -= OnOptionPerformed;
+        character.OnOptionCanceled -= OnOptionCanceled;
+        character.OnChangeFaceDirection -= OnChangeFaceDirection;
+        character.OnHit -= OnHit;
+        character.OnBlockHit -= OnBlockHit;
     }
 
     void OnMovement(object sender, Vector2 args)
@@ -79,7 +79,6 @@ public class BaseCharacterMovement : BaseCharacter
 
     void OnJump(object sender, EventArgs args)
     {
-        if (!Recovered()) return;
         if (jumps <= 0) return;
         if (IsGrounded())
         {
@@ -102,40 +101,37 @@ public class BaseCharacterMovement : BaseCharacter
 
     void OnAttack1(object sender, EventArgs args)
     {
-        if (!Recovered() || jumping) return;
-        SetRecoveryDuration(GetDuration(AnimationType.Attack1));
+        if (jumping) return;
     }
 
     void OnAttack2(object sender, EventArgs args)
     {
-        if (!Recovered() || jumping) return;
-        SetRecoveryDuration(GetDuration(AnimationType.Attack2));
+        if (jumping) return;
     }
 
     void OnAttack3(object sender, EventArgs args)
     {
-        if (!Recovered() || jumping) return;
-        SetRecoveryDuration(GetDuration(AnimationType.Attack3));
+        if (jumping) return;
+        //character.SetRecoveryDuration(character.GetDuration(AnimationType.Attack3));
     }
 
     void OnUltimate(object sender, EventArgs args)
     {
-        if (!Recovered() || jumping) return;
-        SetRecoveryDuration(GetDuration(AnimationType.Ultimate));
+        if (jumping) return;
+        //character.SetRecoveryDuration(character.GetDuration(AnimationType.Ultimate));
     }
 
     void OnRoll(object sender, EventArgs args)
     {
-        if(!Recovered()) return;
         if (jumping) return;
-        SetRecoveryDuration(GetDuration(AnimationType.Roll));
+        //character.SetRecoveryDuration(character.GetDuration(AnimationType.Roll));
+        //Debug.Log("Bruh");
         Roll();
     }
 
     void OnOptionPerformed(object sender, EventArgs args)
     {
         if (OptionPerformCond()) return;
-        if (!Recovered()) return;
         if (jumping || option) return;
         OptionPerformedDelegate?.Invoke();
         option = true;
@@ -144,7 +140,7 @@ public class BaseCharacterMovement : BaseCharacter
     void OnOptionCanceled(object sender, EventArgs args)
     {
         if (!option) return;
-        SetRecoveryDuration(GetDuration(AnimationType.CharacterOptionEnd));
+        //character.SetRecoveryDuration(character.GetDuration(AnimationType.CharacterOptionEnd));
         OptionCanceledDelegate?.Invoke();
         option = false;
     }
@@ -156,14 +152,12 @@ public class BaseCharacterMovement : BaseCharacter
 
     void OnHit(object sender, DamageData e)
     {
-        SetRecoveryDuration(GetDuration(AnimationType.Damaged));
-        Knockback(e.Direction, e.HorizontalKnockback, e.VerticalKnockback);
+        Knockback(e.KnockbackDirection, e.HorizontalKnockback, e.VerticalKnockback);
     }
 
-    void OnBlockAttack(object sender, DamageData e)
+    void OnBlockHit(object sender, DamageData e)
     {
-        SetRecoveryDuration(e.StunDuration + GetDuration(AnimationType.DefendEnd));
-        Knockback(e.Direction, e.HorizontalKnockback, e.VerticalKnockback);
+        Knockback(e.KnockbackDirection, e.HorizontalKnockback, e.VerticalKnockback);
     }
 
     void Update()
@@ -177,11 +171,11 @@ public class BaseCharacterMovement : BaseCharacter
         if(!canMove) return;
         if (option)
         {
-            if (OptionCancelCond()) cInput.OnOptionCanceled?.Invoke(this, EventArgs.Empty);
+            if (OptionCancelCond()) character.OnOptionCanceled?.Invoke(this, EventArgs.Empty);
             return;
         }
 
-        if (!Recovered()) return;
+        if (!character.Recovered()) return;
             
         float targetSpeed = data.PlayerSpeed * movement.x;
         float speedDiff = targetSpeed - rb.velocity.x;
@@ -194,10 +188,12 @@ public class BaseCharacterMovement : BaseCharacter
         rb.velocity = new Vector2(rb.velocity.x, 0);
         rb.AddForce(Vector2.up * data.JumpForce, ForceMode2D.Impulse);
         rb.AddForce(movement * data.JumpForce/2, ForceMode2D.Impulse);
+        character.SetGroundedState(false);
     }
 
     void Roll()
     {
+        Debug.Log("Pruh");
         Vector2 dir = isFacingLeft ? Vector2.left : Vector2.right;
         rb.velocity = new Vector2(0, rb.velocity.y);
         rb.AddForce(dir * data.DashForce, ForceMode2D.Impulse);
@@ -217,9 +213,10 @@ public class BaseCharacterMovement : BaseCharacter
     {
         if (IsGrounded() && jumping)
         {
+            character.SetGroundedState(true);
             jumping = false;
             jumps = data.JumpsAllowed;
-            cInput.OnLand?.Invoke(this, EventArgs.Empty);
+            character.OnLand?.Invoke(this, EventArgs.Empty);
         }
     }
 

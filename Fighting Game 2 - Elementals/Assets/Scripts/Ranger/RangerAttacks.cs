@@ -7,37 +7,42 @@ public class RangerAttacks : BaseCharacterAttacks
 {
     [Header("Ranger Prefabs")]
     [SerializeField] Beam ultimateBeamPrefab;
+    [SerializeField] ArrowStorm stormPrefab;
 
     [Header("Ranger Attack Values")]
-    [SerializeField] float arrowForce;
-    [SerializeField] float multiArrowForce;
-    [SerializeField] float arrowLifespan;
+    [SerializeField] float arrowSpeed;
+    [SerializeField] float multiArrowSpeed;
 
     [Header("Ranger Arrow Spawns")]
     [SerializeField] Transform arrowSpawn;
     [SerializeField] Transform jumpArrowSpawn;
     [SerializeField] Transform beamSpawn;
+    [SerializeField] Transform stormSpawn;
     [SerializeField] List<Transform> multiArrowSpawns = new();
 
-    public void ShootAirMulti()
+    bool enhance;
+
+    public override void Awake()
     {
-        foreach (Transform spawn in multiArrowSpawns)
-        {
-            Vector2 dir = spawn.position - centre.position;
-            var arrow = Instantiate(prefab, spawn.position, Quaternion.identity);
-            arrow.GetComponent<Arrow>().SpawnArrow(new Arrow.ArrowData
-            {
-                FlipSprite = IsFacingLeft,
-                FlightDirection = dir,
-                FlightSpeed = multiArrowForce,
-                DeathTime = Time.time + arrowLifespan,
-                Damage = attackData[AnimationType.Attack2].Damage,
-                Source = this,
-                VerticalKnockback = attackData[AnimationType.Attack2].VerticalKnockback,
-                HorizontalKnockback = attackData[AnimationType.Attack2].HorizontalKnockback,
-                StunDuration = attackData[AnimationType.Attack2].StunDuration,
-            });
-        }
+        base.Awake();
+    }
+
+    public override void OnEnable()
+    {
+        base.OnEnable();
+        Enhance1 = () => { enhance = true; };
+        Enhance2 = () => { enhance = true; };
+        Enhance3 = () => { enhance = true; };
+        EnhanceJump = () => { enhance = true; };
+    }
+
+    public override void OnDisable()
+    {
+        base.OnDisable();
+        Enhance1 = null;
+        Enhance2 = null;
+        Enhance3 = null;
+        EnhanceJump = null;
     }
 
     public void ArrowStab()
@@ -47,46 +52,64 @@ public class RangerAttacks : BaseCharacterAttacks
 
     public void ShootNormal()
     {
-        var arrow = Instantiate(prefab, arrowSpawn.position, Quaternion.identity);
-        arrow.GetComponent<Arrow>().SpawnArrow(new Arrow.ArrowData
+        if (enhance)
         {
-            FlipSprite = IsFacingLeft,
-            FlightDirection = IsFacingLeft ? Vector3.left : Vector3.right,
-            FlightSpeed = arrowForce,
-            DeathTime = Time.time + arrowLifespan,
-            Damage = attackData[AnimationType.Attack2].Damage,
-            Source = this,
-            VerticalKnockback = attackData[AnimationType.Attack2].VerticalKnockback,
-            HorizontalKnockback = attackData[AnimationType.Attack2].HorizontalKnockback,
-            StunDuration = attackData[AnimationType.Attack2].StunDuration,
-        });
+            enhance = false;
+            ShootNormalEnhance();
+        }
+
+        var arrow = Instantiate(prefab, arrowSpawn.position, Quaternion.identity);
+        arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.Two), character,
+            IsFacingLeft, IsFacingLeft ? Vector3.left : Vector3.right, arrowSpeed, 5f);
+    }
+
+    public void ShootNormalEnhance()
+    {
+        var arrow = Instantiate(prefab, 
+            new Vector2(arrowSpawn.position.x, arrowSpawn.position.y + 0.1f), Quaternion.identity);
+        arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.TwoEnhanced), character,
+            IsFacingLeft, IsFacingLeft ? Vector3.left : Vector3.right, arrowSpeed, 5f);
+
+        arrow = Instantiate(prefab,
+            new Vector2(arrowSpawn.position.x, arrowSpawn.position.y - 0.1f), Quaternion.identity);
+        arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.TwoEnhanced), character,
+            IsFacingLeft, IsFacingLeft ? Vector3.left : Vector3.right, arrowSpeed, 5f);
+    }
+
+    public void MultiShot()
+    {
+        if (enhance)
+        {
+            MultiShotEnhance();
+            enhance = false;
+        }
+        else
+        {
+            foreach (Transform spawn in multiArrowSpawns)
+            {
+                var arrow = Instantiate(prefab, spawn.position, Quaternion.identity);
+                arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.Two),
+                    character, IsFacingLeft, spawn.position - centre.position, multiArrowSpeed, 5f);
+            }
+        }
+    }
+
+    void MultiShotEnhance()
+    {
+        var storm = Instantiate(stormPrefab, stormSpawn.position, Quaternion.identity);
+        storm.SetupArrowSpawn(GetDamageData(AttackType.ThreeEnhanced), character);
     }
 
     public void ShootWhileJumping()
     {
         var arrow = Instantiate(prefab, jumpArrowSpawn.position, Quaternion.identity);
-        Vector2 dir = jumpArrowSpawn.position - centre.position;
-        arrow.GetComponent<Arrow>().SpawnArrow(new Arrow.ArrowData
-        {
-            FlipSprite = IsFacingLeft,
-            FlightDirection = dir,
-            FlightSpeed = arrowForce,
-            DeathTime = Time.time + arrowLifespan,
-            Damage = attackData[AnimationType.Attack2].Damage,
-            Source = this,
-            VerticalKnockback = attackData[AnimationType.Attack2].VerticalKnockback,
-            HorizontalKnockback = attackData[AnimationType.Attack2].HorizontalKnockback,
-            StunDuration = attackData[AnimationType.Attack2].StunDuration,
-        });
+        arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.Two), character,
+            IsFacingLeft, jumpArrowSpawn.position - centre.position, arrowSpeed, 5f);
     }
 
     public void UltimateBlast()
     {
         var beam = Instantiate(ultimateBeamPrefab, beamSpawn.position, Quaternion.identity);
-        beam.Spawn(new Beam.BeamData
-        {
-            FlipSprite = IsFacingLeft,
-            Lifespan = .333f
-        });
+        beam.SetupBeam(GetDamageData(AttackType.Ultimate),character, IsFacingLeft);
     }
 }

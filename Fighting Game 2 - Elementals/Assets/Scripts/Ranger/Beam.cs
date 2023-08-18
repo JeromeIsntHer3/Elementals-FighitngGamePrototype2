@@ -1,32 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Arrow;
 
-public class Beam : MonoBehaviour
+public class Beam : Hitbox
 {
-    public class BeamData
-    {
-        public bool FlipSprite;
-        public float Lifespan;
-    }
-
     SpriteRenderer sr;
-    float deathTime;
 
-    void Awake()
+    public void SetupBeam(DamageData data, BaseCharacter owner, bool flipX)
     {
+        base.SetDamageData(data, owner);
         sr = GetComponent<SpriteRenderer>();
-    }
-
-    public void Spawn(BeamData data)
-    {
-        sr.flipX = data.FlipSprite;
-        //deathTime = Time.time + data.Lifespan;
-    }
-
-    void Update()
-    {
-        //if (deathTime < Time.time) Destroy(gameObject);
+        sr.flipX = flipX;
     }
 
     public void Despawn()

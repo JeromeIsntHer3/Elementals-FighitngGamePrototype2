@@ -2,26 +2,15 @@ using UnityEngine;
 
 public class Hurtbox : GameBox
 {
-    [SerializeField] Hurtboxes hurtboxGroup;
-
-    void Start()
+    public void Hit(DamageData damageData)
     {
-        hurtboxGroup = transform.parent.GetComponent<Hurtboxes>();
+        damageData.KnockbackDirection = owner.transform.position - damageData.Source.transform.position;
+        owner.GetComponent<BaseCharacterHealth>().Damage(damageData);
     }
 
-    void Hit(DamageData dData)
+    public void BlockHit(DamageData damageData)
     {
-        if (!hurtboxGroup.CanBeHit(dData)) return;
-        hurtboxGroup.SetAttack(dData);
-        owner.GetComponent<BaseCharacterHealth>().Damage(dData);
-    }
-
-    public void OnTriggerEnter2D(Collider2D collision)
-    {
-        if(collision.TryGetComponent(out IHitbox hitbox))
-        {
-            hitbox.Data().Direction = owner.transform.position - hitbox.Data().Source.transform.position;
-            Hit(hitbox.Data());
-        }
+        damageData.KnockbackDirection = owner.transform.position - damageData.Source.transform.position;
+        owner.OnBlockHit?.Invoke(this, damageData);
     }
 }

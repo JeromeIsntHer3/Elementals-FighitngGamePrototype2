@@ -6,8 +6,9 @@ using UnityEngine;
 [Serializable]
 public class CharacterAnimation
 {
-    [HideInInspector] public string dispName;
     public AnimationType Type;
     public AnimationClip Clip;
+    public bool AnimationCondition;
+    public bool FullyAnimate;
     public bool canChangeFaceDirection;
 }

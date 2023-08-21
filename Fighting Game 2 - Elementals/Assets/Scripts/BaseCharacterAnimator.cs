@@ -10,7 +10,9 @@ public class BaseCharacterAnimator : MonoBehaviour
     protected BaseCharacter character;
 
     readonly Dictionary<AnimationType, int> animationHashes = new();
-    readonly Dictionary<int, bool> animationCanChangeFaceDirection = new();
+    readonly Dictionary<AnimationType, bool> animationCanChangeFaceDirection = new();
+    readonly Dictionary<AnimationType, bool> animationFullyAnimate = new();
+    readonly Dictionary<AnimationType, bool> animationCondition = new();
 
     Animator animator;
     SpriteRenderer spriteRenderer;
@@ -49,11 +51,11 @@ public class BaseCharacterAnimator : MonoBehaviour
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
 
-        character.AnimationData.AddToDicts(new AnimationTransferData()
-        {
-            hashes = animationHashes,
-            canFlipX = animationCanChangeFaceDirection
-        });
+        //Add Animations Here
+        character.AnimationData.AddToHashesDict(animationHashes);
+        character.AnimationData.AddToCanChangeDirectionDict(animationCanChangeFaceDirection);
+        character.AnimationData.AddToFullyAnimate(animationFullyAnimate);
+        character.AnimationData.AddToConditionDict(animationCondition);
     }
 
     public virtual void OnEnable()
@@ -309,6 +311,13 @@ public class BaseCharacterAnimator : MonoBehaviour
         blockCancel = false;
     }
 
+    //int GetAnimationState()
+    //{
+    //    if (Time.time < lockedTilTime) return currentState;
+
+    //    if(anima)
+    //}
+
     int GetAnimState()
     {
         if (Time.time < lockedTilTime) return currentState;
@@ -398,15 +407,4 @@ public class BaseCharacterAnimator : MonoBehaviour
     {
         return animationCanChangeFaceDirection[s];
     }
-
-    #region Classes
-
-    public class AnimationTransferData
-    {
-        public Dictionary<AnimationType, int> hashes = new();
-        public Dictionary<AnimationType, float> durations = new();
-        public Dictionary<int, bool> canFlipX = new();
-    }
-
-    #endregion
 }

@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 using UnityEditor;
-using Codice.Client.Common.FsNodeReaders;
 
 [CustomPropertyDrawer(typeof(CharacterAnimation))]
 public class CharacterAnimationEditor : PropertyDrawer
@@ -27,12 +26,12 @@ public class CharacterAnimationEditor : PropertyDrawer
         fold.Add(animTypeEnum);
         fold.Add(canChange);
         fold.Add(animationClip);
-        fold.Add(clipInspector);
+        //fold.Add(clipInspector);
         root.Add(fold);
 
-        
+
         //animationClip.RegisterCallback<ChangeEvent<Object>, VisualElement>(ClipChanged, clipInspector);
-        //animTypeEnum.RegisterCallback<ChangeEvent<string>, Foldout>(TypeChanged, fold);
+        animTypeEnum.RegisterCallback<ChangeEvent<string>, Foldout>(TypeChanged, fold);
 
 
         return root;

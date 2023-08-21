@@ -24,11 +24,11 @@ public class CharacterAnimationSO : ScriptableObject
         }
     }
 
-    public void AddToConditionDict(Dictionary<AnimationType, bool> conditionDict)
+    public void AddToConditionList(Dictionary<AnimationType, bool> conds)
     {
         foreach(CharacterAnimation animation in CharacterAnimations)
         {
-            conditionDict.Add(animation.Type, animation.AnimationCondition);
+            conds.Add(animation.Type, animation.AnimationCondition);
         }
     }
 

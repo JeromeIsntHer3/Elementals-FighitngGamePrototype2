@@ -12,23 +12,24 @@ public class BaseCharacterAnimator : MonoBehaviour
     readonly Dictionary<AnimationType, int> animationHashes = new();
     readonly Dictionary<AnimationType, bool> animationCanChangeFaceDirection = new();
     readonly Dictionary<AnimationType, bool> animationFullyAnimate = new();
-    readonly Dictionary<AnimationType, bool> animationCondition = new();
+    readonly Dictionary<AnimationType, bool> animCond = new();
 
     Animator animator;
     SpriteRenderer spriteRenderer;
 
     #region AnimationTriggers
 
-    bool grounded = true,
-        attack1, attack2, attack3, ultimate, airAttack,
-        roll, jumped, landed,
-        option, optionTrigger, optionCancelTrigger, optionCancelCheck,
-        hit, death,
-        blocking, blockTrigger, blockCancel, hitStun, blockStun, blockStarted;
+    bool grounded = true;
+    //    attack1, attack2, attack3, ultimate, airAttack,
+    //    roll, jumped, landed,
+    //    option, optionTrigger, optionCancelTrigger, optionCancelCheck,
+    //    hit, death,
+    //    blocking, blockTrigger, blockCancel, hitStun, blockStun, blockStarted;
 
     #endregion
 
     int currentState;
+    AnimationType currAnimType;
     int previousState;
     float lockedTilTime;
     float stunTilTime;
@@ -55,7 +56,7 @@ public class BaseCharacterAnimator : MonoBehaviour
         character.AnimationData.AddToHashesDict(animationHashes);
         character.AnimationData.AddToCanChangeDirectionDict(animationCanChangeFaceDirection);
         character.AnimationData.AddToFullyAnimate(animationFullyAnimate);
-        character.AnimationData.AddToConditionDict(animationCondition);
+        character.AnimationData.AddToConditionList(animCond);
     }
 
     public virtual void OnEnable()
@@ -112,12 +113,12 @@ public class BaseCharacterAnimator : MonoBehaviour
         if (!grounded)
         {
             CancelAnimation();
-            airAttack = true;
+            animCond[AnimationType.JumpAttack] = true;
             return;
         }
 
         CancelAnimation();
-        attack1 = true;
+        animCond[AnimationType.Attack1] = true;
         attacking = true;
         attackingTilTime = Time.time + character.GetAnimationDuration(AnimationType.Attack1);
     }
@@ -126,7 +127,7 @@ public class BaseCharacterAnimator : MonoBehaviour
     {
         if (!grounded) return;
         CancelAnimation();
-        attack2 = true;
+        animCond[AnimationType.Attack2] = true;
         attacking = true;
         attackingTilTime = Time.time + character.GetAnimationDuration(AnimationType.Attack1);
     }
@@ -135,7 +136,7 @@ public class BaseCharacterAnimator : MonoBehaviour
     {
         if (!grounded) return;
         CancelAnimation();
-        attack3 = true;
+        animCond[AnimationType.Attack3] = true;
         attacking = true;
         attackingTilTime = Time.time + character.GetAnimationDuration(AnimationType.Attack1);
     }
@@ -144,13 +145,13 @@ public class BaseCharacterAnimator : MonoBehaviour
     {
         if (!grounded) return;
         CancelAnimation();
-        ultimate = true;
+        animCond[AnimationType.Ultimate] = true;
     }
 
     void OnRoll(object sender, EventArgs args)
     {
         if (!grounded) return;
-        roll = true;
+        animCond[AnimationType.Roll] = true;
         CancelAnimation();
     }
 
@@ -158,19 +159,18 @@ public class BaseCharacterAnimator : MonoBehaviour
     {
         if (OptionPerformCondition()) return;
         if (!grounded) return;
-        optionTrigger = true;
-        option = true;
+        animCond[AnimationType.CharacterOptionStart] = true;
+        animCond[AnimationType.CharacterOptionLoop] = true;
     }
 
     void OnOptionCanceled(object sender, EventArgs args)
     {
-        if (!option) return;
+        if (!animCond[AnimationType.CharacterOptionLoop]) return;
 
         if (previousState == GetHash(AnimationType.CharacterOptionStart) || 
             previousState == GetHash(AnimationType.CharacterOptionLoop))
         {
-            optionCancelTrigger = true;
-            optionCancelCheck = true;
+            animCond[AnimationType.CharacterOptionEnd] = true;
             character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.CharacterOptionEnd));
         }
     }
@@ -178,7 +178,7 @@ public class BaseCharacterAnimator : MonoBehaviour
     void OnJump(object sender, EventArgs args)
     {
         if (!grounded || !character.Recovered()) return;
-        jumped = true;
+        animCond[AnimationType.JumpStart] = true;
         grounded = false;
     }
 
@@ -186,14 +186,14 @@ public class BaseCharacterAnimator : MonoBehaviour
     {
         CancelAnimation();
         grounded = true;
-        landed = true;
+        animCond[AnimationType.JumpEnd] = true;
     }
 
     void OnHit(object sender, DamageData args)
     {
         CancelAnimation();
-        hit = true;
-        hitStun = true;
+        animCond[AnimationType.Hit] = true;
+        animCond[AnimationType.RecoveryFromHit] = true;
         stunTilTime = Time.time + args.StunDuration;
         character.SetRecoveryDuration(args.StunDuration);
         ShakeOnHit(args.StunDuration);
@@ -204,21 +204,21 @@ public class BaseCharacterAnimator : MonoBehaviour
     {
         rb.velocity = Vector2.zero;
         //blockTrigger = true;
-        blocking = true;
-        blockStarted = false;
+        animCond[AnimationType.DefendStart] = true;
+        animCond[AnimationType.DefendLoop] = true;
     }
 
     void OnBlockCanceled(object sender, EventArgs e)
     {
-        if (!blocking) return;
-        blockCancel = true;
-        blocking = false;
+        if (!animCond[AnimationType.DefendLoop]) return;
+        animCond[AnimationType.DefendEnd] = true;
+        animCond[AnimationType.DefendLoop] = false;
     }
 
     void OnBlockHit(object sender, DamageData data)
     {
         CancelAnimation();
-        blockStun = true;
+        animCond[AnimationType.DefendHit] = true;
         blockTilTime = Time.time + data.StunDuration / GameManager.HitShakeAnimationMultipler;
         ShakeOnHit(data.StunDuration / GameManager.HitShakeAnimationMultipler);
         character.SetRecoveryDuration(data.StunDuration);
@@ -268,11 +268,11 @@ public class BaseCharacterAnimator : MonoBehaviour
     void Update()
     {
         if (attackingTilTime < Time.time) attacking = false;
-        if(stunTilTime < Time.time) hitStun = false;
-        if(blockTilTime < Time.time) blockStun = false;
+        if(stunTilTime < Time.time) animCond[AnimationType.Hit] = false;
+        if(blockTilTime < Time.time) animCond[AnimationType.DefendHit] = false;
  
-        if (blocking) character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.DefendEnd));
-        if (option) character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.CharacterOptionEnd));
+        if (animCond[AnimationType.DefendLoop]) character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.DefendEnd));
+        //if (animCond[AnimationType.CharacterOptionLoop]) character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.CharacterOptionEnd));
 
         if(cInput.CurrentMovementInput().x == 0)
         {
@@ -296,32 +296,67 @@ public class BaseCharacterAnimator : MonoBehaviour
 
     void SetAnimationConditionsFalse()
     {
-        attack1 = false;
-        attack2 = false;
-        attack3 = false;
-        roll = false;
-        jumped = false;
-        landed = false;
-        airAttack = false;
-        ultimate = false;
-        optionTrigger = false;
-        optionCancelTrigger = false;
-        hit = false;
-        blockTrigger = false;
-        blockCancel = false;
+        //attack1 = false;
+        //attack2 = false;
+        //attack3 = false;
+        //roll = false;
+        //jumped = false;
+        //landed = false;
+        //airAttack = false;
+        //ultimate = false;
+        //optionTrigger = false;
+        //optionCancelTrigger = false;
+        //hit = false;
+        //blockTrigger = false;
+        //blockCancel = false;
+
+        animCond[AnimationType.Attack1] = false;
+        animCond[AnimationType.Attack2] = false;
+        animCond[AnimationType.Attack3] = false;
+        animCond[AnimationType.Roll] = false;
+        animCond[AnimationType.JumpStart] = false;
+        animCond[AnimationType.JumpEnd] = false;
+        animCond[AnimationType.JumpAttack] = false;
+        animCond[AnimationType.Ultimate] = false;
+        animCond[AnimationType.CharacterOptionStart] = false;
+        animCond[AnimationType.DefendStart] = false;
+        animCond[AnimationType.DefendEnd] = false;
+        animCond[AnimationType.Hit] = false;
     }
 
-    //int GetAnimationState()
-    //{
-    //    if (Time.time < lockedTilTime) return currentState;
-
-    //    if(anima)
-    //}
+    int GetHashAndSetLockTime(AnimationType t)
+    {
+        currAnimType = t;
+        if (animationFullyAnimate[t]) lockedTilTime = Time.time + character.GetAnimationDuration(t);
+        return animationHashes[t];
+    }
 
     int GetAnimState()
     {
         if (Time.time < lockedTilTime) return currentState;
 
+        if (animCond[AnimationType.Hit]) return GetHashAndSetLockTime(AnimationType.Hit);
+        if (animCond[AnimationType.RecoveryFromHit]) return GetHashAndSetLockTime(AnimationType.RecoveryFromHit);
+
+        if (animCond[AnimationType.DefendHit]) return GetHashAndSetLockTime(AnimationType.DefendHit);
+        if (animCond[AnimationType.DefendEnd]) return GetHashAndSetLockTime(AnimationType.DefendEnd);
+        if (animCond[AnimationType.DefendStart]) return GetHashAndSetLockTime(AnimationType.DefendStart);
+        if (animCond[AnimationType.DefendLoop]) return GetHashAndSetLockTime(AnimationType.DefendLoop);
+
+        //if (animCond[AnimationType.CharacterOptionEnd]) return GetHashAndSetLockTime(AnimationType.CharacterOptionEnd);
+        //if (animCond[AnimationType.CharacterOptionStart]) return GetHashAndSetLockTime(AnimationType.CharacterOptionStart);
+        //if (animCond[AnimationType.CharacterOptionLoop]) return GetHashAndSetLockTime(AnimationType.CharacterOptionLoop);
+
+        if (animCond[AnimationType.Roll]) return GetHashAndSetLockTime(AnimationType.Roll);
+        if (animCond[AnimationType.JumpEnd]) return GetHashAndSetLockTime(AnimationType.JumpEnd);
+        if (animCond[AnimationType.JumpStart]) return GetHashAndSetLockTime(AnimationType.JumpStart);
+
+        if (animCond[AnimationType.Ultimate]) return GetHashAndSetLockTime(AnimationType.Ultimate);
+        if (animCond[AnimationType.Attack1]) return GetHashAndSetLockTime(AnimationType.Attack1);
+        if (animCond[AnimationType.Attack2]) return GetHashAndSetLockTime(AnimationType.Attack2);
+        if (animCond[AnimationType.Attack3]) return GetHashAndSetLockTime(AnimationType.Attack3);
+
+#if false
         if (death) return GetHash(AnimationType.Death);
         if (hit) return LockState(GetHash(AnimationType.Hit), character.GetAnimationDuration(AnimationType.Hit));
         if (hitStun) return LockState(GetHash(AnimationType.RecoveryFromHit), character.GetAnimationDuration(AnimationType.RecoveryFromHit));
@@ -367,6 +402,9 @@ public class BaseCharacterAnimator : MonoBehaviour
 
         //Non-Grounded Animations
         if(airAttack) return LockState(GetHash(AnimationType.JumpAttack), character.GetAnimationDuration(AnimationType.JumpAttack));
+
+#endif
+        if (grounded) return movement.x == 0 ? GetHash(AnimationType.Idle) : GetHash(AnimationType.Run);
         if (rb.velocity.y > 3) return GetHash(AnimationType.JumpRising);
         if (rb.velocity.y > 1) return LockState(GetHash(AnimationType.JumpPeak), character.GetAnimationDuration(AnimationType.JumpPeak));
         return rb.velocity.y < -1 ?
@@ -398,13 +436,13 @@ public class BaseCharacterAnimator : MonoBehaviour
     void ChangeFaceDirection(Vector2 v)
     {
         if (v == Vector2.zero || !grounded) return;
-        if (currentState != 0) { if (!CanChangeDirection(currentState)) return; }
+        if (currentState != 0) { if (!CanChangeDirection(currAnimType)) return; }
         spriteRenderer.flipX = v.x <= 0;
         character.OnChangeFaceDirection?.Invoke(this, spriteRenderer.flipX);
     }
 
-    bool CanChangeDirection(int s)
+    bool CanChangeDirection(AnimationType t)
     {
-        return animationCanChangeFaceDirection[s];
+        return animationCanChangeFaceDirection[t];
     }
 }

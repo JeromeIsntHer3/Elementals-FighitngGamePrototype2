@@ -15,6 +15,7 @@ public class CharacterAnimationEditor : PropertyDrawer
         var animTypeEnum = new PropertyField(property.FindPropertyRelative("Type"));
         var canChange = new PropertyField(property.FindPropertyRelative("canChangeFaceDirection"));
         var animationClip = new PropertyField(property.FindPropertyRelative("Clip"));
+        
 
         var clipInspector = new Box();
         root.Add(clipInspector);
@@ -26,6 +27,8 @@ public class CharacterAnimationEditor : PropertyDrawer
         fold.Add(animTypeEnum);
         fold.Add(canChange);
         fold.Add(animationClip);
+        //fold.Add(new PropertyField(property.FindPropertyRelative("AnimationCondition")));
+        fold.Add(new PropertyField(property.FindPropertyRelative("FullyAnimate")));
         //fold.Add(clipInspector);
         root.Add(fold);
 

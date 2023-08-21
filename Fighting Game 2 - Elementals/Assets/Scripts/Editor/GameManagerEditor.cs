@@ -14,7 +14,8 @@ public class GameManagerEditor : Editor
     {
 
         var root = new VisualElement();
-        m_UXML.CloneTree(root);
+
+        if (m_UXML != null) m_UXML?.CloneTree(root);
 
         //InspectorElement.FillDefaultInspector(root, serializedObject, this);
         //return root;

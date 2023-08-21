@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 504ae3a9e59e5c4439d2b72fe58eaeaf, type: 3}
+  m_Name: Fire_Knight_Animations
+  m_EditorClassIdentifier: 
+  CharacterAnimations:
+  - dispName: sdzfsdf
+    Type: 0
+    Clip: {fileID: 7400000, guid: 2946f4ebbabd8894f9961b9420ee4f7f, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 1
+    Clip: {fileID: 7400000, guid: 4aadd5123b34da244834a379c398fa18, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 2
+    Clip: {fileID: 7400000, guid: 1f0d2b66d25bdcd418dff34a1217b7f4, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 6
+    Clip: {fileID: 7400000, guid: 68e8c82ed96282d4f913c46f1226a1b8, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 7
+    Clip: {fileID: 7400000, guid: beb6db7e8083ac642933c31c6d64ef2b, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 8
+    Clip: {fileID: 7400000, guid: 40b11d9ef1d592e4483c9c7446b5b6ba, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 9
+    Clip: {fileID: 7400000, guid: 6ea67727586e4e148b0a3a51865db048, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 10
+    Clip: {fileID: 7400000, guid: d610934680dadf24b99bf42ff83ce347, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 11
+    Clip: {fileID: 7400000, guid: bb8d704ab21c1414988e38fba80a3cd2, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 12
+    Clip: {fileID: 7400000, guid: 2a65f78d1b63ee249a900b5f3a453eb1, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 13
+    Clip: {fileID: 7400000, guid: e099388c239ffa94b8e7572d5b1b5d03, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 14
+    Clip: {fileID: 7400000, guid: fd7d2b9f776dec64f9fde6677fbbc176, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 15
+    Clip: {fileID: 7400000, guid: ad7a727150578994b99bb49b6cabfbca, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 16
+    Clip: {fileID: 7400000, guid: 361b83a2f4e14aa468cdb7cd61d7c1df, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 17
+    Clip: {fileID: 7400000, guid: 27eea9aa10788ea4181fb8c620ba7c47, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 18
+    Clip: {fileID: 7400000, guid: 803878c7e10667d43ae65f87de10bcf9, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 19
+    Clip: {fileID: 7400000, guid: be699babcf934eb43896a5566fcc87c8, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 20
+    Clip: {fileID: 7400000, guid: ee6a922b597e37740832ce42519c5993, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 21
+    Clip: {fileID: 7400000, guid: 8efbd58534537804cb54fe90868b9bf2, type: 2}
+    canChangeFaceDirection: 0
+  - dispName: sdzfsdf
+    Type: 22
+    Clip: {fileID: 7400000, guid: 1ef8f57932c65904f8e49924afc4d196, type: 2}
+    canChangeFaceDirection: 0

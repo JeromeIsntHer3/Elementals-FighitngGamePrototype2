@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 using UnityEditor;
+using Codice.Client.Common.FsNodeReaders;
 
 [CustomPropertyDrawer(typeof(CharacterAnimation))]
 public class CharacterAnimationEditor : PropertyDrawer
@@ -12,15 +13,27 @@ public class CharacterAnimationEditor : PropertyDrawer
     {
         var root = new VisualElement();
 
-        root.Add(new PropertyField(property.FindPropertyRelative("Type")));
-        root.Add(new PropertyField(property.FindPropertyRelative("canChangeFaceDirection")));
+        var animTypeEnum = new PropertyField(property.FindPropertyRelative("Type"));
+        var canChange = new PropertyField(property.FindPropertyRelative("canChangeFaceDirection"));
         var animationClip = new PropertyField(property.FindPropertyRelative("Clip"));
-        root.Add(animationClip);
 
         var clipInspector = new Box();
         root.Add(clipInspector);
 
-        animationClip.RegisterCallback<ChangeEvent<Object>, VisualElement>(ClipChanged, clipInspector);
+        var fold = new Foldout()
+        {
+            viewDataKey = "dateKeyCharacterAnimationEditor"
+        };
+        fold.Add(animTypeEnum);
+        fold.Add(canChange);
+        fold.Add(animationClip);
+        fold.Add(clipInspector);
+        root.Add(fold);
+
+        
+        //animationClip.RegisterCallback<ChangeEvent<Object>, VisualElement>(ClipChanged, clipInspector);
+        //animTypeEnum.RegisterCallback<ChangeEvent<string>, Foldout>(TypeChanged, fold);
+
 
         return root;
     }
@@ -33,5 +46,11 @@ public class CharacterAnimationEditor : PropertyDrawer
         if (t == null) return;
 
         clipInspector.Add(new InspectorElement(t));
+    }
+
+    void TypeChanged(ChangeEvent<string> evt, Foldout fold)
+    {
+        fold.text = "";
+        fold.text = evt.newValue;
     }
 }

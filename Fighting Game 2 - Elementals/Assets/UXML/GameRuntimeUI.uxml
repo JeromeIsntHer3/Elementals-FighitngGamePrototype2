@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="full" style="flex-grow: 1;">
+        <ui:VisualElement name="Top" style="flex-grow: 0; flex-direction: column; justify-content: flex-end; flex-basis: 100px; align-self: auto; align-items: stretch; background-color: rgba(0, 0, 0, 0.21); margin-left: 20px; margin-right: 20px; margin-top: 20px; margin-bottom: 20px;">
+            <ui:Slider picking-mode="Ignore" label="Slider" value="39.6" high-value="100" style="width: 703px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

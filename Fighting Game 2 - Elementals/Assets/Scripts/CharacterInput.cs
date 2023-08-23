@@ -6,105 +6,122 @@ using Ctx = UnityEngine.InputSystem.InputAction.CallbackContext;
 
 public class CharacterInput : MonoBehaviour
 {
-    PlayerControls controls;
+    PlayerInput playerInput;
     BaseCharacter character;
     Vector2 movement;
 
+    #region InputActions
+
+    InputAction movementAction;
+    InputAction rollAction;
+    InputAction jumpAction;
+    InputAction cancelAction;
+    InputAction enhanceAction;
+    InputAction blockAction;
+    InputAction attack1Action;
+    InputAction attack2Action;
+    InputAction attack3Action;
+    InputAction ultimateAction;
+    InputAction optionAction;
+
+    #endregion
+
     void Awake()
     {
-        controls = new ();
         character = GetComponent<BaseCharacter>();
-    }
-
-    void OnEnable()
-    {
-        controls.Enable();
-    }
-
-    void OnDisable()
-    {
-        controls.Disable();
+        playerInput = GetComponent<PlayerInput>();
+        movementAction = playerInput.actions["Movement"];
+        rollAction = playerInput.actions["Roll"];
+        jumpAction = playerInput.actions["Jump"];
+        cancelAction = playerInput.actions["Cancel"];
+        enhanceAction = playerInput.actions["Enhance"];
+        blockAction = playerInput.actions["Block"];
+        attack1Action = playerInput.actions["Attack1"];
+        attack2Action = playerInput.actions["Attack2"];
+        attack3Action = playerInput.actions["Attack3"];
+        ultimateAction = playerInput.actions["Ultimate"];
+        optionAction = playerInput.actions["Option"];
     }
 
     void Start()
     {
-        controls.Player.Movement.performed += (Ctx obj) => 
+        movementAction.performed += (Ctx obj) => 
         {
             character.OnMovement?.Invoke(this, obj.ReadValue<Vector2>());
             character.OnMovementPerformed?.Invoke(this, obj.ReadValue<Vector2>());
         };
-        controls.Player.Movement.canceled += (Ctx obj) =>
+        movementAction.canceled += (Ctx obj) =>
         {
             character.OnMovement?.Invoke(this, obj.ReadValue<Vector2>());
             character.OnMovementCanceled?.Invoke(this, obj.ReadValue<Vector2>());
         };
 
-        controls.Player.Attack1.performed += (Ctx obj) =>
+        attack1Action.performed += (Ctx obj) =>
         {
             if (!character.Recovered()) return;
             character.OnAttack1?.Invoke(this, EventArgs.Empty);
             character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack1));
         };
-        controls.Player.Attack2.performed += (Ctx obj) =>
+        attack2Action.performed += (Ctx obj) =>
         {
             if (!character.Recovered()) return;
             character.OnAttack2?.Invoke(this, EventArgs.Empty);
             character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack2));
         };
-        controls.Player.Attack3.performed += (Ctx obj) =>
+        attack3Action.performed += (Ctx obj) =>
         {
             if (!character.Recovered()) return;
             character.OnAttack3?.Invoke(this, EventArgs.Empty);
             character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack3));
         };
-        controls.Player.Ultimate.performed += (Ctx obj) =>
+        ultimateAction.performed += (Ctx obj) =>
         {
             if (!character.Recovered()) return;
             character.OnUltimate?.Invoke(this, EventArgs.Empty);
             character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Ultimate));
         };
 
-        controls.Player.Roll.performed += (Ctx obj) =>
+        rollAction.performed += (Ctx obj) =>
         {
             if (!character.Recovered()) return;
             character.OnRoll?.Invoke(this, EventArgs.Empty);
             character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Roll));
         };
 
-        controls.Player.Jump.performed += (Ctx obj) =>
+        jumpAction.performed += (Ctx obj) =>
         {
             if (!character.Recovered()) return;
             character.OnJump?.Invoke(this, EventArgs.Empty);
         };
 
-        controls.Player.Option.performed += (Ctx obj) =>
+        optionAction.performed += (Ctx obj) =>
         {
             if (!character.Recovered()) return;
             character.OnOption?.Invoke(this, EventArgs.Empty);
         };
 
-        controls.Player.Option.canceled += (Ctx obj) =>
+        optionAction.canceled += (Ctx obj) =>
         {
             character.OnOptionCanceled?.Invoke(this, EventArgs.Empty);
         };
 
-        controls.Player.Enhance.performed += (Ctx obj) =>
+        enhanceAction.performed += (Ctx obj) =>
         {
             character.OnTryEnhance?.Invoke(this, EventArgs.Empty);
         };
-        controls.Player.Cancel.performed += (Ctx obj) =>
+        cancelAction.performed += (Ctx obj) =>
         {
             character.OnTryCancel?.Invoke(this, EventArgs.Empty);
         };
 
-        controls.Player.Block.performed += (Ctx obj) =>
+        blockAction.performed += (Ctx obj) =>
         {
             if (!character.IsGrounded) return;
             character.OnBlock?.Invoke(this, EventArgs.Empty);
         };
 
 
-        controls.Player.Block.canceled += (Ctx obj) =>
+        blockAction.canceled += (Ctx obj) =>
         {
             character.OnBlockCanceled?.Invoke(this, EventArgs.Empty);
         };
@@ -112,7 +129,7 @@ public class CharacterInput : MonoBehaviour
 
     void Update()
     {
-        movement = controls.Player.Movement.ReadValue<Vector2>();
+        movement = movementAction.ReadValue<Vector2>();
     }
 
     public Vector2 CurrentMovementInput()

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 504ae3a9e59e5c4439d2b72fe58eaeaf, type: 3}
   m_Name: Fire_Knight_Animations
   m_EditorClassIdentifier: 
+  hasOptionAnimations: 0
   CharacterAnimations:
   - Type: 0
     Clip: {fileID: 7400000, guid: 2946f4ebbabd8894f9961b9420ee4f7f, type: 2}
@@ -64,7 +65,7 @@ MonoBehaviour:
     FullyAnimate: 1
     canChangeFaceDirection: 0
   - Type: 13
-    Clip: {fileID: 7400000, guid: e099388c239ffa94b8e7572d5b1b5d03, type: 2}
+    Clip: {fileID: 7400000, guid: 1ef8f57932c65904f8e49924afc4d196, type: 2}
     AnimationCondition: 0
     FullyAnimate: 1
     canChangeFaceDirection: 0

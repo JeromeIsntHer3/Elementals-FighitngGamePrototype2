@@ -7,7 +7,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Movement_Slide_Start
+  m_Name: LR_Movement_Slide_Start
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -33,7 +33,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Defend_Start
+  m_Name: LR_Defend_Start
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -59,7 +59,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Movement_Slide_End
+  m_Name: LR_Movement_Slide_End
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -85,7 +85,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Defend_Loop
+  m_Name: LR_Defend_Loop
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -111,7 +111,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Hit_Recovery
+  m_Name: LR_Hit_Recovery
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -137,7 +137,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Attack_Projectile_Special
+  m_Name: LR_Attack_Projectile_Special
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -163,7 +163,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Jump_Start
+  m_Name: LR_Jump_Start
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -189,7 +189,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Jump_End
+  m_Name: LR_Jump_End
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -215,7 +215,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Defend_End
+  m_Name: LR_Defend_End
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -241,7 +241,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Attack_Projectile
+  m_Name: LR_Attack_Projectile
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -289,7 +289,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Jump_Upward_Loop
+  m_Name: LR_Jump_Upward_Loop
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -315,7 +315,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Movement_Run
+  m_Name: LR_Movement_Run
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -341,7 +341,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Hit
+  m_Name: LR_Hit
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -367,7 +367,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Movement_Roll
+  m_Name: LR_Movement_Roll
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -393,7 +393,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Attack_Normal
+  m_Name: LR_Attack_Normal
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -419,7 +419,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Death
+  m_Name: LR_Death
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -445,7 +445,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Pose_Idle
+  m_Name: LR_Pose_Idle
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -471,7 +471,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Movement_Slide_Loop
+  m_Name: LR_Ranger_Movement_Slide_Loop
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -497,7 +497,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Jump_Falling_Loop
+  m_Name: LR_Jump_Falling_Loop
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -523,7 +523,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Defend_Hit
+  m_Name: LR_Defend_Hit
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -549,7 +549,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Jump_Peak
+  m_Name: LR_Jump_Peak
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -575,7 +575,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Attack_Air
+  m_Name: LR_Attack_Air
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -617,7 +617,7 @@ AnimatorStateMachine:
     m_Position: {x: 720, y: 370, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 4034544879062575371}
-    m_Position: {x: 260, y: 580, z: 0}
+    m_Position: {x: 260, y: 550, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 4356749845490514007}
     m_Position: {x: 30, y: 200, z: 0}
@@ -656,7 +656,7 @@ AnimatorStateMachine:
     m_Position: {x: 720, y: 430, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 2677407850427565161}
-    m_Position: {x: 260, y: 520, z: 0}
+    m_Position: {x: 260, y: 490, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -6455191249985201724}
     m_Position: {x: 490, y: 190, z: 0}
@@ -668,10 +668,10 @@ AnimatorStateMachine:
     m_Position: {x: 490, y: 250, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -5089140361940800282}
-    m_Position: {x: 525, y: 315, z: 0}
+    m_Position: {x: 490, y: 370, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 6354551416762297609}
-    m_Position: {x: 560, y: 380, z: 0}
+    m_Position: {x: 490, y: 430, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
@@ -689,7 +689,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Ranger_Attack_Ultimate
+  m_Name: LR_Attack_Ultimate
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []

@@ -5,9 +5,6 @@ using UnityEngine;
 
 public class BaseCharacterAttacks : MonoBehaviour
 {
-    [Header("Attack Prefabs")]
-    [SerializeField] protected GameObject prefab;
-
     [Header("References")]
     [SerializeField] protected Transform rotater;
     [SerializeField] protected Transform centre;
@@ -100,6 +97,7 @@ public class BaseCharacterAttacks : MonoBehaviour
         if (inAir)
         {
             JumpAttack?.Invoke();
+            SetHitboxData(GetDamageData(AttackType.Jump));
             SetNewAttack(AnimationType.JumpAttack, AttackType.Jump);
             return;
         }
@@ -150,7 +148,7 @@ public class BaseCharacterAttacks : MonoBehaviour
     void OnTryEnhanceAttack(object sender, EventArgs e)
     {
         if(meterCount == 0 && currentMeterValue <= 0) return;
-        if (GameManager.EnhanceAttackThresholdDuration + recentAttackTime < Time.time) return;
+        if (GameManager.Instance.MeterBurnThresholdTime + recentAttackTime < Time.time) return;
         if (meterUsedTime > Time.time) return;
         meterUsedTime = Time.time + character.GetAnimationDuration(currentAnimationType);
         UseMeter(GetAttackData(currentAttackType).MeterUsage, false);
@@ -159,9 +157,9 @@ public class BaseCharacterAttacks : MonoBehaviour
 
     void OnTryCancelAnimation(object sender, EventArgs e)
     {
-        if (meterCount == 0 && currentMeterValue <= 0) return;
-        if (attackingTilTime < Time.time) return;
+        if (meterCount == 0 && currentMeterValue <= 0 || attackingTilTime < Time.time) return;
         meterUsedTime = 0;
+        attackingTilTime = 0;
         UseMeter(50,true);
     }
 

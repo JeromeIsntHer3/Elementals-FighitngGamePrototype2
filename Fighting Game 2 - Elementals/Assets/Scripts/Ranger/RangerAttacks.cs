@@ -6,6 +6,7 @@ using UnityEngine;
 public class RangerAttacks : BaseCharacterAttacks
 {
     [Header("Ranger Prefabs")]
+    [SerializeField] Arrow arrowPrefab;
     [SerializeField] Beam ultimateBeamPrefab;
     [SerializeField] ArrowStorm stormPrefab;
 
@@ -24,7 +25,7 @@ public class RangerAttacks : BaseCharacterAttacks
     public void ArrowStab()
     {
         if (!enhance) return;
-        var arrow = Instantiate(prefab, arrowSpawn.position, Quaternion.identity);
+        var arrow = Instantiate(arrowPrefab, arrowSpawn.position, Quaternion.identity);
         arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.Two), character,
             IsFacingLeft, IsFacingLeft ? Vector3.left : Vector3.right, arrowSpeed, 5f);
         enhance = false;
@@ -32,7 +33,7 @@ public class RangerAttacks : BaseCharacterAttacks
 
     public void ShootNormal()
     {
-        var arrow = Instantiate(prefab, arrowSpawn.position, Quaternion.identity);
+        var arrow = Instantiate(arrowPrefab, arrowSpawn.position, Quaternion.identity);
         arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.Two), character,
             IsFacingLeft, IsFacingLeft ? Vector3.left : Vector3.right, arrowSpeed, 5f);
         if (!enhance) return;
@@ -42,12 +43,12 @@ public class RangerAttacks : BaseCharacterAttacks
 
     public void ShootNormalEnhance()
     {
-        var arrow = Instantiate(prefab, 
+        var arrow = Instantiate(arrowPrefab, 
             new Vector2(arrowSpawn.position.x, arrowSpawn.position.y + 0.1f), Quaternion.identity);
         arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.TwoEnhanced), character,
             IsFacingLeft, IsFacingLeft ? Vector3.left : Vector3.right, arrowSpeed, 5f);
 
-        arrow = Instantiate(prefab,
+        arrow = Instantiate(arrowPrefab,
             new Vector2(arrowSpawn.position.x, arrowSpawn.position.y - 0.1f), Quaternion.identity);
         arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.TwoEnhanced), character,
             IsFacingLeft, IsFacingLeft ? Vector3.left : Vector3.right, arrowSpeed, 5f);
@@ -64,7 +65,7 @@ public class RangerAttacks : BaseCharacterAttacks
         {
             foreach (Transform spawn in multiArrowSpawns)
             {
-                var arrow = Instantiate(prefab, spawn.position, Quaternion.identity);
+                var arrow = Instantiate(arrowPrefab, spawn.position, Quaternion.identity);
                 arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.Two),
                     character, IsFacingLeft, spawn.position - centre.position, multiArrowSpeed, 5f);
             }
@@ -79,7 +80,7 @@ public class RangerAttacks : BaseCharacterAttacks
 
     public void ShootWhileJumping()
     {
-        var arrow = Instantiate(prefab, jumpArrowSpawn.position, Quaternion.identity);
+        var arrow = Instantiate(arrowPrefab, jumpArrowSpawn.position, Quaternion.identity);
         arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.Two), character,
             IsFacingLeft, jumpArrowSpawn.position - centre.position, arrowSpeed, 5f);
     }

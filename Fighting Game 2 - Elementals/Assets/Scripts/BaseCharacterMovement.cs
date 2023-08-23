@@ -99,7 +99,7 @@ public class BaseCharacterMovement : MonoBehaviour
 
     void OnOptionPerformed(object sender, EventArgs args)
     {
-        if (OptionPerformCond()) return;
+        if (OptionPerformCond == null || !OptionPerformCond()) return;
         if (jumping || option) return;
         OptionPerformedDelegate?.Invoke();
         option = true;
@@ -130,19 +130,17 @@ public class BaseCharacterMovement : MonoBehaviour
     void Update()
     {
         movement = cInput.CurrentMovementInput();
-        if (option) OptionUpdate?.Invoke();
+        if (option)
+        {
+            OptionUpdate?.Invoke();
+            if (OptionCancelCond == null || !OptionCancelCond()) return;
+            character.OnOptionCanceled?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     void FixedUpdate()
     {
-        if(!canMove) return;
-        if (option)
-        {
-            if (OptionCancelCond()) character.OnOptionCanceled?.Invoke(this, EventArgs.Empty);
-            return;
-        }
-
-        if (!character.Recovered()) return;
+        if (!character.Recovered() || !canMove) return;
             
         float targetSpeed = (jumping ? data.PlayerSpeed * 4/5f : data.PlayerSpeed) * movement.x;
         float speedDiff = targetSpeed - rb.velocity.x;
@@ -152,6 +150,7 @@ public class BaseCharacterMovement : MonoBehaviour
 
     void Jump()
     {
+        movement.x = 0;
         rb.velocity = new Vector2(rb.velocity.x, 0);
         rb.AddForce(Vector2.up * data.JumpForce, ForceMode2D.Impulse);
         rb.AddForce(movement * data.JumpForce/2, ForceMode2D.Impulse);
@@ -160,7 +159,6 @@ public class BaseCharacterMovement : MonoBehaviour
 
     void Roll()
     {
-        Debug.Log("Pruh");
         Vector2 dir = isFacingLeft ? Vector2.left : Vector2.right;
         rb.velocity = new Vector2(0, rb.velocity.y);
         rb.AddForce(dir * data.DashForce, ForceMode2D.Impulse);
@@ -189,6 +187,8 @@ public class BaseCharacterMovement : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        if (groundCheck1 == null || groundCheck2 == null) return;
+
         Vector3 point1 = groundCheck1.position;
         Vector3 point2 = new (groundCheck2.position.x, groundCheck1.position.y);
         Vector3 point3 = groundCheck2.position;

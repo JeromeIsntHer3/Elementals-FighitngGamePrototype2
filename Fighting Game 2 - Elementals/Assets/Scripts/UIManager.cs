@@ -20,15 +20,20 @@ public class UIManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        //Invoke(nameof(LateAwake), .1f);
     }
 
     void OnEnable()
     {
-        playerOne.GetComponent<BaseCharacterAttacks>().OnMeterUsed += meterOne.OnMeterUsed;
-        playerTwo.GetComponent<BaseCharacterAttacks>().OnMeterUsed += meterTwo.OnMeterUsed;
+        if(playerOne != null)
+        {
+            playerOne.GetComponent<BaseCharacterAttacks>().OnMeterUsed += meterOne.OnMeterUsed;
+            playerOne.GetComponent<BaseCharacterHealth>().OnHealthChanged += healthBarOne.OnHealthDepleted;
+        }
 
-        playerOne.GetComponent<BaseCharacterHealth>().OnHealthChanged += healthBarOne.OnHealthDepleted;
-        playerTwo.GetComponent<BaseCharacterHealth>().OnHealthChanged += healthBarTwo.OnHealthDepleted;
+        if(playerTwo != null)
+        {
+            playerTwo.GetComponent<BaseCharacterAttacks>().OnMeterUsed += meterTwo.OnMeterUsed;
+            playerTwo.GetComponent<BaseCharacterHealth>().OnHealthChanged += healthBarTwo.OnHealthDepleted;
+        }
     }
 }

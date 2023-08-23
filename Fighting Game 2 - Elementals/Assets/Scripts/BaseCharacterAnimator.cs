@@ -8,6 +8,7 @@ public class BaseCharacterAnimator : MonoBehaviour
     protected CharacterInput cInput;
     protected BaseCharacterMovement cMovement;
     protected BaseCharacter character;
+    protected Rigidbody2D rb;
 
     readonly Dictionary<AnimationType, int> animationHashes = new();
     readonly Dictionary<AnimationType, bool> animationCanChangeFaceDirection = new();
@@ -16,32 +17,19 @@ public class BaseCharacterAnimator : MonoBehaviour
 
     Animator animator;
     SpriteRenderer spriteRenderer;
-
-    #region AnimationTriggers
-
+    AnimationType currentState;
+    AnimationType previousState;
+    bool attacking = false;
     bool grounded = true;
-    //    attack1, attack2, attack3, ultimate, airAttack,
-    //    roll, jumped, landed,
-    //    option, optionTrigger, optionCancelTrigger, optionCancelCheck,
-    //    hit, death,
-    //    blocking, blockTrigger, blockCancel, hitStun, blockStun, blockStarted;
-
-    #endregion
-
-    int currentState;
-    AnimationType currAnimType;
-    int previousState;
     float lockedTilTime;
     float stunTilTime;
     float blockTilTime;
     float attackingTilTime;
-    bool attacking;
-
-    protected Rigidbody2D rb;
     Vector2 movement;
 
     public delegate bool OptionCondition();
     protected OptionCondition OptionPerformCondition;
+
 
     public virtual void Awake()
     {
@@ -71,8 +59,6 @@ public class BaseCharacterAnimator : MonoBehaviour
         character.OnUltimate += OnUltimate;
 
         character.OnRoll += OnRoll;
-        character.OnOption += OnOption;
-        character.OnOptionCanceled += OnOptionCanceled;
 
         character.OnHit += OnHit;
         character.OnBlock += OnBlock;
@@ -81,6 +67,10 @@ public class BaseCharacterAnimator : MonoBehaviour
 
         character.OnEnhanceAttack += OnEnhanceAttack;
         character.OnCancelAnimation += OnAnimationCancel;
+
+        if (!character.AnimationData.hasOptionAnimations) return;
+        character.OnOption += OnOption;
+        character.OnOptionCanceled += OnOptionCanceled;
     }
 
     public virtual void OnDisable()
@@ -93,14 +83,16 @@ public class BaseCharacterAnimator : MonoBehaviour
         character.OnAttack3 -= OnAttack3;
         character.OnUltimate -= OnUltimate;
         character.OnRoll -= OnRoll;
-        character.OnOption -= OnOption;
-        character.OnOptionCanceled -= OnOptionCanceled;
         character.OnHit -= OnHit;
         character.OnBlock -= OnBlock;
         character.OnBlockHit -= OnBlockHit;
         character.OnBlockCanceled -= OnBlockCanceled;
         character.OnEnhanceAttack -= OnEnhanceAttack;
         character.OnCancelAnimation -= OnAnimationCancel;
+
+        if (!character.AnimationData.hasOptionAnimations) return;
+        character.OnOption -= OnOption;
+        character.OnOptionCanceled -= OnOptionCanceled;
     }
 
     void OnMovement(object sender, Vector2 args)
@@ -112,8 +104,11 @@ public class BaseCharacterAnimator : MonoBehaviour
     {
         if (!grounded)
         {
+            
             CancelAnimation();
             animCond[AnimationType.JumpAttack] = true;
+            attacking = true;
+            attackingTilTime = Time.time + character.GetAnimationDuration(AnimationType.JumpAttack);
             return;
         }
 
@@ -167,8 +162,8 @@ public class BaseCharacterAnimator : MonoBehaviour
     {
         if (!animCond[AnimationType.CharacterOptionLoop]) return;
 
-        if (previousState == GetHash(AnimationType.CharacterOptionStart) || 
-            previousState == GetHash(AnimationType.CharacterOptionLoop))
+        if (previousState == AnimationType.CharacterOptionStart || 
+            previousState == AnimationType.CharacterOptionLoop)
         {
             animCond[AnimationType.CharacterOptionEnd] = true;
             character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.CharacterOptionEnd));
@@ -196,7 +191,7 @@ public class BaseCharacterAnimator : MonoBehaviour
         animCond[AnimationType.RecoveryFromHit] = true;
         stunTilTime = Time.time + args.StunDuration;
         character.SetRecoveryDuration(args.StunDuration);
-        ShakeOnHit(args.StunDuration);
+        ShakeOnHit(args.StunDuration);          
         DamageFlash();
     }
 
@@ -219,15 +214,16 @@ public class BaseCharacterAnimator : MonoBehaviour
     {
         CancelAnimation();
         animCond[AnimationType.DefendHit] = true;
-        blockTilTime = Time.time + data.StunDuration / GameManager.HitShakeAnimationMultipler;
-        ShakeOnHit(data.StunDuration / GameManager.HitShakeAnimationMultipler);
+        blockTilTime = Time.time + data.StunDuration * GameManager.Instance.HitShakeAnim / 100;
+        ShakeOnHit(data.StunDuration * GameManager.Instance.HitShakeAnim / 100);
         character.SetRecoveryDuration(data.StunDuration);
     }
 
-    void ShakeOnHit(float dura)
+    void ShakeOnHit(float duration)
     {
         spriteRenderer.transform.DOKill();
-        spriteRenderer.transform.DOShakePosition(Mathf.Clamp(dura/GameManager.HitShakeAnimationMultipler, .01f, 2f), 
+        spriteRenderer.transform.DOShakePosition(Mathf.Clamp(duration * GameManager.Instance.HitShakeAnim / 100,
+            .01f, 2f), 
             new Vector3(GameManager.Instance.ShakeStrengthX,
             GameManager.Instance.ShakeStrengthY, 0),
             GameManager.Instance.Vibrato, default, false, true, ShakeRandomnessMode.Harmonic)
@@ -267,49 +263,38 @@ public class BaseCharacterAnimator : MonoBehaviour
 
     void Update()
     {
-        if (attackingTilTime < Time.time) attacking = false;
-        if(stunTilTime < Time.time) animCond[AnimationType.Hit] = false;
-        if(blockTilTime < Time.time) animCond[AnimationType.DefendHit] = false;
- 
-        if (animCond[AnimationType.DefendLoop]) character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.DefendEnd));
-        //if (animCond[AnimationType.CharacterOptionLoop]) character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.CharacterOptionEnd));
-
-        if(cInput.CurrentMovementInput().x == 0)
+        if (cInput.CurrentMovementInput().x == 0)
         {
-            Vector2 enemyDir = (character.Enemy.transform.position - transform.position).normalized;
-            ChangeFaceDirection(new Vector2(enemyDir.x, 0));
+            if (character.Enemy != null)
+            {
+                Vector2 enemyDir = (character.Enemy.transform.position - transform.position).normalized;
+                ChangeFaceDirection(new Vector2(enemyDir.x, 0));
+            }
         }
         else
         {
             ChangeFaceDirection(cInput.CurrentMovementInput());
         }
 
-        var newState = GetAnimState();
+        if (attackingTilTime < Time.time) attacking = false;
+        if (stunTilTime < Time.time) animCond[AnimationType.Hit] = false;
+        if (blockTilTime < Time.time) animCond[AnimationType.DefendHit] = false;
+
+        if (animCond[AnimationType.DefendLoop]) character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.DefendEnd));
+        //if (animCond[AnimationType.CharacterOptionLoop]) character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.CharacterOptionEnd));
+
+        var newState = GetAnimation();
 
         SetAnimationConditionsFalse();
 
         previousState = currentState;
         if (SameState(newState)) return;
-        animator.CrossFade(newState, 0, 0);
+        animator.CrossFade(GetHashAndSetLockTime(newState), 0, 0);
         currentState = newState;
     }
 
     void SetAnimationConditionsFalse()
     {
-        //attack1 = false;
-        //attack2 = false;
-        //attack3 = false;
-        //roll = false;
-        //jumped = false;
-        //landed = false;
-        //airAttack = false;
-        //ultimate = false;
-        //optionTrigger = false;
-        //optionCancelTrigger = false;
-        //hit = false;
-        //blockTrigger = false;
-        //blockCancel = false;
-
         animCond[AnimationType.Attack1] = false;
         animCond[AnimationType.Attack2] = false;
         animCond[AnimationType.Attack3] = false;
@@ -321,40 +306,42 @@ public class BaseCharacterAnimator : MonoBehaviour
         animCond[AnimationType.CharacterOptionStart] = false;
         animCond[AnimationType.DefendStart] = false;
         animCond[AnimationType.DefendEnd] = false;
-        animCond[AnimationType.Hit] = false;
     }
 
     int GetHashAndSetLockTime(AnimationType t)
     {
-        currAnimType = t;
         if (animationFullyAnimate[t]) lockedTilTime = Time.time + character.GetAnimationDuration(t);
         return animationHashes[t];
     }
 
-    int GetAnimState()
+    AnimationType GetAnimation()
     {
         if (Time.time < lockedTilTime) return currentState;
 
-        if (animCond[AnimationType.Hit]) return GetHashAndSetLockTime(AnimationType.Hit);
-        if (animCond[AnimationType.RecoveryFromHit]) return GetHashAndSetLockTime(AnimationType.RecoveryFromHit);
+        if (animCond[AnimationType.Hit]) return AnimationType.Hit;
+        if (animCond[AnimationType.RecoveryFromHit])
+        {
+            animCond[AnimationType.RecoveryFromHit] = false;
+            return AnimationType.RecoveryFromHit;
+        }
 
-        if (animCond[AnimationType.DefendHit]) return GetHashAndSetLockTime(AnimationType.DefendHit);
-        if (animCond[AnimationType.DefendEnd]) return GetHashAndSetLockTime(AnimationType.DefendEnd);
-        if (animCond[AnimationType.DefendStart]) return GetHashAndSetLockTime(AnimationType.DefendStart);
-        if (animCond[AnimationType.DefendLoop]) return GetHashAndSetLockTime(AnimationType.DefendLoop);
+        if (animCond[AnimationType.DefendHit]) return AnimationType.DefendHit;
+        if (animCond[AnimationType.DefendEnd]) return AnimationType.DefendEnd;
+        if (animCond[AnimationType.DefendStart]) return AnimationType.DefendStart;
+        if (animCond[AnimationType.DefendLoop]) return AnimationType.DefendLoop;
 
-        //if (animCond[AnimationType.CharacterOptionEnd]) return GetHashAndSetLockTime(AnimationType.CharacterOptionEnd);
-        //if (animCond[AnimationType.CharacterOptionStart]) return GetHashAndSetLockTime(AnimationType.CharacterOptionStart);
-        //if (animCond[AnimationType.CharacterOptionLoop]) return GetHashAndSetLockTime(AnimationType.CharacterOptionLoop);
+        //if (animCond[AnimationType.CharacterOptionEnd]) return AnimationType.CharacterOptionEnd;
+        //if (animCond[AnimationType.CharacterOptionStart]) return AnimationType.CharacterOptionStart;
+        //if (animCond[AnimationType.CharacterOptionLoop]) return AnimationType.CharacterOptionLoop;
 
-        if (animCond[AnimationType.Roll]) return GetHashAndSetLockTime(AnimationType.Roll);
-        if (animCond[AnimationType.JumpEnd]) return GetHashAndSetLockTime(AnimationType.JumpEnd);
-        if (animCond[AnimationType.JumpStart]) return GetHashAndSetLockTime(AnimationType.JumpStart);
+        if (animCond[AnimationType.Roll]) return AnimationType.Roll;
+        if (animCond[AnimationType.JumpEnd]) return AnimationType.JumpEnd;
+        if (animCond[AnimationType.JumpStart]) return AnimationType.JumpStart;
 
-        if (animCond[AnimationType.Ultimate]) return GetHashAndSetLockTime(AnimationType.Ultimate);
-        if (animCond[AnimationType.Attack1]) return GetHashAndSetLockTime(AnimationType.Attack1);
-        if (animCond[AnimationType.Attack2]) return GetHashAndSetLockTime(AnimationType.Attack2);
-        if (animCond[AnimationType.Attack3]) return GetHashAndSetLockTime(AnimationType.Attack3);
+        if (animCond[AnimationType.Ultimate]) return AnimationType.Ultimate;
+        if (animCond[AnimationType.Attack1]) return AnimationType.Attack1;
+        if (animCond[AnimationType.Attack2]) return AnimationType.Attack2;
+        if (animCond[AnimationType.Attack3]) return AnimationType.Attack3;
 
 #if false
         if (death) return GetHash(AnimationType.Death);
@@ -404,18 +391,11 @@ public class BaseCharacterAnimator : MonoBehaviour
         if(airAttack) return LockState(GetHash(AnimationType.JumpAttack), character.GetAnimationDuration(AnimationType.JumpAttack));
 
 #endif
-        if (grounded) return movement.x == 0 ? GetHash(AnimationType.Idle) : GetHash(AnimationType.Run);
-        if (rb.velocity.y > 3) return GetHash(AnimationType.JumpRising);
-        if (rb.velocity.y > 1) return LockState(GetHash(AnimationType.JumpPeak), character.GetAnimationDuration(AnimationType.JumpPeak));
-        return rb.velocity.y < -1 ?
-            GetHash(AnimationType.JumpFalling)
-            : LockState(GetHash(AnimationType.JumpRising), character.GetAnimationDuration(AnimationType.JumpRising));
-
-        int LockState(int s, float t)
-        {
-            lockedTilTime = Time.time + t;
-            return s;
-        }
+        if (grounded) return movement.x == 0 ? AnimationType.Idle : AnimationType.Run;
+        if (animCond[AnimationType.JumpAttack]) return AnimationType.JumpAttack;
+        if (rb.velocity.y > 3) return AnimationType.JumpRising;
+        if (rb.velocity.y > 1) return AnimationType.JumpPeak;
+        return rb.velocity.y < -1 ? AnimationType.JumpFalling : AnimationType.JumpRising;
     }
 
     void CancelAnimation()
@@ -423,12 +403,7 @@ public class BaseCharacterAnimator : MonoBehaviour
         lockedTilTime = 0;
     }
 
-    int GetHash(AnimationType type)
-    {
-        return animationHashes[type];
-    }
-
-    bool SameState(int newState)
+    bool SameState(AnimationType newState)
     {
         return currentState == newState;
     }
@@ -436,7 +411,7 @@ public class BaseCharacterAnimator : MonoBehaviour
     void ChangeFaceDirection(Vector2 v)
     {
         if (v == Vector2.zero || !grounded) return;
-        if (currentState != 0) { if (!CanChangeDirection(currAnimType)) return; }
+        if (currentState != 0) { if (!CanChangeDirection(currentState)) return; }
         spriteRenderer.flipX = v.x <= 0;
         character.OnChangeFaceDirection?.Invoke(this, spriteRenderer.flipX);
     }

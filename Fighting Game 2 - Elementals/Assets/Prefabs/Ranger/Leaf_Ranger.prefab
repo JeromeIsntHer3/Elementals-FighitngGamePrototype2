@@ -48,7 +48,7 @@ GameObject:
   m_Layer: 7
   m_Name: ArrowSpawn (6)
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -219,7 +219,7 @@ GameObject:
   m_Layer: 7
   m_Name: ArrowSpawn (4)
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -250,7 +250,7 @@ GameObject:
   m_Layer: 7
   m_Name: ArrowSpawn (7)
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -281,7 +281,7 @@ GameObject:
   m_Layer: 7
   m_Name: ArrowSpawn
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -403,7 +403,7 @@ GameObject:
   m_Layer: 7
   m_Name: ArrowSpawn (2)
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -465,7 +465,7 @@ GameObject:
   m_Layer: 7
   m_Name: UltiSpawn
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -735,7 +735,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.0066551566, y: -0.1064831}
+  m_Offset: {x: 0.00025242567, y: -0.1064831}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -746,7 +746,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.5474466, y: 1.2395871}
+  m_Size: {x: 0.5612618, y: 1.2395871}
   m_EdgeRadius: 0
 --- !u!114 &123895863454984510
 MonoBehaviour:
@@ -788,7 +788,7 @@ GameObject:
   m_Layer: 7
   m_Name: ArrowSpawn (5)
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -820,6 +820,7 @@ GameObject:
   - component: {fileID: 7843513284910525123}
   - component: {fileID: 3668499072787781697}
   - component: {fileID: 8601698920724597929}
+  - component: {fileID: 8170260380229860288}
   - component: {fileID: 9090715947920779465}
   - component: {fileID: 7967445969706520631}
   - component: {fileID: 1646892394122441442}
@@ -827,12 +828,12 @@ GameObject:
   - component: {fileID: 3675216059393867222}
   - component: {fileID: 5942693812805270233}
   m_Layer: 7
-  m_Name: Ranger
+  m_Name: Leaf_Ranger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4906293603137724233
 Transform:
   m_ObjectHideFlags: 0
@@ -957,9 +958,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f21c9ceff33ee4e4eb0deb33ef05582b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: 1
+  player: 2
   animationData: {fileID: 11400000, guid: 59b9b19f1c4931843a43135828a482d1, type: 2}
---- !u!114 &9090715947920779465
+--- !u!114 &8170260380229860288
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -967,6 +968,92 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5494376411780763073}
   m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: ead93b3707114db40b236f21120e35b7, type: 3}
+  m_NotificationBehavior: 2
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 00c6ac29-f362-49ad-a895-14b236051bc5
+    m_ActionName: Player/Movement[/Keyboard/a,/Keyboard/d,/XInputControllerWindows/dpad/left,/XInputControllerWindows/dpad/right]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 7c8144c5-cb21-468d-9716-3dab89e363f3
+    m_ActionName: Player/Attack1[/Keyboard/j,/XInputControllerWindows/buttonWest]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: a7315cb6-436d-4dfa-bf52-8c0ee00d7f61
+    m_ActionName: Player/Attack2[/Keyboard/i,/XInputControllerWindows/buttonNorth]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 3a5bdd6b-5a76-4434-8e04-263d20da2003
+    m_ActionName: Player/Attack3[/Keyboard/k,/XInputControllerWindows/buttonSouth]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 0eebeeaa-6718-4f8b-b0c6-d8e3cd4d5590
+    m_ActionName: Player/Roll[/Keyboard/shift,/XInputControllerWindows/leftStickPress]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: e2d821d4-396e-4cdf-be4d-8bcf220cc78f
+    m_ActionName: Player/Jump[/Keyboard/space,/XInputControllerWindows/dpad/up]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: cd9ca316-49a1-408f-81a1-3553fc4f50f0
+    m_ActionName: Player/Ultimate[/Keyboard/u,/XInputControllerWindows/rightShoulder]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 26195679-d264-4297-84f7-63cc05582c76
+    m_ActionName: Player/Option[/Keyboard/o,/XInputControllerWindows/rightTrigger]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 17a1060c-0f12-4359-9327-5c860f48e8e3
+    m_ActionName: Player/Enhance[/Keyboard/h,/XInputControllerWindows/rightStickPress]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 6a421922-3f19-4cbd-888c-b3d57e219956
+    m_ActionName: Player/Block[/Keyboard/l,/XInputControllerWindows/leftShoulder]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 5162c187-b12c-4663-adf5-cdda6c0d6bb6
+    m_ActionName: Player/Cancel[/Keyboard/semicolon,/XInputControllerWindows/leftTrigger]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 8b0145de-f60f-491f-a55d-91f5983384a0
+    m_ActionName: UI/Navigation[/XInputControllerWindows/leftStick/up,/XInputControllerWindows/rightStick/up,/XInputControllerWindows/leftStick/down,/XInputControllerWindows/rightStick/down,/XInputControllerWindows/leftStick/left,/XInputControllerWindows/rightStick/left,/XInputControllerWindows/leftStick/right,/XInputControllerWindows/rightStick/right,/XInputControllerWindows/dpad,/Keyboard/w,/Keyboard/upArrow,/Keyboard/s,/Keyboard/downArrow,/Keyboard/a,/Keyboard/leftArrow,/Keyboard/d,/Keyboard/rightArrow]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 2d3fb2d6-4fb7-4846-870c-f33b99f3b4b1
+    m_ActionName: UI/Cancel[/Keyboard/escape,/XInputControllerWindows/buttonEast]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: b8234edc-7f01-4699-b9ba-6dd930fdd017
+    m_ActionName: UI/Submit[/Keyboard/enter,/XInputControllerWindows/buttonSouth]
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: Keyboard
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
+--- !u!114 &9090715947920779465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5494376411780763073}
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 12243bd08137b3c409dafe3e627df513, type: 3}
   m_Name: 
@@ -1015,7 +1102,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4e5c7cccc984ae47a7518136b1c7515, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 3612778244317551059, guid: e1b37aac3ee4501408b6823adbccc0b8, type: 3}
   rotater: {fileID: 9063186671329392225}
   centre: {fileID: 1202857195423581174}
   attacksData: {fileID: 11400000, guid: 5d691b723a082ee49ac4c5cd1fbd99bc, type: 2}
@@ -1023,6 +1109,7 @@ MonoBehaviour:
   maxMeterValue: 100
   currentMeterValue: 100
   meterCount: 3
+  arrowPrefab: {fileID: -345113762163150280, guid: e1b37aac3ee4501408b6823adbccc0b8, type: 3}
   ultimateBeamPrefab: {fileID: 6628246287202306316, guid: 5de746c521a23fe4790fd727e32523c0, type: 3}
   stormPrefab: {fileID: 7280461822294780868, guid: d3b51869dc49d994b87ae892a2340414, type: 3}
   arrowSpeed: 85
@@ -1558,7 +1645,7 @@ GameObject:
   m_Layer: 7
   m_Name: ArrowStormSpawn
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 2488908585195742037, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -1711,7 +1798,7 @@ GameObject:
   m_Layer: 7
   m_Name: ArrowSpawn (1)
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -1742,7 +1829,7 @@ GameObject:
   m_Layer: 7
   m_Name: AirArrowSpawn
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 1206586993520771344, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -1773,7 +1860,7 @@ GameObject:
   m_Layer: 7
   m_Name: ArrowSpawn (3)
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1

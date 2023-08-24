@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
@@ -26,9 +27,19 @@ public class GameManager : MonoBehaviour
 
     #endregion
 
+    PlayerInputManager playerInputManager;
+
     void Awake()
     {
         Instance = this;
         Application.targetFrameRate = FrameRate;
+        playerInputManager = GetComponent<PlayerInputManager>();
+        SpawnPlayer();
+    }
+
+    void SpawnPlayer()
+    {
+        playerInputManager.JoinPlayer(0, default, "Keyboard");
+        playerInputManager.JoinPlayer(1, default, "Controller");
     }
 }

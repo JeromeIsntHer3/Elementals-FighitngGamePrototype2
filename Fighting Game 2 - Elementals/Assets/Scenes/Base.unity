@@ -2316,7 +2316,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5494376411780763073, guid: edcd38532c5ae9049bb368944876520b, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8170260380229860288, guid: edcd38532c5ae9049bb368944876520b, type: 3}
       propertyPath: m_DefaultControlScheme
@@ -2610,6 +2610,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1397349621}
   - component: {fileID: 1397349622}
+  - component: {fileID: 1397349623}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -2654,6 +2655,50 @@ MonoBehaviour:
   ShakeStrengthX: 0.2
   ShakeStrengthY: 0.01
   Vibrato: 20
+--- !u!114 &1397349623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397349620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 621567455fd1c4ceb811cc8a00b6a1a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_NotificationBehavior: 3
+  m_MaxPlayerCount: -1
+  m_AllowJoining: 1
+  m_JoinBehavior: 2
+  m_PlayerJoinedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_PlayerLeftEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_JoinAction:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Join
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 1230c493-7fa1-4317-9888-7b6f3bbdd0c4
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: 7704521246509551395, guid: ead93b3707114db40b236f21120e35b7, type: 3}
+  m_PlayerPrefab: {fileID: 8643802285760932057}
+  m_SplitScreen: 0
+  m_MaintainAspectRatioInSplitScreen: 0
+  m_FixedNumberOfSplitScreens: -1
+  m_SplitScreenRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
 --- !u!1 &1456302838
 GameObject:
   m_ObjectHideFlags: 0
@@ -3686,7 +3731,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6156557663959136171, guid: dc953acca3727ce47a8f6df392ffa598, type: 3}
   m_PrefabInstance: {fileID: 8643802285760932056}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 8643802285760932057}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f21c9ceff33ee4e4eb0deb33ef05582b, type: 3}
@@ -3703,6 +3748,10 @@ PrefabInstance:
     - target: {fileID: 2979018342426392207, guid: dc953acca3727ce47a8f6df392ffa598, type: 3}
       propertyPath: m_Name
       value: Fire_Knight
+      objectReference: {fileID: 0}
+    - target: {fileID: 2979018342426392207, guid: dc953acca3727ce47a8f6df392ffa598, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5707502071308784754, guid: dc953acca3727ce47a8f6df392ffa598, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3749,6 +3798,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dc953acca3727ce47a8f6df392ffa598, type: 3}
+--- !u!1 &8643802285760932057 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2979018342426392207, guid: dc953acca3727ce47a8f6df392ffa598, type: 3}
+  m_PrefabInstance: {fileID: 8643802285760932056}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

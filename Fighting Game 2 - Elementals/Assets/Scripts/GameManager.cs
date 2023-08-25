@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
         Instance = this;
         Application.targetFrameRate = FrameRate;
         playerInputManager = GetComponent<PlayerInputManager>();
-        SpawnPlayer();
+        //SpawnPlayer();
     }
 
     void SpawnPlayer()

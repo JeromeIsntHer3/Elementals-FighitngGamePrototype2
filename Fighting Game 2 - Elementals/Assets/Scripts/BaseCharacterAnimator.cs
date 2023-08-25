@@ -29,6 +29,7 @@ public class BaseCharacterAnimator : MonoBehaviour
 
     public delegate bool OptionCondition();
     protected OptionCondition OptionPerformCondition;
+    protected OptionCondition OptionCancelCondition;
 
 
     public virtual void Awake()
@@ -68,9 +69,15 @@ public class BaseCharacterAnimator : MonoBehaviour
         character.OnEnhanceAttack += OnEnhanceAttack;
         character.OnCancelAnimation += OnAnimationCancel;
 
-        if (!character.AnimationData.hasOptionAnimations) return;
-        character.OnOption += OnOption;
-        character.OnOptionCanceled += OnOptionCanceled;
+        if (character.AnimationData.optionIsHeld)
+        {
+            character.OnOption += OnOption;
+            character.OnOptionCanceled += OnOptionCanceled;
+        }
+        else if(character.AnimationData.optionIsTriggered)
+        {
+            character.OnOption += OnOption;
+        }
     }
 
     public virtual void OnDisable()
@@ -90,9 +97,15 @@ public class BaseCharacterAnimator : MonoBehaviour
         character.OnEnhanceAttack -= OnEnhanceAttack;
         character.OnCancelAnimation -= OnAnimationCancel;
 
-        if (!character.AnimationData.hasOptionAnimations) return;
-        character.OnOption -= OnOption;
-        character.OnOptionCanceled -= OnOptionCanceled;
+        if (character.AnimationData.optionIsHeld)
+        {
+            character.OnOption -= OnOption;
+            character.OnOptionCanceled -= OnOptionCanceled;
+        }
+        else if (character.AnimationData.optionIsTriggered)
+        {
+            character.OnOption -= OnOption;
+        }
     }
 
     void OnMovement(object sender, Vector2 args)
@@ -152,9 +165,13 @@ public class BaseCharacterAnimator : MonoBehaviour
 
     void OnOption(object sender, EventArgs args)
     {
-        if (OptionPerformCondition()) return;
-        if (!grounded) return;
+        if (!OptionPerformCondition() && !grounded) return;
         animCond[AnimationType.CharacterOptionStart] = true;
+        if (character.AnimationData.optionIsTriggered)
+        {
+            character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.CharacterOptionStart));
+            return;
+        }
         animCond[AnimationType.CharacterOptionLoop] = true;
     }
 
@@ -162,12 +179,9 @@ public class BaseCharacterAnimator : MonoBehaviour
     {
         if (!animCond[AnimationType.CharacterOptionLoop]) return;
 
-        if (previousState == AnimationType.CharacterOptionStart || 
-            previousState == AnimationType.CharacterOptionLoop)
-        {
-            animCond[AnimationType.CharacterOptionEnd] = true;
-            character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.CharacterOptionEnd));
-        }
+        animCond[AnimationType.CharacterOptionEnd] = true;
+        animCond[AnimationType.CharacterOptionLoop] = false;
+        character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.CharacterOptionEnd));
     }
 
     void OnJump(object sender, EventArgs args)
@@ -181,6 +195,7 @@ public class BaseCharacterAnimator : MonoBehaviour
     {
         CancelAnimation();
         grounded = true;
+        character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.JumpEnd));
         animCond[AnimationType.JumpEnd] = true;
     }
 
@@ -191,7 +206,7 @@ public class BaseCharacterAnimator : MonoBehaviour
         animCond[AnimationType.RecoveryFromHit] = true;
         stunTilTime = Time.time + args.StunDuration;
         character.SetRecoveryDuration(args.StunDuration);
-        ShakeOnHit(args.StunDuration);          
+        ShakeOnHit(args.StunDuration);
         DamageFlash();
     }
 
@@ -254,10 +269,11 @@ public class BaseCharacterAnimator : MonoBehaviour
 
     void SetSpriteColour(Color color, float totalDuration)
     {
+        Color prevColor = spriteRenderer.color;
         spriteRenderer.DOKill();
         spriteRenderer.DOColor(color, totalDuration/2).OnComplete(() =>
         {
-            spriteRenderer.DOColor(Color.white, totalDuration / 2);
+            spriteRenderer.DOColor(prevColor, totalDuration / 2);
         });
     }
 
@@ -281,7 +297,10 @@ public class BaseCharacterAnimator : MonoBehaviour
         if (blockTilTime < Time.time) animCond[AnimationType.DefendHit] = false;
 
         if (animCond[AnimationType.DefendLoop]) character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.DefendEnd));
-        //if (animCond[AnimationType.CharacterOptionLoop]) character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.CharacterOptionEnd));
+        if (character.AnimationData.optionIsHeld && animCond[AnimationType.CharacterOptionLoop])
+        {
+            character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.CharacterOptionEnd));
+        }
 
         var newState = GetAnimation();
 
@@ -289,6 +308,7 @@ public class BaseCharacterAnimator : MonoBehaviour
 
         previousState = currentState;
         if (SameState(newState)) return;
+        Debug.Log(newState);
         animator.CrossFade(GetHashAndSetLockTime(newState), 0, 0);
         currentState = newState;
     }
@@ -304,6 +324,7 @@ public class BaseCharacterAnimator : MonoBehaviour
         animCond[AnimationType.JumpAttack] = false;
         animCond[AnimationType.Ultimate] = false;
         animCond[AnimationType.CharacterOptionStart] = false;
+        animCond[AnimationType.CharacterOptionEnd] = false;
         animCond[AnimationType.DefendStart] = false;
         animCond[AnimationType.DefendEnd] = false;
     }
@@ -330,9 +351,17 @@ public class BaseCharacterAnimator : MonoBehaviour
         if (animCond[AnimationType.DefendStart]) return AnimationType.DefendStart;
         if (animCond[AnimationType.DefendLoop]) return AnimationType.DefendLoop;
 
-        //if (animCond[AnimationType.CharacterOptionEnd]) return AnimationType.CharacterOptionEnd;
-        //if (animCond[AnimationType.CharacterOptionStart]) return AnimationType.CharacterOptionStart;
-        //if (animCond[AnimationType.CharacterOptionLoop]) return AnimationType.CharacterOptionLoop;
+        if (character.AnimationData.optionIsHeld)
+        {
+            if (animCond[AnimationType.CharacterOptionEnd]) return AnimationType.CharacterOptionEnd;
+            if (animCond[AnimationType.CharacterOptionStart]) return AnimationType.CharacterOptionStart;
+            if (animCond[AnimationType.CharacterOptionLoop]) return AnimationType.CharacterOptionLoop;
+        }
+
+        if (character.AnimationData.optionIsTriggered)
+        {
+            if (animCond[AnimationType.CharacterOptionStart]) return AnimationType.CharacterOptionStart;
+        }
 
         if (animCond[AnimationType.Roll]) return AnimationType.Roll;
         if (animCond[AnimationType.JumpEnd]) return AnimationType.JumpEnd;
@@ -393,9 +422,9 @@ public class BaseCharacterAnimator : MonoBehaviour
 #endif
         if (grounded) return movement.x == 0 ? AnimationType.Idle : AnimationType.Run;
         if (animCond[AnimationType.JumpAttack]) return AnimationType.JumpAttack;
-        if (rb.velocity.y > 3) return AnimationType.JumpRising;
-        if (rb.velocity.y > 1) return AnimationType.JumpPeak;
-        return rb.velocity.y < -1 ? AnimationType.JumpFalling : AnimationType.JumpRising;
+        if (rb.velocity.y > 3f) return AnimationType.JumpRising;
+        if (rb.velocity.y > 1f) return AnimationType.JumpPeak;
+        return rb.velocity.y < -1f ? AnimationType.JumpFalling : AnimationType.JumpRising;
     }
 
     void CancelAnimation()

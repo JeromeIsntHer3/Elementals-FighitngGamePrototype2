@@ -104,4 +104,9 @@ public class BaseCharacter : MonoBehaviour
     {
         isGrounded = s;
     }
+
+    public bool HasOption()
+    {
+        return animationData.optionIsHeld || animationData.optionIsTriggered;
+    }
 }

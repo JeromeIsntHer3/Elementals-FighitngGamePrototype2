@@ -1893,28 +1893,30 @@ MonoBehaviour:
   startButton: {fileID: 768856798}
   settingsButton: {fileID: 150910680}
   quitButton: {fileID: 1671744248}
-  playerOneCharacterName: {fileID: 45486907}
-  playerTwoCharacterName: {fileID: 1386092959}
-  colorBlockOne:
-    m_NormalColor: {r: 1, g: 0.10950938, b: 0, a: 1}
+  playerCharacterNames:
+  - {fileID: 45486907}
+  - {fileID: 1386092959}
+  colorBlocks:
+  - m_NormalColor: {r: 1, g: 0.10950938, b: 0, a: 1}
     m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
     m_PressedColor: {r: 1, g: 1, b: 1, a: 1}
     m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
-    m_DisabledColor: {r: 1, g: 1, b: 1, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_ColorMultiplier: 3
     m_FadeDuration: 0.1
-  colorBlockTwo:
-    m_NormalColor: {r: 0, g: 0.6444626, b: 1, a: 1}
+  - m_NormalColor: {r: 0, g: 0.6444626, b: 1, a: 1}
     m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
     m_PressedColor: {r: 1, g: 1, b: 1, a: 1}
     m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
-    m_DisabledColor: {r: 1, g: 1, b: 1, a: 1}
+    m_DisabledColor: {r: 0.7830189, g: 0.7830189, b: 0.7830189, a: 1}
     m_ColorMultiplier: 3
     m_FadeDuration: 0.1
-  oneSpawn: {fileID: 756907368}
-  twoSpawn: {fileID: 724436613}
-  readyText1: {fileID: 1375328704}
-  readyText2: {fileID: 2106421806}
+  spawns:
+  - {fileID: 756907368}
+  - {fileID: 724436613}
+  playerReadyTexts:
+  - {fileID: 1375328704}
+  - {fileID: 2106421806}
   pim: {fileID: 588928336}
   es: {fileID: 991225891}
   playerPrefab: {fileID: 1225122275205714279, guid: de0fd2924b393c841b22b97f470bf6aa, type: 3}

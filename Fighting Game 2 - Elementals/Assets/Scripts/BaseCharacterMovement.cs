@@ -45,22 +45,38 @@ public class BaseCharacterMovement : MonoBehaviour
     {
         character.OnJump += OnJump;
         character.OnRoll += OnRoll;
-        character.OnOption += OnOptionPerformed;
-        character.OnOptionCanceled += OnOptionCanceled;
         character.OnChangeFaceDirection += OnChangeFaceDirection;
         character.OnHit += OnHit;
         character.OnBlockHit += OnBlockHit;
+
+        if (character.AnimationData.optionIsHeld)
+        {
+            character.OnOption += OnOptionPerformed;
+            character.OnOptionCanceled += OnOptionCanceled;
+        }
+        else if (character.AnimationData.optionIsTriggered)
+        {
+            character.OnOption += OnOptionPerformed;
+        }
     }
 
     public virtual void OnDisable()
     {
         character.OnJump -= OnJump;
         character.OnRoll -= OnRoll;
-        character.OnOption -= OnOptionPerformed;
-        character.OnOptionCanceled -= OnOptionCanceled;
         character.OnChangeFaceDirection -= OnChangeFaceDirection;
         character.OnHit -= OnHit;
         character.OnBlockHit -= OnBlockHit;
+
+        if (character.AnimationData.optionIsHeld)
+        {
+            character.OnOption -= OnOptionPerformed;
+            character.OnOptionCanceled -= OnOptionCanceled;
+        }
+        else if (character.AnimationData.optionIsTriggered)
+        {
+            character.OnOption -= OnOptionPerformed;
+        }
     }
 
     void OnJump(object sender, EventArgs args)
@@ -102,6 +118,7 @@ public class BaseCharacterMovement : MonoBehaviour
         if (OptionPerformCond == null || !OptionPerformCond()) return;
         if (jumping || option) return;
         OptionPerformedDelegate?.Invoke();
+        if (character.AnimationData.optionIsTriggered) return;
         option = true;
     }
 

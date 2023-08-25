@@ -28,11 +28,6 @@ public class CharacterContainerUI : MonoBehaviour
         indicator.Add(1, indicator2);
     }
 
-    void Confirmed()
-    {
-
-    }
-
     public void Select(ColorBlock color, int index)
     {
         if(selectedCount == 0)
@@ -68,12 +63,12 @@ public class CharacterContainerUI : MonoBehaviour
         {
             if(index == 0)
             {
-                containerButton.colors = MenuSceneManager.Instance.colorBlockTwo;
+                containerButton.colors = MenuSceneManager.Instance.GetColorBlock(1);
                 indicator[0].gameObject.SetActive(false);
             }
             else
             {
-                containerButton.colors = MenuSceneManager.Instance.colorBlockOne;
+                containerButton.colors = MenuSceneManager.Instance.GetColorBlock(0);
                 indicator[1].gameObject.SetActive(false);
             }
         }

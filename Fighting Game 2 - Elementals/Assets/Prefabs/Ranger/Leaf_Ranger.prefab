@@ -935,7 +935,7 @@ Animator:
   m_GameObject: {fileID: 5494376411780763073}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 2acbb2863f2e0414899edd1b11a25233, type: 2}
+  m_Controller: {fileID: 9100000, guid: 4e83232b6b52de347aba69338db16dfa, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1041,6 +1041,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: b8234edc-7f01-4699-b9ba-6dd930fdd017
     m_ActionName: UI/Submit[/Keyboard/enter,/XInputControllerWindows/buttonSouth]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 4d91615e-ad24-4b52-81e6-1c8951e4abd6
+    m_ActionName: UI/Back[/Keyboard/l,/XInputControllerWindows/buttonEast]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard
   m_DefaultActionMap: Player
@@ -1053,7 +1057,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5494376411780763073}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 12243bd08137b3c409dafe3e627df513, type: 3}
   m_Name: 

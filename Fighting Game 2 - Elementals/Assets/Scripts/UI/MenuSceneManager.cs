@@ -21,14 +21,10 @@ public class MenuSceneManager : MonoBehaviour
     [SerializeField] Button quitButton;
 
     [Header("Character Select")]
-    [SerializeField] TextMeshProUGUI playerOneCharacterName;
-    [SerializeField] TextMeshProUGUI playerTwoCharacterName;
-    public ColorBlock colorBlockOne;
-    public ColorBlock colorBlockTwo;
-    [SerializeField] Transform oneSpawn;
-    [SerializeField] Transform twoSpawn;
-    [SerializeField] TextMeshProUGUI readyText1;
-    [SerializeField] TextMeshProUGUI readyText2;
+    [SerializeField] List<TextMeshProUGUI> playerCharacterNames;
+    [SerializeField] List<ColorBlock> colorBlocks;
+    [SerializeField] List<Transform> spawns;
+    [SerializeField] List<TextMeshProUGUI> playerReadyTexts;
 
     [Header("Multiplayer")]
     [SerializeField] PlayerInputManager pim;
@@ -61,6 +57,8 @@ public class MenuSceneManager : MonoBehaviour
     CharacterSelectProxyUI proxyOne;
     CharacterSelectProxyUI proxyTwo;
 
+    MenuState state = MenuState.Main;
+
     void Start()
     {
         Instance = this;
@@ -71,17 +69,13 @@ public class MenuSceneManager : MonoBehaviour
 
         pim.playerPrefab = playerPrefab;
 
-        indexColorBlock.Add(0, colorBlockOne);
-        indexColorBlock.Add(1, colorBlockTwo);
-
-        indexName.Add(0, playerOneCharacterName);
-        indexName.Add(1, playerTwoCharacterName);
-
-        indexSpawn.Add(0, oneSpawn);
-        indexSpawn.Add(1, twoSpawn);
-
-        indexReadyText.Add(0, readyText1);
-        indexReadyText.Add(1, readyText1);
+        for(int i = 0; i < 2; i++)
+        {
+            indexColorBlock.Add(i, colorBlocks[i]);
+            indexName.Add(i, playerCharacterNames[i]);
+            indexSpawn.Add(i, spawns[i]);
+            indexReadyText.Add(i, playerReadyTexts[i]);
+        }
 
         confirmedCharacter.Add(0, null);
         confirmedCharacter.Add(1, null);
@@ -89,6 +83,8 @@ public class MenuSceneManager : MonoBehaviour
 
     void ToCharacterSelect()
     {
+        state = MenuState.Select;
+
         es.gameObject.SetActive(false);
 
         mainMenu.SetActive(false);
@@ -114,6 +110,13 @@ public class MenuSceneManager : MonoBehaviour
 
     void BackToMainMenu()
     {
+        state = MenuState.Main;
+
+        foreach(var spawn in spawns)
+        {
+            if(spawn.childCount > 0) Utils.DestroyChildren(spawn);
+        }
+
         proxyOne.OnDeselect -= ProxyOneDeselect;
         proxyTwo.OnDeselect -= ProxyTwoDeselect;
 
@@ -133,21 +136,32 @@ public class MenuSceneManager : MonoBehaviour
 
     void ProxyOneDeselect(object sender, EventArgs args)
     {
-        //Change return to else later on
-        if (!confirmedCharacter[0]) return;
-        readyText1.gameObject.SetActive(false);
-        proxyOne.SetSelectionState(true);
-        confirmedCharacter[0] = null;
-        Debug.Log("Player One Deselected");
+        if (state != MenuState.Select) return;
+        if (confirmedCharacter[0])
+        {
+            indexReadyText[0].gameObject.SetActive(false);
+            proxyOne.SetSelectionState(true);
+            confirmedCharacter[0] = null;
+        }
+        else
+        {
+            BackToMainMenu();
+        }
     }
 
     void ProxyTwoDeselect(object sender, EventArgs args)
     {
-        if (!confirmedCharacter[1]) return;
-        readyText2.gameObject.SetActive(false);
-        proxyTwo.SetSelectionState(true);
-        confirmedCharacter[1] = null;
-        Debug.Log("Player Two Deselected");
+        if (state != MenuState.Select) return;
+        if (confirmedCharacter[1])
+        {
+            indexReadyText[1].gameObject.SetActive(false);
+            proxyTwo.SetSelectionState(true);
+            confirmedCharacter[1] = null;
+        }
+        else
+        {
+            BackToMainMenu();
+        }
     }
 
     void SelectNewCharacter(CharacterContainerUI c, int playerIndex)
@@ -168,7 +182,7 @@ public class MenuSceneManager : MonoBehaviour
             if (selectedCharacter[playerIndex])
             {
                 selectedCharacter[playerIndex].Deselect(playerIndex);
-                if (indexSpawn[playerIndex].GetChild(0) != null) Destroy(indexSpawn[playerIndex].GetChild(0).gameObject);
+                if (indexSpawn[playerIndex].childCount > 0) Utils.DestroyChildren(indexSpawn[playerIndex]);
             }
             SelectNewCharacter(c, playerIndex);
         }
@@ -190,4 +204,14 @@ public class MenuSceneManager : MonoBehaviour
             confirmedCharacter[playerIndex] = c;
         }
     }
+
+    public ColorBlock GetColorBlock(int index)
+    {
+        return colorBlocks[index];
+    }
+}
+
+public enum MenuState
+{
+    Main, Select, Settings
 }

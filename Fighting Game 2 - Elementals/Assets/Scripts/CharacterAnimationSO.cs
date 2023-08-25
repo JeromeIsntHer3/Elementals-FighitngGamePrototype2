@@ -5,7 +5,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CharacterAnimation", menuName = "Character/AnimationData")]
 public class CharacterAnimationSO : ScriptableObject
 {
-    public bool hasOptionAnimations;
+    public bool optionIsHeld;
+    public bool optionIsTriggered;
     public List<CharacterAnimation> CharacterAnimations = new();
 
     public void AddToHashesDict(Dictionary<AnimationType, int> hashDict)

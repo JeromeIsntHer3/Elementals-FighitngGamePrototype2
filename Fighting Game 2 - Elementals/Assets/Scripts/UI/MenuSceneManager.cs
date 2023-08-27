@@ -117,6 +117,9 @@ public class MenuSceneManager : MonoBehaviour
             if(spawn.childCount > 0) Utils.DestroyChildren(spawn);
         }
 
+        indexReadyText[0].gameObject.SetActive(false);
+        indexReadyText[1].gameObject.SetActive(false);
+
         proxyOne.OnDeselect -= ProxyOneDeselect;
         proxyTwo.OnDeselect -= ProxyTwoDeselect;
 

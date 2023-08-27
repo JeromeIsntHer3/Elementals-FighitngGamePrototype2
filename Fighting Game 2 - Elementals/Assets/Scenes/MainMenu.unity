@@ -940,8 +940,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pb_CharacterName: Metal Bladekeeper
   pb_Info:
-    Prefab: {fileID: 0}
-    RelativeSpawn: {x: 0, y: 0, z: 0}
+    Prefab: {fileID: 4269141564837244922, guid: c357a7541ea189841966fbebb1484c02, type: 3}
+    RelativeSpawn: {x: -2.208768, y: -0.6960635, z: 0}
   manager: {fileID: 588928335}
   indicator1: {fileID: 114143006}
   indicator2: {fileID: 2063206476}
@@ -2965,8 +2965,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pb_CharacterName: Crystal Mauler
   pb_Info:
-    Prefab: {fileID: 0}
-    RelativeSpawn: {x: 0, y: 0, z: 0}
+    Prefab: {fileID: 5592719238539048988, guid: 2e57698060e166a488bb3f29b7909889, type: 3}
+    RelativeSpawn: {x: -2.331642, y: -0.748724, z: 0}
   manager: {fileID: 588928335}
   indicator1: {fileID: 1086264203}
   indicator2: {fileID: 764267334}

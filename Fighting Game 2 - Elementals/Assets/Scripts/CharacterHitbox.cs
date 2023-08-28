@@ -2,19 +2,29 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class CharacterHitbox : Hitbox
 {
-    void Start()
+    void OnEnable()
     {
-        HitSuccessful = (Hurtbox box) =>
-        {
-            box.Hit(DamageData);
-        };
+        HitSuccessful = HitSuccess;
+        HitBlock = HitFailed;
+    }
 
-        HitBlock = (Hurtbox box) =>
-        {
-            box.BlockHit(DamageData);
-        };
+    void OnDisable()
+    {
+        HitSuccessful = null;
+        HitBlock = null;
+    }
+
+    void HitSuccess(Hurtbox hb)
+    {
+        owner.OnHitEnemy?.Invoke(this, EventArgs.Empty);
+    }
+
+    void HitFailed(Hurtbox hb)
+    {
+        owner.OnHitBlocked?.Invoke(this, EventArgs.Empty);
     }
 }

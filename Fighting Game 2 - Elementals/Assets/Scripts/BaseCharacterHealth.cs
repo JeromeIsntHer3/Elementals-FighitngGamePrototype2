@@ -35,7 +35,6 @@ public class BaseCharacterHealth : MonoBehaviour
 
     public void Damage(DamageData data)
     {
-        Debug.Log(data);
         character.OnHit?.Invoke(this, data);
         OnHealthChanged?.Invoke(this, currentHealth / maxHealth);
     }

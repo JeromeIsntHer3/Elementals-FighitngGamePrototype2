@@ -5,8 +5,6 @@ public class Hurtbox : GameBox
     public void Hit(DamageData damageData)
     {
         DamageData damage = damageData;
-
-        Debug.Log(damage);
         damageData.KnockbackDirection = owner.transform.position - damageData.Source.transform.position;
         owner.GetComponent<BaseCharacterHealth>().Damage(damage);
     }

@@ -26,13 +26,13 @@ public class UIManager : MonoBehaviour
     {
         if(playerOne != null)
         {
-            playerOne.GetComponent<BaseCharacterAttacks>().OnMeterUsed += meterOne.OnMeterUsed;
+            playerOne.GetComponent<BaseCharacterAttacks>().OnMeterValueChanged += meterOne.OnMeterUsed;
             playerOne.GetComponent<BaseCharacterHealth>().OnHealthChanged += healthBarOne.OnHealthDepleted;
         }
 
         if(playerTwo != null)
         {
-            playerTwo.GetComponent<BaseCharacterAttacks>().OnMeterUsed += meterTwo.OnMeterUsed;
+            playerTwo.GetComponent<BaseCharacterAttacks>().OnMeterValueChanged += meterTwo.OnMeterUsed;
             playerTwo.GetComponent<BaseCharacterHealth>().OnHealthChanged += healthBarTwo.OnHealthDepleted;
         }
     }

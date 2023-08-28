@@ -2318,6 +2318,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8170260380229860288, guid: edcd38532c5ae9049bb368944876520b, type: 3}
+      propertyPath: m_DefaultControlScheme
+      value: Controller
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2647,6 +2651,8 @@ MonoBehaviour:
   ShakeStrengthX: 0.2
   ShakeStrengthY: 0.01
   Vibrato: 20
+  RCColor: {r: 0, g: 0, b: 0, a: 0}
+  ECColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &1397349623
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4034,10 +4040,12 @@ MonoBehaviour:
   maxMeterValue: 100
   currentMeterValue: 100
   meterCount: 3
-  knifePrefab: {fileID: 3506348259598705253, guid: 11b760adc54829444b46b76de7f5124a, type: 3}
+  meterGainOnHit: 0
+  knifePrefab: {fileID: 506569303055711129, guid: 11b760adc54829444b46b76de7f5124a, type: 3}
   knifeThrowSpawn: {fileID: 5867644199186092343}
   trapThrowSpawn: {fileID: 8763749311816338680}
   knifeSpeed: 70
+  trapSpeed: 50
 --- !u!61 &1704690587524914838
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4462,6 +4470,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2623321930755981035, guid: f76e8839c52cd3a4e8a4c01d12a219c6, type: 3}
+      propertyPath: m_Size.y
+      value: 1.2484045
+      objectReference: {fileID: 0}
+    - target: {fileID: 2623321930755981035, guid: f76e8839c52cd3a4e8a4c01d12a219c6, type: 3}
+      propertyPath: m_Offset.y
+      value: -1.360908
+      objectReference: {fileID: 0}
     - target: {fileID: 3029417491872044144, guid: f76e8839c52cd3a4e8a4c01d12a219c6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3
@@ -4502,6 +4518,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3761173726328151760, guid: f76e8839c52cd3a4e8a4c01d12a219c6, type: 3}
+      propertyPath: m_Size.y
+      value: 0.48001426
+      objectReference: {fileID: 0}
+    - target: {fileID: 3761173726328151760, guid: f76e8839c52cd3a4e8a4c01d12a219c6, type: 3}
+      propertyPath: m_Offset.y
+      value: -0.09704742
+      objectReference: {fileID: 0}
+    - target: {fileID: 5378995814197009314, guid: f76e8839c52cd3a4e8a4c01d12a219c6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.002
+      objectReference: {fileID: 0}
+    - target: {fileID: 5378995814197009314, guid: f76e8839c52cd3a4e8a4c01d12a219c6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.601
+      objectReference: {fileID: 0}
     - target: {fileID: 5912625293620403706, guid: f76e8839c52cd3a4e8a4c01d12a219c6, type: 3}
       propertyPath: m_Name
       value: Crystal_Mauler
@@ -4509,6 +4541,22 @@ PrefabInstance:
     - target: {fileID: 5912625293620403706, guid: f76e8839c52cd3a4e8a4c01d12a219c6, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6211431736814763555, guid: f76e8839c52cd3a4e8a4c01d12a219c6, type: 3}
+      propertyPath: m_Size.y
+      value: 1.2034419
+      objectReference: {fileID: 0}
+    - target: {fileID: 6211431736814763555, guid: f76e8839c52cd3a4e8a4c01d12a219c6, type: 3}
+      propertyPath: m_Offset.y
+      value: -1.3641614
+      objectReference: {fileID: 0}
+    - target: {fileID: 6601574664292509490, guid: f76e8839c52cd3a4e8a4c01d12a219c6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.254
+      objectReference: {fileID: 0}
+    - target: {fileID: 7534209809875362051, guid: f76e8839c52cd3a4e8a4c01d12a219c6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.933
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4901,7 +4949,7 @@ Transform:
   m_GameObject: {fileID: 7865768763391540092}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3, y: 0.46980917, z: 0}
+  m_LocalPosition: {x: 1.53, y: 0.46980917, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4965,7 +5013,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8014191305721258998
 Transform:
   m_ObjectHideFlags: 0
@@ -5094,17 +5142,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1109850912722804149, guid: dc953acca3727ce47a8f6df392ffa598, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 569873718}
     - target: {fileID: 2979018342426392207, guid: dc953acca3727ce47a8f6df392ffa598, type: 3}
       propertyPath: m_Name
       value: Fire_Knight
       objectReference: {fileID: 0}
     - target: {fileID: 2979018342426392207, guid: dc953acca3727ce47a8f6df392ffa598, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5707502071308784754, guid: dc953acca3727ce47a8f6df392ffa598, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3
+      value: 6.03
       objectReference: {fileID: 0}
     - target: {fileID: 5707502071308784754, guid: dc953acca3727ce47a8f6df392ffa598, type: 3}
       propertyPath: m_LocalPosition.y
@@ -5179,7 +5231,7 @@ Transform:
   m_GameObject: {fileID: 1427674802682840375}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.07, y: -1.21, z: 0}
+  m_LocalPosition: {x: 0.302, y: -1.081, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

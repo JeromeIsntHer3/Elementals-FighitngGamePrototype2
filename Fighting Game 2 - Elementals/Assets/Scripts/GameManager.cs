@@ -19,6 +19,8 @@ public class GameManager : MonoBehaviour
     public float ShakeStrengthX;
     public float ShakeStrengthY;
     public int Vibrato;
+    public Color RCColor;
+    public Color ECColor;
 
     #region Getter And Setters
 

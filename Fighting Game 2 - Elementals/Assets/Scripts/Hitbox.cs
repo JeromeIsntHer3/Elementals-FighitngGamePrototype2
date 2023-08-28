@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Hitbox : GameBox
@@ -37,9 +36,11 @@ public class Hitbox : GameBox
                 }
 
                 hurtbox.BlockHit(DamageData);
+                HitBlock(hurtbox);
                 return;
             }
             hurtbox.Hit(DamageData);
+            HitSuccessful(hurtbox);
         }
     }
 

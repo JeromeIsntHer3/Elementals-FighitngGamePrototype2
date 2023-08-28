@@ -15,6 +15,7 @@ public class BaseCharacterAttacks : MonoBehaviour
     [SerializeField] int maxMeterValue;
     [SerializeField] int currentMeterValue;
     [SerializeField] int meterCount;
+    [SerializeField] int meterGainOnHit;
 
     protected readonly Dictionary<AttackType, AttackData> attackData = new();
 
@@ -48,7 +49,7 @@ public class BaseCharacterAttacks : MonoBehaviour
             this.count = count;
         }
     }
-    public EventHandler<OnMeterUsedArgs> OnMeterUsed;
+    public EventHandler<OnMeterUsedArgs> OnMeterValueChanged;
 
 
     public virtual void Awake()
@@ -60,7 +61,7 @@ public class BaseCharacterAttacks : MonoBehaviour
 
     void Start()
     {
-        OnMeterUsed?.Invoke(this, new OnMeterUsedArgs(currentMeterValue / maxMeterValue, meterCount));
+        OnMeterValueChanged?.Invoke(this, new OnMeterUsedArgs(currentMeterValue / maxMeterValue, meterCount));
     }
 
     public virtual void OnEnable()
@@ -77,6 +78,8 @@ public class BaseCharacterAttacks : MonoBehaviour
 
         character.OnTryEnhance += OnTryEnhanceAttack;
         character.OnTryCancel += OnTryCancelAnimation;
+
+        character.OnHitEnemy += OnHitEnemy;
     }
 
     public virtual void OnDisable()
@@ -90,6 +93,7 @@ public class BaseCharacterAttacks : MonoBehaviour
         character.OnChangeFaceDirection -= OnChangeFaceDir;
         character.OnTryEnhance -= OnTryEnhanceAttack;
         character.OnTryCancel -= OnTryCancelAnimation;
+        character.OnHitEnemy -= OnHitEnemy;
     }
 
     void OnAttack1(object sender, EventArgs e)
@@ -163,36 +167,17 @@ public class BaseCharacterAttacks : MonoBehaviour
         UseMeter(50,true);
     }
 
+    void OnHitEnemy(object sender, EventArgs e)
+    {
+        currentMeterValue += meterGainOnHit;
+        OnMeterValueChanged?.Invoke(this, new OnMeterUsedArgs((float)currentMeterValue / maxMeterValue, meterCount));
+    }
+
     void SetHitboxData(DamageData data)
     {
         foreach(var box in hitboxes.colliders)
         {
             box.GetComponent<Hitbox>().SetDamageData(data, character);
-        }
-    }
-
-    public void UseMeter(int usage, bool cancel)
-    {
-        if (meterCount < 0 || meterCount == 0 && currentMeterValue < 50) return;
-        currentMeterValue -= usage;
-        if (currentMeterValue <= 0)
-        {
-            if (meterCount > 0)
-            {
-                meterCount--;
-                currentMeterValue = 100;
-            }
-        }
-
-        OnMeterUsed?.Invoke(this,new OnMeterUsedArgs((float) currentMeterValue / maxMeterValue, meterCount));
-
-        if (cancel)
-        {
-            character.OnCancelAnimation?.Invoke(this, EventArgs.Empty);
-        }
-        else
-        {
-            character.OnEnhanceAttack?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -221,5 +206,30 @@ public class BaseCharacterAttacks : MonoBehaviour
             DamageType = attackData.DamageType,
             Source = character
         };
+    }
+
+    public void UseMeter(int usage, bool cancel)
+    {
+        if (meterCount < 0 || meterCount == 0 && currentMeterValue < 50) return;
+        currentMeterValue -= usage;
+        if (currentMeterValue <= 0)
+        {
+            if (meterCount > 0)
+            {
+                meterCount--;
+                currentMeterValue = 100;
+            }
+        }
+
+        OnMeterValueChanged?.Invoke(this, new OnMeterUsedArgs((float)currentMeterValue / maxMeterValue, meterCount));
+
+        if (cancel)
+        {
+            character.OnCancelAnimation?.Invoke(this, EventArgs.Empty);
+        }
+        else
+        {
+            character.OnEnhanceAttack?.Invoke(this, EventArgs.Empty);
+        }
     }
 }

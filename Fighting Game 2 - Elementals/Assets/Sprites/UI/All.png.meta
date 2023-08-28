@@ -202,7 +202,7 @@ TextureImporter:
         width: 32
         height: 12
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 4, y: 4, z: 4, w: 4}
       outline: []
       physicsShape: []
@@ -210,6 +210,48 @@ TextureImporter:
       bones: []
       spriteID: e53b2f3c33f7b434594c539b40cd05ec
       internalID: 1816463632
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_FK_Heat
+      rect:
+        serializedVersion: 2
+        x: 579
+        y: 74
+        width: 10
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 3, y: 7, z: 3, w: 6}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 593fdb0715e16bd43941c90bd7c93191
+      internalID: -286724534
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FK_Heat2
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 197
+        width: 48
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 6, y: 7, z: 6, w: 7}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 797125197737423449bdef7a927e650a
+      internalID: -862095631
       vertices: []
       indices: 
       edges: []
@@ -228,7 +270,9 @@ TextureImporter:
       All_Meter: 490052986
       Button_UI: 1816463632
       CharacterContrainer: 353491346
+      FK_Heat2: -862095631
       Health_Red: 2711620
+      UI_FK_Heat: -286724534
       Wood_HealthContainer: 391353997
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0

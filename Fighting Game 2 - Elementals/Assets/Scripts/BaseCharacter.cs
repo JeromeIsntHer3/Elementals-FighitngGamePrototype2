@@ -45,6 +45,8 @@ public class BaseCharacter : MonoBehaviour
     public EventHandler<DamageData> OnHit;
     public EventHandler<DamageData> OnBlockHit;
     public EventHandler<bool> OnChangeFaceDirection;
+    public EventHandler OnHitEnemy;
+    public EventHandler OnHitBlocked;
 
     #endregion
 

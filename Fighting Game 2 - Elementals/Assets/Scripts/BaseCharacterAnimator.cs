@@ -9,6 +9,7 @@ public class BaseCharacterAnimator : MonoBehaviour
     protected BaseCharacterMovement cMovement;
     protected BaseCharacter character;
     protected Rigidbody2D rb;
+    protected SpriteRenderer spriteRenderer;
 
     readonly Dictionary<AnimationType, int> animationHashes = new();
     readonly Dictionary<AnimationType, bool> animationCanChangeFaceDirection = new();
@@ -16,7 +17,6 @@ public class BaseCharacterAnimator : MonoBehaviour
     readonly Dictionary<AnimationType, bool> animCond = new();
 
     Animator animator;
-    SpriteRenderer spriteRenderer;
     AnimationType currentState;
     AnimationType previousState;
     bool attacking = false;
@@ -165,7 +165,7 @@ public class BaseCharacterAnimator : MonoBehaviour
 
     void OnOption(object sender, EventArgs args)
     {
-        if (!OptionPerformCondition() && !grounded) return;
+        if (!OptionPerformCondition() || !grounded) return;
         animCond[AnimationType.CharacterOptionStart] = true;
         if (character.AnimationData.optionIsTriggered)
         {
@@ -256,6 +256,7 @@ public class BaseCharacterAnimator : MonoBehaviour
     void OnEnhanceAttack(object sender, EventArgs args)
     {
         SetSpriteColour(Color.yellow, .5f);
+        spriteRenderer.material.SetColor("_GradientOutline1", Color.yellow);
     }
 
     void OnAnimationCancel(object sender, EventArgs e)
@@ -265,15 +266,15 @@ public class BaseCharacterAnimator : MonoBehaviour
         character.CancelRecovery();
         attacking = false;
         SetSpriteColour(Color.cyan, .2f);
+        spriteRenderer.material.SetColor("_GradientOutline1", Color.cyan);
     }
 
     void SetSpriteColour(Color color, float totalDuration)
     {
-        Color prevColor = spriteRenderer.color;
-        spriteRenderer.DOKill();
+        spriteRenderer.DOKill(true);
         spriteRenderer.DOColor(color, totalDuration/2).OnComplete(() =>
         {
-            spriteRenderer.DOColor(prevColor, totalDuration / 2);
+            spriteRenderer.DOColor(Color.white, totalDuration / 2);
         });
     }
 
@@ -308,7 +309,6 @@ public class BaseCharacterAnimator : MonoBehaviour
 
         previousState = currentState;
         if (SameState(newState)) return;
-        Debug.Log(newState);
         animator.CrossFade(GetHashAndSetLockTime(newState), 0, 0);
         currentState = newState;
     }

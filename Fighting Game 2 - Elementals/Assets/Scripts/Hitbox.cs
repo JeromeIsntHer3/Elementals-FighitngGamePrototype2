@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Hitbox : GameBox
@@ -7,7 +8,12 @@ public class Hitbox : GameBox
     protected HitboxExecute HitSuccessful;
     protected HitboxExecute HitBlock;
 
+    public EventHandler<Collider2D> OnHitOther;
+
     bool hit;
+    bool canDeflect;
+
+    public bool CanDeflect { get { return canDeflect; } }
 
     public virtual void SetDamageData(DamageData data, BaseCharacter owner)
     {
@@ -26,12 +32,13 @@ public class Hitbox : GameBox
             Vector3 spawnPoint = GetComponent<Collider2D>().ClosestPoint(hurtbox.transform.position);
             EffectManager.Instance.SpawnHitSplash(spawnPoint, owner.IsFacingLeft);
             hit = true;
+
             if (hurtbox.BoxOwner.IsGuarding)
             {
                 if (FacingSameDirection(hurtbox))
                 {
                     hurtbox.Hit(DamageData);
-                    hurtbox.BoxOwner.OnBlockCanceled?.Invoke(this, System.EventArgs.Empty);
+                    hurtbox.BoxOwner.OnBlockCanceled?.Invoke(this, EventArgs.Empty);
                     return;
                 }
 
@@ -42,6 +49,7 @@ public class Hitbox : GameBox
             hurtbox.Hit(DamageData);
             HitSuccessful(hurtbox);
         }
+        OnHitOther?.Invoke(this, col);
     }
 
     protected bool CheckHitSelf(Hurtbox hurtbox)
@@ -52,5 +60,10 @@ public class Hitbox : GameBox
     bool FacingSameDirection(Hurtbox box)
     {
         return box.BoxOwner.IsFacingLeft && owner.IsFacingLeft;
+    }
+
+    public void SetDeflectState(bool state)
+    {
+        canDeflect = state;
     }
 }

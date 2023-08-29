@@ -14,63 +14,54 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Attacks:
   - AttackType: 0
-    DamageType: 0
-    Damage: 3
+    Damage: 5
     HorizontalKnockback: 3
     VerticalKnockback: 3
     StunDuration: 0.5
     MeterUsage: 50
   - AttackType: 1
-    DamageType: 0
     Damage: 3
     HorizontalKnockback: 3
     VerticalKnockback: 3
     StunDuration: 0.4
     MeterUsage: 50
   - AttackType: 2
-    DamageType: 0
     Damage: 3
     HorizontalKnockback: 3
     VerticalKnockback: 3
     StunDuration: 0.3
     MeterUsage: 50
   - AttackType: 3
-    DamageType: 0
     Damage: 0
     HorizontalKnockback: 0
     VerticalKnockback: 0
     StunDuration: 0
     MeterUsage: 0
   - AttackType: 4
-    DamageType: 0
     Damage: 0
     HorizontalKnockback: 0
     VerticalKnockback: 0
     StunDuration: 0
     MeterUsage: 0
   - AttackType: 5
-    DamageType: 0
     Damage: 0
     HorizontalKnockback: 0
     VerticalKnockback: 0
     StunDuration: 0
     MeterUsage: 50
   - AttackType: 6
-    DamageType: 0
     Damage: 0
     HorizontalKnockback: 0
     VerticalKnockback: 0
     StunDuration: 0
     MeterUsage: 50
   - AttackType: 7
-    DamageType: 0
     Damage: 0
     HorizontalKnockback: 0
     VerticalKnockback: 0
     StunDuration: 0
     MeterUsage: 50
   - AttackType: 8
-    DamageType: 0
     Damage: 0
     HorizontalKnockback: 0
     VerticalKnockback: 0

@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class CMRockProjectile : BaseProjectile
 {
+    [SerializeField] Collider2D rockCol;
+    [SerializeField] Collider2D explosionCol;
+
     Animator anim;
 
     void OnEnable()
@@ -17,13 +20,14 @@ public class CMRockProjectile : BaseProjectile
         OnTriggerEvent -= OnTrigger;
     }
 
-    public CMRockProjectile SetupProjectile(DamageData data, BaseCharacter owner, bool flipX, Vector2 dir, float speed, float lifespan)
+    public CMRockProjectile SetupProjectile(DamageData data, BaseCharacter owner, bool flipX, Vector2 dir, float speed, float lifespan
+        , float dist)
     {
         InitProjectile(owner, data, lifespan, false);
         anim = GetComponent<Animator>();
         transform.eulerAngles = new Vector3(transform.eulerAngles.x, 180, transform.eulerAngles.z);
         rb.velocity = dir.normalized * speed;
-        Invoke(nameof(Expand), .3f);
+        Invoke(nameof(Expand), dist/speed);
         return this;
     }
 
@@ -35,7 +39,17 @@ public class CMRockProjectile : BaseProjectile
 
     public void Explode()
     {
-        StartCoroutine(WaitFor());
+        hitSomething = false;
+        rb.constraints = RigidbodyConstraints2D.FreezeAll;
+        rb.gravityScale = 0;
+
+        gameObject.layer = LayerMask.NameToLayer("Projectile");
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            transform.GetChild(i).gameObject.layer = LayerMask.NameToLayer("Projectile");
+        }
+        anim.CrossFade("Rock_Projectile_Explode", 0, 0);
+        Invoke(nameof(DestroyRock), .525f);
     }
 
     void DestroyRock()
@@ -47,12 +61,18 @@ public class CMRockProjectile : BaseProjectile
     {
         if (hitSomething) return;
         if (!col.TryGetComponent(out Hurtbox hurtbox)) return;
-        if (CheckHitOwner(hurtbox)) return;
-
-        Vector3 fxSpawnPoint = GetComponent<Collider2D>().ClosestPoint(hurtbox.transform.position);
-        EffectManager.Instance.SpawnHitSplash(fxSpawnPoint, owner.IsFacingLeft);
+        if (BelongsToOwner(hurtbox)) return;
 
         hitSomething = true;
+
+        Vector3 fxSpawnPoint = explosionCol.ClosestPoint(hurtbox.transform.position);
+        EffectManager.Instance.SpawnHitSplash(fxSpawnPoint, owner.IsFacingLeft);
+
+        rb.velocity = Vector2.zero;
+        rb.constraints = RigidbodyConstraints2D.FreezeAll;
+        gameObject.layer = LayerMask.NameToLayer("Ground");
+        rockCol.gameObject.layer = gameObject.layer;
+
         if (hurtbox.BoxOwner.IsGuarding)
         {
             if (owner.IsFacingLeft && hurtbox.BoxOwner.IsFacingLeft)
@@ -68,15 +88,14 @@ public class CMRockProjectile : BaseProjectile
         hurtbox.Hit(damageData);
     }
 
-    IEnumerator WaitFor()
+    public void HitRock(Vector2 direction, float hitForce)
     {
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        rb.AddForce(hitForce * direction, ForceMode2D.Impulse);
+        rb.gravityScale = 1.5f;
+        hitSomething = false;
+
         gameObject.layer = LayerMask.NameToLayer("Projectile");
-        for(int i = 0; i < transform.childCount; i++)
-        {
-            transform.GetChild(i).gameObject.layer = LayerMask.NameToLayer("Projectile");
-        }
-        yield return new WaitForEndOfFrame();
-        anim.CrossFade("Rock_Projectile_Explode", 0, 0);
-        Invoke(nameof(DestroyRock), .525f);
+        rockCol.gameObject.layer = gameObject.layer;
     }
 }

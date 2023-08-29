@@ -18,19 +18,27 @@ public class BaseCharacterHealth : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-    public virtual void OnEnable()
+    protected virtual void OnEnable()
     {
         character.OnHit += OnHit;
+        character.OnBlockHit += BlockHit;
     }
 
-    public virtual void OnDisable()
+    protected virtual void OnDisable()
     {
         character.OnHit -= OnHit;
+        character.OnBlockHit -= BlockHit;
     }
 
     void OnHit(object sender, DamageData e)
     {
         currentHealth -= e.Damage;
+    }
+
+    void BlockHit(object sender, DamageData e)
+    {
+        currentHealth -= e.Damage;
+        OnHealthChanged?.Invoke(this, currentHealth / maxHealth);
     }
 
     public void Damage(DamageData data)

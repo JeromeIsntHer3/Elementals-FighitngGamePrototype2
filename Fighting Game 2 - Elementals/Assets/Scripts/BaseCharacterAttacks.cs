@@ -35,7 +35,7 @@ public class BaseCharacterAttacks : MonoBehaviour
     float recentAttackTime;
     float meterUsedTime;
     float attackingTilTime;
-    AttackType currentAttackType;
+    protected AttackType currentAttackType;
     AnimationType currentAnimationType;
 
     public class OnMeterUsedArgs : EventArgs
@@ -52,7 +52,7 @@ public class BaseCharacterAttacks : MonoBehaviour
     public EventHandler<OnMeterUsedArgs> OnMeterValueChanged;
 
 
-    public virtual void Awake()
+    protected virtual void Awake()
     {
         character = GetComponent<BaseCharacter>();
         cInput = GetComponent<CharacterInput>();
@@ -64,11 +64,11 @@ public class BaseCharacterAttacks : MonoBehaviour
         OnMeterValueChanged?.Invoke(this, new OnMeterUsedArgs(currentMeterValue / maxMeterValue, meterCount));
     }
 
-    public virtual void OnEnable()
+    protected virtual void OnEnable()
     {
-        character.OnAttack1 += OnAttack1;
-        character.OnAttack2 += OnAttack2;
-        character.OnAttack3 += OnAttack3;
+        character.OnAttackOne += OnAttack1;
+        character.OnAttackTwo += OnAttack2;
+        character.OnAttackThree += OnAttack3;
         character.OnUltimate += OnUltimate;
 
         character.OnJump += OnJump;
@@ -82,11 +82,11 @@ public class BaseCharacterAttacks : MonoBehaviour
         character.OnHitEnemy += OnHitEnemy;
     }
 
-    public virtual void OnDisable()
+    protected virtual void OnDisable()
     {
-        character.OnAttack1 -= OnAttack1;
-        character.OnAttack2 -= OnAttack2;
-        character.OnAttack3 -= OnAttack3;
+        character.OnAttackOne -= OnAttack1;
+        character.OnAttackTwo -= OnAttack2;
+        character.OnAttackThree -= OnAttack3;
         character.OnUltimate -= OnUltimate;
         character.OnJump -= OnJump;
         character.OnLand -= OnLand;
@@ -203,7 +203,6 @@ public class BaseCharacterAttacks : MonoBehaviour
             VerticalKnockback = attackData.VerticalKnockback,
             HorizontalKnockback = attackData.HorizontalKnockback,
             StunDuration = attackData.StunDuration,
-            DamageType = attackData.DamageType,
             Source = character
         };
     }

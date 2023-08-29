@@ -1199,7 +1199,7 @@ AnimationClip:
   - time: 0.13333334
     functionName: ThrowKnife
     data: 
-    objectReferenceParameter: {fileID: 2417626929574480288, guid: 67dcb0d2b9c173543bf0dcde7c44885a, type: 3}
+    objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0

@@ -7,12 +7,12 @@ public class LRMovement : BaseCharacterMovement
 {
     [SerializeField] float pushbackForce;
 
-    public override void Awake()
+    protected override void Awake()
     {
         base.Awake();
     }
 
-    public override void OnEnable()
+    protected override void OnEnable()
     {
         base.OnEnable();
 
@@ -27,7 +27,7 @@ public class LRMovement : BaseCharacterMovement
         OptionUpdate += Recovery;
     }
 
-    public override void OnDisable()
+    protected override void OnDisable()
     {
         base.OnDisable();
 
@@ -61,7 +61,7 @@ public class LRMovement : BaseCharacterMovement
 
     bool StopSliding()
     {
-        return Mathf.Abs(rb.velocity.x) < 2;
+        return Mathf.Abs(rb.velocity.x) < .4f;
     }
 
     bool CanSlide()

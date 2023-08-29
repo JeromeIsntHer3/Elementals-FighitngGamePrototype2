@@ -43,88 +43,50 @@ public class CharacterInput : MonoBehaviour
         optionAction = playerInput.actions["Option"];
     }
 
-    void Start()
+    void OnEnable()
     {
-        movementAction.performed += (Ctx obj) => 
-        {
-            character.OnMovement?.Invoke(this, obj.ReadValue<Vector2>());
-            character.OnMovementPerformed?.Invoke(this, obj.ReadValue<Vector2>());
-        };
-        movementAction.canceled += (Ctx obj) =>
-        {
-            character.OnMovement?.Invoke(this, obj.ReadValue<Vector2>());
-            character.OnMovementCanceled?.Invoke(this, obj.ReadValue<Vector2>());
-        };
+        movementAction.performed += MovePerformed;
+        movementAction.canceled += MoveCanceled;
 
-        attack1Action.performed += (Ctx obj) =>
-        {
-            if (!character.Recovered()) return;
-            character.OnAttack1?.Invoke(this, EventArgs.Empty);
-            character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack1));
-        };
-        attack2Action.performed += (Ctx obj) =>
-        {
-            if (!character.Recovered()) return;
-            character.OnAttack2?.Invoke(this, EventArgs.Empty);
-            character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack2));
-        };
-        attack3Action.performed += (Ctx obj) =>
-        {
-            if (!character.Recovered()) return;
-            character.OnAttack3?.Invoke(this, EventArgs.Empty);
-            character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack3));
-        };
-        ultimateAction.performed += (Ctx obj) =>
-        {
-            if (!character.Recovered()) return;
-            character.OnUltimate?.Invoke(this, EventArgs.Empty);
-            character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Ultimate));
-        };
+        rollAction.performed += RollPerformed;
+        jumpAction.performed += JumpPerformed;
 
-        rollAction.performed += (Ctx obj) =>
-        {
-            if (!character.Recovered()) return;
-            character.OnRoll?.Invoke(this, EventArgs.Empty);
-            character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Roll));
-        };
+        attack1Action.performed += AttackOnePerformed;
+        attack2Action.performed += AttackTwoPerformed;
+        attack3Action.performed += AttackThreePerformed;
+        ultimateAction.performed += UltimatePerformed;
 
-        jumpAction.performed += (Ctx obj) =>
-        {
-            if (!character.Recovered()) return;
-            character.OnJump?.Invoke(this, EventArgs.Empty);
-        };
+        optionAction.performed += OptionPerformed;
+        optionAction.canceled += OptionCanceled;
 
-        optionAction.performed += (Ctx obj) =>
-        {
-            if (!character.Recovered()) return;
-            character.OnOption?.Invoke(this, EventArgs.Empty);
-        };
+        enhanceAction.performed += EnhancePerformed;
+        cancelAction.performed += CancelPerformed;
 
-        optionAction.canceled += (Ctx obj) =>
-        {
-            character.OnOptionCanceled?.Invoke(this, EventArgs.Empty);
-        };
+        blockAction.performed += BlockPerformed;
+        blockAction.canceled += BlockCanceled;
+    }
 
-        enhanceAction.performed += (Ctx obj) =>
-        {
-            character.OnTryEnhance?.Invoke(this, EventArgs.Empty);
-        };
-        cancelAction.performed += (Ctx obj) =>
-        {
-            character.OnTryCancel?.Invoke(this, EventArgs.Empty);
-        };
+    void OnDisable()
+    {
+        movementAction.performed -= MovePerformed;
+        movementAction.canceled -= MoveCanceled;
 
-        blockAction.performed += (Ctx obj) =>
-        {
-            if (!character.IsGrounded) return;
-            character.OnBlock?.Invoke(this, EventArgs.Empty);
-        };
+        rollAction.performed -= RollPerformed;
+        jumpAction.performed -= JumpPerformed;
 
+        attack1Action.performed -= AttackOnePerformed;
+        attack2Action.performed -= AttackTwoPerformed;
+        attack3Action.performed -= AttackThreePerformed;
+        ultimateAction.performed -= UltimatePerformed;
 
-        blockAction.canceled += (Ctx obj) =>
-        {
-            character.OnBlockCanceled?.Invoke(this, EventArgs.Empty);
-        };
+        optionAction.performed -= OptionPerformed;
+        optionAction.canceled -= OptionCanceled;
+
+        enhanceAction.performed -= EnhancePerformed;
+        cancelAction.performed -= CancelPerformed;
+
+        blockAction.performed -= BlockPerformed;
+        blockAction.canceled -= BlockCanceled;
     }
 
     void Update()
@@ -132,95 +94,93 @@ public class CharacterInput : MonoBehaviour
         movement = movementAction.ReadValue<Vector2>();
     }
 
-    public Vector2 CurrentMovementInput()
+    void MovePerformed(Ctx obj)
     {
-        return movement;
+        character.OnMovement?.Invoke(this, obj.ReadValue<Vector2>());
+        character.OnMovementPerformed?.Invoke(this, obj.ReadValue<Vector2>());
     }
 
-    public void TriggerBlock()
+    void MoveCanceled(Ctx obj)
     {
-        if (!character.Recovered() || !character.IsGrounded) return;
-        character.OnBlock?.Invoke(this, EventArgs.Empty);
+        character.OnMovement?.Invoke(this, obj.ReadValue<Vector2>());
+        character.OnMovementCanceled?.Invoke(this, obj.ReadValue<Vector2>());
     }
 
-    public void CancelBlock()
+    void AttackOnePerformed(Ctx obj)
+    {
+        if (!character.Recovered()) return;
+        character.OnAttackOne?.Invoke(this, EventArgs.Empty);
+        character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack1));
+    }
+
+    void AttackTwoPerformed(Ctx obj)
+    {
+        if (!character.Recovered()) return;
+        character.OnAttackTwo?.Invoke(this, EventArgs.Empty);
+        character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack2));
+    }
+
+    void AttackThreePerformed(Ctx obj)
+    {
+        if (!character.Recovered()) return;
+        character.OnAttackThree?.Invoke(this, EventArgs.Empty);
+        character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack3));
+    }
+
+    void UltimatePerformed(Ctx obj)
+    {
+        if (!character.Recovered()) return;
+        character.OnUltimate?.Invoke(this, EventArgs.Empty);
+        character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Ultimate));
+    }
+
+    void JumpPerformed(Ctx obj)
+    {
+        if (!character.Recovered()) return;
+        character.OnJump?.Invoke(this, EventArgs.Empty);
+    }
+
+    void RollPerformed(Ctx obj)
+    {
+        if (!character.Recovered()) return;
+        character.OnRoll?.Invoke(this, EventArgs.Empty);
+        character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Roll));
+    }
+
+    void OptionPerformed(Ctx obj)
+    {
+        if (!character.Recovered()) return;
+        character.OnOption?.Invoke(this, EventArgs.Empty);
+    }
+
+    void OptionCanceled(Ctx obj)
+    {
+        character.OnOptionCanceled?.Invoke(this, EventArgs.Empty);
+    }
+
+    void EnhancePerformed(Ctx obj)
+    {
+        character.OnTryEnhance?.Invoke(this, EventArgs.Empty);
+    }
+
+    void CancelPerformed(Ctx obj)
+    {
+        character.OnTryCancel?.Invoke(this, EventArgs.Empty);
+    }
+
+    void BlockPerformed(Ctx obj)
+    {
+        if (!character.IsGrounded) return;
+        character.OnBlockPerformed?.Invoke(this, EventArgs.Empty);
+    }
+
+    void BlockCanceled(Ctx obj)
     {
         character.OnBlockCanceled?.Invoke(this, EventArgs.Empty);
     }
 
-    public void TriggerAttack1()
+    public Vector2 CurrentMovementInput()
     {
-        if (!character.Recovered()) return;
-        character.OnAttack1?.Invoke(this, EventArgs.Empty);
-        character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack1));
-    }
-
-    public void TriggerAttack2()
-    {
-        if (!character.Recovered()) return;
-        character.OnAttack2?.Invoke(this, EventArgs.Empty);
-        character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack2));
-    }
-
-    public void TriggerAttack3()
-    {
-        if (!character.Recovered()) return;
-        character.OnAttack3?.Invoke(this, EventArgs.Empty);
-        character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack3));
+        return movement;
     }
 }
-
-#if UNITY_EDITOR
-
-[CustomEditor(typeof(CharacterInput))]
-public class CharacterInputInspector : Editor
-{
-    SerializedProperty onBlockEvent;
-
-    void OnEnable()
-    {
-        //onBlockEvent = serializedObject.FindProperty(nameof());
-    }
-
-    public override void OnInspectorGUI()
-    {
-        base.OnInspectorGUI();
-
-        CharacterInput input = (CharacterInput)target;
-
-        GUILayout.BeginHorizontal();
-
-        if (GUILayout.Button("Perform Block"))
-        {
-            input.TriggerBlock();
-        }
-
-        if (GUILayout.Button("Cancel Block"))
-        {
-            input.CancelBlock();
-        }
-
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal();
-
-        if (GUILayout.Button("Perform Attack 1"))
-        {
-            input.TriggerAttack1();
-        }
-
-        if (GUILayout.Button("Perform Attack 2"))
-        {
-            input.TriggerAttack2();
-        }
-
-        if (GUILayout.Button("Perform Attack 3"))
-        {
-            input.TriggerAttack3();
-        }
-
-        GUILayout.EndHorizontal();
-    }
-}
-
-#endif

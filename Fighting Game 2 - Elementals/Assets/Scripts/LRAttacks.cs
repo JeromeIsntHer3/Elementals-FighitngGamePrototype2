@@ -21,6 +21,24 @@ public class LRAttacks : BaseCharacterAttacks
     [SerializeField] Transform stormSpawn;
     [SerializeField] List<Transform> multiArrowSpawns = new();
 
+    Vector2 stormDirection;
+
+    protected override void OnEnable()
+    {
+        base.OnEnable();
+        character.OnMovement += OnMovement;
+    }
+
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+        character.OnMovement -= OnMovement;
+    }
+
+    void OnMovement(object sender, Vector2 dir)
+    {
+        stormDirection = dir;
+    }
 
     public void ArrowStab()
     {
@@ -74,8 +92,19 @@ public class LRAttacks : BaseCharacterAttacks
 
     void MultiShotEnhance()
     {
-        var storm = Instantiate(stormPrefab, stormSpawn.position, Quaternion.identity);
-        storm.SetupArrowSpawn(GetDamageData(AttackType.ThreeEnhanced), character);
+        Vector2 spawnPos = stormSpawn.position;
+
+        if(stormDirection.x > 0)
+        {
+            spawnPos = new Vector2(spawnPos.x + 3, spawnPos.y);
+        }
+        else if(stormDirection.x < 0)
+        {
+            spawnPos = new Vector2(spawnPos.x - 2, spawnPos.y);
+        }
+
+        var storm = Instantiate(stormPrefab, spawnPos, Quaternion.identity);
+        storm.SetupStorm(character, GetDamageData(AttackType.ThreeEnhanced));
     }
 
     public void ShootWhileJumping()

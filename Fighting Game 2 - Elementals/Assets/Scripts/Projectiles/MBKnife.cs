@@ -6,6 +6,7 @@ public class MBKnife : BaseProjectile
 {
     bool trap;
     bool landed;
+    bool enhanced;
     Animator anim;
 
     void OnEnable()
@@ -18,15 +19,17 @@ public class MBKnife : BaseProjectile
         OnTriggerEvent -= OnTrigger;
     }
 
-    public void SetupKnife(BaseCharacter owner, DamageData data, float lifespan, bool flipX, 
-        Vector2 direction, float speed, bool isTrap)
+    public void SetupKnife(BaseCharacter owner, DamageData data, float lifespan, bool flipX,
+        Vector2 direction, float speed, bool isTrap = false, bool enhanced = false)
     {
         InitProjectile(owner, data, lifespan, false);
+
+        trap = isTrap;
+        this.enhanced = enhanced;
 
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
         rb.AddForce(direction * speed, ForceMode2D.Impulse);
-        trap = isTrap;
         anim = GetComponent<Animator>();
         Invoke(nameof(Explode), lifespan / 2);
     }
@@ -44,14 +47,22 @@ public class MBKnife : BaseProjectile
 
     void OnTrigger(object sender, Collider2D col)
     {
+        Vector2 landingPoint;
+
         if (hitSomething) return;
         if (col.TryGetComponent(out Hurtbox hurtbox))
         {
-            if (CheckHitOwner(hurtbox)) return;
+            if (BelongsToOwner(hurtbox)) return;
 
-            Vector3 spawnPoint = GetComponent<Collider2D>().ClosestPoint(hurtbox.transform.position);
-            EffectManager.Instance.SpawnHitSplash(spawnPoint, owner.IsFacingLeft);
             hitSomething = true;
+
+            if (enhanced)
+            {
+                landingPoint = GetTeleportPosition(hurtbox.transform);
+                landingPoint = new Vector2(landingPoint.x, landingPoint.y + (owner.IsFacingLeft ? 1 : -1));
+                owner.transform.position = landingPoint;
+            }
+
             if (hurtbox.BoxOwner.IsGuarding)
             {
                 if (owner.IsFacingLeft && hurtbox.BoxOwner.IsFacingLeft)
@@ -60,17 +71,42 @@ public class MBKnife : BaseProjectile
                     hurtbox.BoxOwner.OnBlockCanceled?.Invoke(this, System.EventArgs.Empty);
                     return;
                 }
-
                 hurtbox.BlockHit(damageData);
                 return;
             }
             hurtbox.Hit(damageData);
         }
+        else if(col.TryGetComponent(out Hitbox hitbox))
+        {
 
-        if (trap)
+            if (BelongsToOwner(hitbox)) return;
+            hitSomething = true;
+
+            if(hitbox.CanDeflect)
+            {
+                Vector2 currVel = rb.velocity;
+                rb.velocity = Vector2.zero;
+                Vector2 dir = currVel.x > 0 ? Vector2.left : Vector2.right;
+                rb.AddForce(dir * currVel * 3, ForceMode2D.Impulse);
+                hitSomething = false;
+                owner = hitbox.BoxOwner;
+                return;
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        landingPoint = GetTeleportPosition(col.transform);
+        if (enhanced)
+        {
+            owner.transform.position = new Vector2(landingPoint.x, landingPoint.y + 1.9f);
+            Destroy(gameObject);
+        }
+        else if (trap)
         {
             if (landed) return;
-            Vector3 landingPoint = GetComponent<Collider2D>().ClosestPoint(col.transform.position);
             anim.CrossFade("Knife_Land", 0, 0);
             transform.position = landingPoint;
             transform.eulerAngles = Vector3.zero;
@@ -81,5 +117,10 @@ public class MBKnife : BaseProjectile
         {
             Destroy(gameObject);
         }
+    }
+
+    Vector2 GetTeleportPosition(Transform objectHit)
+    {
+        return GetComponent<Collider2D>().ClosestPoint(objectHit.transform.position);
     }
 }

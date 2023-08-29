@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GameBoxes : MonoBehaviour
 {
+    public bool DrawGizmo = true;
     public List<Collider2D> colliders;
     public Color color;
     protected Vector3[] points;
@@ -19,6 +20,7 @@ public class GameBoxes : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        if(!DrawGizmo) return;
         if(colliders.Count <= 0) return;
         Gizmos.color = color;
         foreach (var collider in colliders)

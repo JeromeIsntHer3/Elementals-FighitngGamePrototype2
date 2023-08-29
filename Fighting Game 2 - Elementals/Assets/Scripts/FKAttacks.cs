@@ -32,26 +32,26 @@ public class FKAttacks : BaseCharacterAttacks
     public EventHandler<bool> OnOptionStateChanged;
     public EventHandler OnHeatBurnComplete;
 
-    public override void OnEnable()
+    protected override void OnEnable()
     {
         base.OnEnable();
 
         character.OnOption += OnOptionPressed;
-        character.OnAttack1 += OnAttack1;
-        character.OnAttack2 += OnAttack2;
-        character.OnAttack3 += OnAttack3;
+        character.OnAttackOne += OnAttack1;
+        character.OnAttackTwo += OnAttack2;
+        character.OnAttackThree += OnAttack3;
 
         character.OnHitEnemy += AddMeter;
     }
 
-    public override void OnDisable()
+    protected override void OnDisable()
     {
         base.OnDisable();
 
         character.OnOption -= OnOptionPressed;
-        character.OnAttack1 -= OnAttack1;
-        character.OnAttack2 -= OnAttack2;
-        character.OnAttack3 -= OnAttack3;
+        character.OnAttackOne -= OnAttack1;
+        character.OnAttackTwo -= OnAttack2;
+        character.OnAttackThree -= OnAttack3;
 
         character.OnHitEnemy -= AddMeter;
     }
@@ -116,6 +116,7 @@ public class FKAttacks : BaseCharacterAttacks
         var slash = Instantiate(fireslashPrefab, slashSpawn.position, Quaternion.identity);
 
         DamageData data = GetDamageData(AttackType.One);
+        data.Enhanced = true;
         if(option) data.Damage *= heatMultipler;
 
         slash.SetupFireball(data, character, IsFacingLeft,
@@ -127,8 +128,10 @@ public class FKAttacks : BaseCharacterAttacks
     {
         if (!enhance) return;
         var disc = Instantiate(firediscPrefab, slashSpawn.position, Quaternion.identity);
-        disc.SetupFireball(GetDamageData(AttackType.Two), character, IsFacingLeft, 
-            IsFacingLeft ? Vector2.left : Vector2.right, discSpeed, .5f, true);
+        DamageData data = GetDamageData(AttackType.Two);
+        data.Enhanced = true;
+        disc.SetupFireball(data, character, IsFacingLeft, IsFacingLeft ? Vector2.left : Vector2.right,
+            discSpeed, .5f, true);
         enhance = false;
     }
 
@@ -136,7 +139,10 @@ public class FKAttacks : BaseCharacterAttacks
     {
         if(!enhance) return;
         var explosion = Instantiate(explosionPrefab, explosionSpawn.position, Quaternion.identity);
-        explosion.SetupFireball(GetDamageData(AttackType.Three), character, IsFacingLeft, Vector2.zero, 0, .5f);
+        DamageData data = GetDamageData(AttackType.Three);
+        data.Enhanced = true;
+        explosion.SetupFireball(data, character, IsFacingLeft, 
+            Vector2.zero, 0, .5f);
         enhance = false;
     }
 }

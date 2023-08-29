@@ -64,11 +64,11 @@ MonoBehaviour:
     MeterUsage: 100
   - AttackType: 7
     DamageType: 0
-    Damage: 10
-    HorizontalKnockback: 4
+    Damage: 0
+    HorizontalKnockback: 0
     VerticalKnockback: 0
-    StunDuration: 0.5
-    MeterUsage: 50
+    StunDuration: 0
+    MeterUsage: 0
   - AttackType: 8
     DamageType: 0
     Damage: 0

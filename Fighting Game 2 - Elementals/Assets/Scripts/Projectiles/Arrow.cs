@@ -25,7 +25,7 @@ public class Arrow : BaseProjectile
         if (hitSomething) return;
         if (col.TryGetComponent(out Hurtbox hurtbox))
         {
-            if (CheckHitOwner(hurtbox)) return;
+            if (BelongsToOwner(hurtbox)) return;
 
             Vector3 spawnPoint = GetComponent<Collider2D>().ClosestPoint(hurtbox.transform.position);
             EffectManager.Instance.SpawnHitSplash(spawnPoint, owner.IsFacingLeft);
@@ -44,6 +44,12 @@ public class Arrow : BaseProjectile
             }
             hurtbox.Hit(damageData);
         }
+
+        if(col.TryGetComponent(out BaseProjectile projectile))
+        {
+            if (projectile.Owner == owner) return;
+        }
+
         Destroy(gameObject);
     }
 

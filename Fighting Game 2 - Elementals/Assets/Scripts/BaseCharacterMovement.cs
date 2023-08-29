@@ -33,7 +33,7 @@ public class BaseCharacterMovement : MonoBehaviour
     protected OptionCondition OptionPerformCond;
     protected OptionCondition OptionCancelCond;
 
-    public virtual void Awake()
+    protected virtual void Awake()
     {
         character = GetComponent<BaseCharacter>();
         rb = GetComponent<Rigidbody2D>();
@@ -41,7 +41,7 @@ public class BaseCharacterMovement : MonoBehaviour
         jumps = data.JumpsAllowed;
     }
 
-    public virtual void OnEnable()
+    protected virtual void OnEnable()
     {
         character.OnJump += OnJump;
         character.OnRoll += OnRoll;
@@ -60,7 +60,7 @@ public class BaseCharacterMovement : MonoBehaviour
         }
     }
 
-    public virtual void OnDisable()
+    protected virtual void OnDisable()
     {
         character.OnJump -= OnJump;
         character.OnRoll -= OnRoll;
@@ -183,6 +183,7 @@ public class BaseCharacterMovement : MonoBehaviour
 
     void Knockback(Vector2 direction, float hForce, float vForce)
     {
+        movement.x = 0;
         rb.AddForce(direction.normalized * new Vector2(hForce, vForce), ForceMode2D.Impulse);
     }
 

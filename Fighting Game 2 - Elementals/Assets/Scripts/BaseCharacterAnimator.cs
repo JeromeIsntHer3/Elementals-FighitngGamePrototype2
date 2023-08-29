@@ -32,7 +32,7 @@ public class BaseCharacterAnimator : MonoBehaviour
     protected OptionCondition OptionCancelCondition;
 
 
-    public virtual void Awake()
+    protected virtual void Awake()
     {
         character = GetComponent<BaseCharacter>();
         animator = GetComponent<Animator>();
@@ -48,21 +48,21 @@ public class BaseCharacterAnimator : MonoBehaviour
         character.AnimationData.AddToConditionList(animCond);
     }
 
-    public virtual void OnEnable()
+    protected virtual void OnEnable()
     {
         character.OnMovement += OnMovement;
         character.OnJump += OnJump;
         character.OnLand += OnLand;
 
-        character.OnAttack1 += OnAttack1;
-        character.OnAttack2 += OnAttack2;
-        character.OnAttack3 += OnAttack3;
+        character.OnAttackOne += OnAttack1;
+        character.OnAttackTwo += OnAttack2;
+        character.OnAttackThree += OnAttack3;
         character.OnUltimate += OnUltimate;
 
         character.OnRoll += OnRoll;
 
         character.OnHit += OnHit;
-        character.OnBlock += OnBlock;
+        character.OnBlockPerformed += OnBlock;
         character.OnBlockHit += OnBlockHit;
         character.OnBlockCanceled += OnBlockCanceled;
 
@@ -80,18 +80,18 @@ public class BaseCharacterAnimator : MonoBehaviour
         }
     }
 
-    public virtual void OnDisable()
+    protected virtual void OnDisable()
     {
         character.OnMovement -= OnMovement;
         character.OnJump -= OnJump;
         character.OnLand -= OnLand;
-        character.OnAttack1 -= OnAttack1;
-        character.OnAttack2 -= OnAttack2;
-        character.OnAttack3 -= OnAttack3;
+        character.OnAttackOne -= OnAttack1;
+        character.OnAttackTwo -= OnAttack2;
+        character.OnAttackThree -= OnAttack3;
         character.OnUltimate -= OnUltimate;
         character.OnRoll -= OnRoll;
         character.OnHit -= OnHit;
-        character.OnBlock -= OnBlock;
+        character.OnBlockPerformed -= OnBlock;
         character.OnBlockHit -= OnBlockHit;
         character.OnBlockCanceled -= OnBlockCanceled;
         character.OnEnhanceAttack -= OnEnhanceAttack;
@@ -278,7 +278,7 @@ public class BaseCharacterAnimator : MonoBehaviour
         });
     }
 
-    void Update()
+    protected virtual void Update()
     {
         if (cInput.CurrentMovementInput().x == 0)
         {
@@ -325,7 +325,7 @@ public class BaseCharacterAnimator : MonoBehaviour
         animCond[AnimationType.Ultimate] = false;
         animCond[AnimationType.CharacterOptionStart] = false;
         animCond[AnimationType.CharacterOptionEnd] = false;
-        animCond[AnimationType.DefendStart] = false;
+        //animCond[AnimationType.DefendStart] = false;
         animCond[AnimationType.DefendEnd] = false;
     }
 
@@ -348,7 +348,12 @@ public class BaseCharacterAnimator : MonoBehaviour
 
         if (animCond[AnimationType.DefendHit]) return AnimationType.DefendHit;
         if (animCond[AnimationType.DefendEnd]) return AnimationType.DefendEnd;
-        if (animCond[AnimationType.DefendStart]) return AnimationType.DefendStart;
+        if (animCond[AnimationType.DefendStart])
+        {
+            character.OnBlockActive?.Invoke(this, EventArgs.Empty);
+            animCond[AnimationType.DefendStart] = false;
+            return AnimationType.DefendStart;
+        }
         if (animCond[AnimationType.DefendLoop]) return AnimationType.DefendLoop;
 
         if (character.AnimationData.optionIsHeld)

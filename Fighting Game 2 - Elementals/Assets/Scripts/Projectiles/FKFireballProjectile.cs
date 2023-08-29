@@ -21,7 +21,7 @@ public class FKFireballProjectile : BaseProjectile
         if (hitSomething) return;
         if (col.TryGetComponent(out Hurtbox hurtbox))
         {
-            if (CheckHitOwner(hurtbox)) return;
+            if (BelongsToOwner(hurtbox)) return;
 
             Vector3 spawnPoint = GetComponent<Collider2D>().ClosestPoint(hurtbox.transform.position);
             EffectManager.Instance.SpawnHitSplash(spawnPoint, owner.IsFacingLeft);

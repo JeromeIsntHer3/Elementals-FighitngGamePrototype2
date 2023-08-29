@@ -29,10 +29,10 @@ MonoBehaviour:
     MeterUsage: 0
   - AttackType: 2
     DamageType: 0
-    Damage: 0
-    HorizontalKnockback: 0
+    Damage: 3
+    HorizontalKnockback: 3
     VerticalKnockback: 0
-    StunDuration: 0
+    StunDuration: 1
     MeterUsage: 0
   - AttackType: 3
     DamageType: 0

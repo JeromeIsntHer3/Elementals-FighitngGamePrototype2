@@ -17,6 +17,8 @@ public class BaseProjectile : MonoBehaviour
     protected EventHandler<Collider2D> OnTriggerEvent;
     protected EventHandler<Collision2D> OnCollisionEvent;
 
+    public BaseCharacter Owner { get { return owner; } }
+
     public virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -33,11 +35,11 @@ public class BaseProjectile : MonoBehaviour
         OnCollisionEvent?.Invoke(this, collision);
     }
 
-    public virtual void InitProjectile(BaseCharacter character, DamageData data, float time, bool flipX)
+    public virtual void InitProjectile(BaseCharacter character, DamageData data, float deathTime, bool flipX)
     {
         owner = character;
         damageData = data;
-        activeTime = time;
+        activeTime = deathTime;
         sr.flipX = flipX;
 
         if (!rb) rb = GetComponent<Rigidbody2D>();
@@ -52,8 +54,8 @@ public class BaseProjectile : MonoBehaviour
         Destroy(gameObject);
     }
 
-    protected bool CheckHitOwner(Hurtbox hurtbox)
+    protected bool BelongsToOwner(GameBox box)
     {
-        return hurtbox.BoxOwner.gameObject == owner.gameObject;
+        return box.BoxOwner.gameObject == owner.gameObject;
     }
 }

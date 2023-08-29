@@ -7,7 +7,6 @@ using UnityEngine;
 public class AttackData
 {
     public AttackType AttackType;
-    public DamageType DamageType;
     public float Damage;
     public float HorizontalKnockback;
     public float VerticalKnockback;

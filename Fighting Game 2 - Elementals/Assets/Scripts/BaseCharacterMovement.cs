@@ -167,7 +167,6 @@ public class BaseCharacterMovement : MonoBehaviour
 
     void Jump()
     {
-        movement.x = 0;
         rb.velocity = new Vector2(rb.velocity.x, 0);
         rb.AddForce(Vector2.up * data.JumpForce, ForceMode2D.Impulse);
         rb.AddForce(movement * data.JumpForce/2, ForceMode2D.Impulse);

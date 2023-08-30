@@ -17,19 +17,19 @@ MonoBehaviour:
     Damage: 5
     HorizontalKnockback: 3
     VerticalKnockback: 3
-    StunDuration: 0.5
+    StunDuration: 2
     MeterUsage: 50
   - AttackType: 1
     Damage: 3
     HorizontalKnockback: 3
     VerticalKnockback: 3
-    StunDuration: 0.4
+    StunDuration: 2
     MeterUsage: 50
   - AttackType: 2
     Damage: 3
     HorizontalKnockback: 3
     VerticalKnockback: 3
-    StunDuration: 0.3
+    StunDuration: 2
     MeterUsage: 50
   - AttackType: 3
     Damage: 0

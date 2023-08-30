@@ -13,6 +13,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] HealthBarUI healthBarOne;
     [SerializeField] HealthBarUI healthBarTwo;
 
+    [SerializeField] ComboUI comboOne;
+    [SerializeField] ComboUI comboTwo;
+
     [SerializeField] BaseCharacter playerOne;
     [SerializeField] BaseCharacter playerTwo;
 
@@ -28,12 +31,16 @@ public class UIManager : MonoBehaviour
         {
             playerOne.GetComponent<BaseCharacterAttacks>().OnMeterValueChanged += meterOne.OnMeterUsed;
             playerOne.GetComponent<BaseCharacterHealth>().OnHealthChanged += healthBarOne.OnHealthDepleted;
+            playerOne.OnHitCombo += comboTwo.SetCombo;
+            playerOne.OnHitType += comboTwo.SetHitType;
         }
 
         if(playerTwo != null)
         {
             playerTwo.GetComponent<BaseCharacterAttacks>().OnMeterValueChanged += meterTwo.OnMeterUsed;
             playerTwo.GetComponent<BaseCharacterHealth>().OnHealthChanged += healthBarTwo.OnHealthDepleted;
+            playerTwo.OnHitCombo += comboOne.SetCombo;
+            playerTwo.OnHitType += comboOne.SetHitType;
         }
     }
 }

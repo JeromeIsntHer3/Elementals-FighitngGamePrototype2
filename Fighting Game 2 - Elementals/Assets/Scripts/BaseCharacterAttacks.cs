@@ -12,16 +12,16 @@ public class BaseCharacterAttacks : MonoBehaviour
     [SerializeField] protected GameBoxes hitboxes;
 
     [Header("Meter")]
-    [SerializeField] int maxMeterValue;
     [SerializeField] int currentMeterValue;
-    [SerializeField] int meterCount;
-    [SerializeField] int meterGainOnHit;
+    [SerializeField] int currentMeterCount;
 
     protected readonly Dictionary<AttackType, AttackData> attackData = new();
 
     protected BaseCharacter character;
     protected CharacterInput cInput;
+    protected AttackType currentAttackType;
     protected bool IsFacingLeft;
+    protected bool enhance;
 
     protected delegate void Attack();
     protected Attack Attack1;
@@ -31,11 +31,10 @@ public class BaseCharacterAttacks : MonoBehaviour
     protected Attack Ultimate;
 
     bool inAir;
-    protected bool enhance;
     float recentAttackTime;
     float meterUsedTime;
     float attackingTilTime;
-    protected AttackType currentAttackType;
+    
     AnimationType currentAnimationType;
 
     public class OnMeterUsedArgs : EventArgs
@@ -59,9 +58,18 @@ public class BaseCharacterAttacks : MonoBehaviour
         attacksData.AddToDict(attackData);
     }
 
+    public void SetupAttacks(int startMeterVal, int startMeterCount)
+    {
+        currentMeterValue = startMeterVal;
+        currentMeterCount = startMeterCount;
+        OnMeterValueChanged?.Invoke(this, 
+            new OnMeterUsedArgs(currentMeterValue, currentMeterCount));
+    }
+
     void Start()
     {
-        OnMeterValueChanged?.Invoke(this, new OnMeterUsedArgs(currentMeterValue / maxMeterValue, meterCount));
+        OnMeterValueChanged?.Invoke(this, 
+            new OnMeterUsedArgs(currentMeterValue, currentMeterCount));
     }
 
     protected virtual void OnEnable()
@@ -112,7 +120,13 @@ public class BaseCharacterAttacks : MonoBehaviour
 
     void OnAttack2(object sender, EventArgs e)
     {
-        if (inAir) return;
+        if (inAir)
+        {
+            JumpAttack?.Invoke();
+            SetHitboxData(GetDamageData(AttackType.Jump));
+            SetNewAttack(AnimationType.JumpAttack, AttackType.Jump);
+            return;
+        }
         Attack2?.Invoke();
         SetHitboxData(GetDamageData(AttackType.Two));
         SetNewAttack(AnimationType.Attack2, AttackType.Two);
@@ -120,7 +134,13 @@ public class BaseCharacterAttacks : MonoBehaviour
 
     void OnAttack3(object sender, EventArgs e)
     {
-        if (inAir) return;
+        if (inAir)
+        {
+            JumpAttack?.Invoke();
+            SetHitboxData(GetDamageData(AttackType.Jump));
+            SetNewAttack(AnimationType.JumpAttack, AttackType.Jump);
+            return;
+        }
         Attack3?.Invoke();
         SetHitboxData(GetDamageData(AttackType.Three));
         SetNewAttack(AnimationType.Attack3, AttackType.Three);
@@ -151,7 +171,7 @@ public class BaseCharacterAttacks : MonoBehaviour
 
     void OnTryEnhanceAttack(object sender, EventArgs e)
     {
-        if(meterCount == 0 && currentMeterValue <= 0) return;
+        if(currentMeterCount == 0 && currentMeterValue <= 0) return;
         if (GameManager.Instance.MeterBurnThresholdTime + recentAttackTime < Time.time) return;
         if (meterUsedTime > Time.time) return;
         meterUsedTime = Time.time + character.GetAnimationDuration(currentAnimationType);
@@ -161,16 +181,32 @@ public class BaseCharacterAttacks : MonoBehaviour
 
     void OnTryCancelAnimation(object sender, EventArgs e)
     {
-        if (meterCount == 0 && currentMeterValue <= 0 || attackingTilTime < Time.time) return;
+        if (currentMeterCount == 0 && currentMeterValue <= 0 || attackingTilTime < Time.time) return;
         meterUsedTime = 0;
         attackingTilTime = 0;
         UseMeter(50,true);
     }
 
-    void OnHitEnemy(object sender, EventArgs e)
+    void OnHitEnemy(object sender, BaseCharacter e)
     {
-        currentMeterValue += meterGainOnHit;
-        OnMeterValueChanged?.Invoke(this, new OnMeterUsedArgs((float)currentMeterValue / maxMeterValue, meterCount));
+        currentMeterValue += GameManager.BaseMeterGainOnEnemyHit;
+
+        if(currentMeterValue > GameManager.MaxMeterValue)
+        {
+            if(currentMeterCount >= GameManager.MaxMeterCount)
+            {
+                currentMeterValue = 100;
+            }
+            else
+            {
+                int meterProfit = currentMeterValue - GameManager.MaxMeterValue;
+                currentMeterCount++;
+                currentMeterValue = meterProfit;
+            }
+        }
+
+        OnMeterValueChanged?.Invoke(this, new OnMeterUsedArgs(
+            currentMeterValue, currentMeterCount));
     }
 
     void SetHitboxData(DamageData data)
@@ -202,25 +238,30 @@ public class BaseCharacterAttacks : MonoBehaviour
             Damage = attackData.Damage,
             VerticalKnockback = attackData.VerticalKnockback,
             HorizontalKnockback = attackData.HorizontalKnockback,
-            StunDuration = attackData.StunDuration,
+            HitStunDuration = attackData.HitStunDuration,
+            BlockStunDuration = attackData.BlockStunDuration,
             Source = character
         };
     }
 
     public void UseMeter(int usage, bool cancel)
     {
-        if (meterCount < 0 || meterCount == 0 && currentMeterValue < 50) return;
+        if (currentMeterCount < 0) return;
+        if (currentMeterCount <= 0 && currentMeterValue < 50) return;
+
+        if (usage > currentMeterValue && currentMeterCount == 0) return;
+
         currentMeterValue -= usage;
-        if (currentMeterValue <= 0)
+
+        if(currentMeterCount > 0)
         {
-            if (meterCount > 0)
+            if(currentMeterValue < 0)
             {
-                meterCount--;
-                currentMeterValue = 100;
+                int meterDeficit = currentMeterValue;
+                currentMeterCount--;
+                currentMeterValue = 100 + meterDeficit;
             }
         }
-
-        OnMeterValueChanged?.Invoke(this, new OnMeterUsedArgs((float)currentMeterValue / maxMeterValue, meterCount));
 
         if (cancel)
         {
@@ -230,5 +271,8 @@ public class BaseCharacterAttacks : MonoBehaviour
         {
             character.OnEnhanceAttack?.Invoke(this, EventArgs.Empty);
         }
+
+        OnMeterValueChanged?.Invoke(this, new OnMeterUsedArgs(
+            (float) currentMeterValue, currentMeterCount));
     }
 }

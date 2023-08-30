@@ -10,7 +10,8 @@ public class DamageData
     public float VerticalKnockback;
     public float HorizontalKnockback;
     public Vector2 KnockbackDirection;
-    public float StunDuration;
+    public float HitStunDuration;
+    public float BlockStunDuration;
     public BaseCharacter Source;
     public bool Enhanced;
 }

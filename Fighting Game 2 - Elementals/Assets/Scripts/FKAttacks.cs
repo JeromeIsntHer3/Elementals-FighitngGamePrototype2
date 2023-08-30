@@ -5,8 +5,9 @@ using UnityEngine;
 
 public class FKAttacks : BaseCharacterAttacks
 {
+    [Header("Heat Meter")]
     [SerializeField] FKHeatBarUI heatBar;
-    [SerializeField] float maxValue;
+    [SerializeField] float maxHeatValue;
     [SerializeField] float currentHeatValue;
     [SerializeField] float drainSpeed;
     [SerializeField] float gainPerHit;
@@ -41,7 +42,7 @@ public class FKAttacks : BaseCharacterAttacks
         character.OnAttackTwo += OnAttack2;
         character.OnAttackThree += OnAttack3;
 
-        character.OnHitEnemy += AddMeter;
+        character.OnHitEnemy += AddHeat;
     }
 
     protected override void OnDisable()
@@ -53,12 +54,12 @@ public class FKAttacks : BaseCharacterAttacks
         character.OnAttackTwo -= OnAttack2;
         character.OnAttackThree -= OnAttack3;
 
-        character.OnHitEnemy -= AddMeter;
+        character.OnHitEnemy -= AddHeat;
     }
 
     void Start()
     {
-        heatBar.SetMeterValue(currentHeatValue / maxValue);
+        heatBar.SetHeatMeterValue(currentHeatValue / maxHeatValue);
     }
 
     void OnOptionPressed(object sender, EventArgs args)
@@ -71,19 +72,19 @@ public class FKAttacks : BaseCharacterAttacks
     {
         if (!option) return;
         currentHeatValue -= attack1Drain;
-        heatBar.SetMeterValue(currentHeatValue / maxValue);
+        heatBar.SetHeatMeterValue(currentHeatValue / maxHeatValue);
     }
     void OnAttack2(object sender, EventArgs args)
     {
         if (!option) return;
         currentHeatValue -= attack2Drain;
-        heatBar.SetMeterValue(currentHeatValue / maxValue);
+        heatBar.SetHeatMeterValue(currentHeatValue / maxHeatValue);
     }
     void OnAttack3(object sender, EventArgs args)
     {
         if (!option) return;
         currentHeatValue -= attack3Drain;
-        heatBar.SetMeterValue(currentHeatValue / maxValue);
+        heatBar.SetHeatMeterValue(currentHeatValue / maxHeatValue);
     }
 
     public void SetupHeatbar(bool left)
@@ -92,18 +93,18 @@ public class FKAttacks : BaseCharacterAttacks
         heatBar.SetupHeatBar(left);
     }
 
-    public void AddMeter(object sender, EventArgs args)
+    public void AddHeat(object sender, BaseCharacter enemy)
     {
         if (option) return;
         currentHeatValue += gainPerHit;
-        heatBar.SetMeterValue(currentHeatValue / maxValue);
+        heatBar.SetHeatMeterValue(currentHeatValue / maxHeatValue);
     }
 
     void FixedUpdate()
     {
         if (!option) return;
         currentHeatValue -= drainSpeed * Time.deltaTime;
-        heatBar.SetMeterValue(currentHeatValue / maxValue);
+        heatBar.SetHeatMeterValue(currentHeatValue / maxHeatValue);
         if (currentHeatValue > 0) return;
         currentHeatValue = 0;
         option = false;

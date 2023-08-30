@@ -11,12 +11,14 @@ public class MBKnife : BaseProjectile
 
     void OnEnable()
     {
-        OnTriggerEvent += OnTrigger;
+        BeforeGuardCheck = BeforeGuard;
+        AfterMainTrigger = AfterTrigger;
     }
 
     void OnDisable()
     {
-        OnTriggerEvent -= OnTrigger;
+        BeforeGuardCheck = null;
+        AfterMainTrigger = null;
     }
 
     public void SetupKnife(BaseCharacter owner, DamageData data, float lifespan, bool flipX,
@@ -45,40 +47,24 @@ public class MBKnife : BaseProjectile
         anim.CrossFade("KnifeExplode", 0, 0);
     }
 
-    void OnTrigger(object sender, Collider2D col)
+    void BeforeGuard(Collider2D col)
+    {
+        if (!col.TryGetComponent(out Hurtbox hurtbox)) return;
+        Vector2 landingPoint;
+        if (enhanced)
+        {
+            landingPoint = GetTeleportPosition(hurtbox.transform);
+            landingPoint = new Vector2(landingPoint.x, landingPoint.y + (owner.IsFacingLeft ? 1 : -1));
+            owner.transform.position = landingPoint;
+        }
+    }
+
+    void AfterTrigger(Collider2D col)
     {
         Vector2 landingPoint;
 
-        if (hitSomething) return;
-        if (col.TryGetComponent(out Hurtbox hurtbox))
+        if(col.TryGetComponent(out Hitbox hitbox))
         {
-            if (BelongsToOwner(hurtbox)) return;
-
-            hitSomething = true;
-
-            if (enhanced)
-            {
-                landingPoint = GetTeleportPosition(hurtbox.transform);
-                landingPoint = new Vector2(landingPoint.x, landingPoint.y + (owner.IsFacingLeft ? 1 : -1));
-                owner.transform.position = landingPoint;
-            }
-
-            if (hurtbox.BoxOwner.IsGuarding)
-            {
-                if (owner.IsFacingLeft && hurtbox.BoxOwner.IsFacingLeft)
-                {
-                    hurtbox.Hit(damageData);
-                    hurtbox.BoxOwner.OnBlockCanceled?.Invoke(this, System.EventArgs.Empty);
-                    return;
-                }
-                hurtbox.BlockHit(damageData);
-                return;
-            }
-            hurtbox.Hit(damageData);
-        }
-        else if(col.TryGetComponent(out Hitbox hitbox))
-        {
-
             if (BelongsToOwner(hitbox)) return;
             hitSomething = true;
 

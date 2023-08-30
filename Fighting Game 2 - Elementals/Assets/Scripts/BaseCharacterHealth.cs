@@ -30,20 +30,16 @@ public class BaseCharacterHealth : MonoBehaviour
         character.OnBlockHit -= BlockHit;
     }
 
-    void OnHit(object sender, DamageData e)
+    void OnHit(object sender, DamageData data)
     {
-        currentHealth -= e.Damage;
-    }
-
-    void BlockHit(object sender, DamageData e)
-    {
-        currentHealth -= e.Damage;
+        currentHealth -= data.Damage;
+        character.SetStunnedDuration(data.HitStunDuration);
         OnHealthChanged?.Invoke(this, currentHealth / maxHealth);
     }
 
-    public void Damage(DamageData data)
+    void BlockHit(object sender, DamageData data)
     {
-        character.OnHit?.Invoke(this, data);
+        currentHealth -= data.Damage;
         OnHealthChanged?.Invoke(this, currentHealth / maxHealth);
     }
 }

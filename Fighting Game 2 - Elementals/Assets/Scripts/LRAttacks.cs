@@ -1,20 +1,22 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst;
 using UnityEngine;
 
 public class LRAttacks : BaseCharacterAttacks
 {
-    [Header("Ranger Prefabs")]
+    [Header("Prefabs")]
     [SerializeField] Arrow arrowPrefab;
     [SerializeField] Beam ultimateBeamPrefab;
     [SerializeField] ArrowStorm stormPrefab;
 
-    [Header("Ranger Attack Values")]
+    [Header("Arrow Values")]
     [SerializeField] float arrowSpeed;
     [SerializeField] float multiArrowSpeed;
 
-    [Header("Ranger Arrow Spawns")]
+    [Header("Arrow Spawns")]
     [SerializeField] Transform arrowSpawn;
     [SerializeField] Transform jumpArrowSpawn;
     [SerializeField] Transform beamSpawn;
@@ -40,36 +42,24 @@ public class LRAttacks : BaseCharacterAttacks
         stormDirection = dir;
     }
 
-    public void ArrowStab()
+    public void ArrowStabEnhance()
     {
         if (!enhance) return;
-        var arrow = Instantiate(arrowPrefab, arrowSpawn.position, Quaternion.identity);
-        arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.Two), character,
-            IsFacingLeft, IsFacingLeft ? Vector3.left : Vector3.right, arrowSpeed, 5f);
+        CreateArrow(arrowSpawn.position, IsFacingLeft ? Vector2.left : Vector2.right, arrowSpeed, 5f, true);
         enhance = false;
     }
 
-    public void ShootNormal()
+    public void ShootArrow()
     {
-        var arrow = Instantiate(arrowPrefab, arrowSpawn.position, Quaternion.identity);
-        arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.Two), character,
-            IsFacingLeft, IsFacingLeft ? Vector3.left : Vector3.right, arrowSpeed, 5f);
+        CreateArrow(arrowSpawn.position, IsFacingLeft ? Vector2.left : Vector2.right, arrowSpeed, 5f);
         if (!enhance) return;
         enhance = false;
-        ShootNormalEnhance();
-    }
-
-    public void ShootNormalEnhance()
-    {
-        var arrow = Instantiate(arrowPrefab, 
-            new Vector2(arrowSpawn.position.x, arrowSpawn.position.y + 0.1f), Quaternion.identity);
-        arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.TwoEnhanced), character,
-            IsFacingLeft, IsFacingLeft ? Vector3.left : Vector3.right, arrowSpeed, 5f);
-
-        arrow = Instantiate(arrowPrefab,
-            new Vector2(arrowSpawn.position.x, arrowSpawn.position.y - 0.1f), Quaternion.identity);
-        arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.TwoEnhanced), character,
-            IsFacingLeft, IsFacingLeft ? Vector3.left : Vector3.right, arrowSpeed, 5f);
+        CreateArrow(new Vector2(arrowSpawn.position.x, arrowSpawn.position.y + .1f), 
+            IsFacingLeft ? Vector2.left : Vector2.right, arrowSpeed,
+            5f, true);
+        CreateArrow(new Vector2(arrowSpawn.position.x, arrowSpawn.position.y - .1f),
+            IsFacingLeft ? Vector2.left : Vector2.right, arrowSpeed,
+            5f, true);
     }
 
     public void MultiShot()
@@ -78,15 +68,11 @@ public class LRAttacks : BaseCharacterAttacks
         {
             MultiShotEnhance();
             enhance = false;
+            return;
         }
-        else
+        foreach (Transform spawn in multiArrowSpawns)
         {
-            foreach (Transform spawn in multiArrowSpawns)
-            {
-                var arrow = Instantiate(arrowPrefab, spawn.position, Quaternion.identity);
-                arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.Two),
-                    character, IsFacingLeft, spawn.position - centre.position, multiArrowSpeed, 5f);
-            }
+            CreateArrow(spawn.position, spawn.position - centre.position, multiArrowSpeed, 5f);
         }
     }
 
@@ -104,19 +90,32 @@ public class LRAttacks : BaseCharacterAttacks
         }
 
         var storm = Instantiate(stormPrefab, spawnPos, Quaternion.identity);
-        storm.SetupStorm(character, GetDamageData(AttackType.ThreeEnhanced));
+        DamageData stormData = GetDamageData(AttackType.ThreeEnhanced);
+        stormData.Enhanced = true;
+        storm.SetupStorm(character, stormData);
     }
 
     public void ShootWhileJumping()
     {
-        var arrow = Instantiate(arrowPrefab, jumpArrowSpawn.position, Quaternion.identity);
-        arrow.GetComponent<Arrow>().SetupArrow(GetDamageData(AttackType.Two), character,
-            IsFacingLeft, jumpArrowSpawn.position - centre.position, arrowSpeed, 5f);
+        CreateArrow(jumpArrowSpawn.position, jumpArrowSpawn.position - centre.position, arrowSpeed, 5f);
     }
 
     public void UltimateBlast()
     {
         var beam = Instantiate(ultimateBeamPrefab, beamSpawn.position, Quaternion.identity);
         beam.SetupBeam(GetDamageData(AttackType.Ultimate),character, IsFacingLeft);
+    }
+
+    DamageData GetArrowDamageData()
+    {
+        return GetDamageData(AttackType.Projectile);
+    }
+
+    void CreateArrow(Vector2 position, Vector2 direction, float speed, float activeTime, bool enhance = false)
+    {
+        var arrow = Instantiate(arrowPrefab, position, Quaternion.identity);
+        DamageData arrowData = GetArrowDamageData();
+        arrowData.Enhanced = false;
+        arrow.SetupArrow(arrowData, character, false, direction, speed, activeTime);
     }
 }

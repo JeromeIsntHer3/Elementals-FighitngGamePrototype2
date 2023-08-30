@@ -14,8 +14,14 @@ public class BaseProjectile : MonoBehaviour
 
     float activeTime;
 
-    protected EventHandler<Collider2D> OnTriggerEvent;
-    protected EventHandler<Collision2D> OnCollisionEvent;
+    protected delegate void TriggerFunc(Collider2D col);
+    protected TriggerFunc BeforeMainTrigger;
+    protected TriggerFunc AfterMainTrigger;
+    protected TriggerFunc BeforeGuardCheck;
+
+    protected delegate void CollideFunc(Collision2D col);
+    protected CollideFunc BeforeMainCollision;
+    protected CollideFunc AfterMainCollision;
 
     public BaseCharacter Owner { get { return owner; } }
 
@@ -25,14 +31,52 @@ public class BaseProjectile : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
     }
 
-    void OnTriggerEnter2D(Collider2D collision)
+    void OnTriggerEnter2D(Collider2D col)
     {
-        OnTriggerEvent?.Invoke(this, collision);
+        BeforeMainTrigger?.Invoke(col);
+
+        if (hitSomething) return;
+        if (col.TryGetComponent(out Hurtbox hurtbox))
+        {
+            if (BelongsToOwner(hurtbox)) return;
+
+            Vector3 spawnPoint = GetComponent<Collider2D>().ClosestPoint(hurtbox.transform.position);
+            EffectManager.Instance.SpawnHitSplash(spawnPoint, owner.IsFacingLeft);
+            hitSomething = true;
+
+            BeforeGuardCheck?.Invoke(col);
+
+            if (hurtbox.BoxOwner.IsGuarding)
+            {
+                if (owner.IsFacingLeft && hurtbox.BoxOwner.IsFacingLeft)
+                {
+                    hurtbox.Hit(damageData);
+                    owner.OnHitEnemy?.Invoke(this, hurtbox.BoxOwner);
+                    hurtbox.BoxOwner.OnBlockCanceled?.Invoke(this, System.EventArgs.Empty);
+                    return;
+                }
+
+                owner.OnHitBlocked?.Invoke(this, hurtbox.BoxOwner);
+                hurtbox.BlockHit(damageData);
+                return;
+            }
+            owner.OnHitEnemy?.Invoke(this, hurtbox.BoxOwner);
+            hurtbox.Hit(damageData);
+        }
+
+        if (col.TryGetComponent(out BaseProjectile projectile))
+        {
+            if (projectile.Owner == owner) return;
+        }
+
+        AfterMainTrigger?.Invoke(col);
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnCollisionEnter2D(Collision2D col)
     {
-        OnCollisionEvent?.Invoke(this, collision);
+        BeforeMainCollision?.Invoke(col);
+
+        AfterMainCollision?.Invoke(col);
     }
 
     public virtual void InitProjectile(BaseCharacter character, DamageData data, float deathTime, bool flipX)

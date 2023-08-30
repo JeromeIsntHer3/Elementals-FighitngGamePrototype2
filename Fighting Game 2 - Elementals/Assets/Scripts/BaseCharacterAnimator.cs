@@ -137,7 +137,7 @@ public class BaseCharacterAnimator : MonoBehaviour
         CancelAnimation();
         animCond[AnimationType.Attack2] = true;
         attacking = true;
-        attackingTilTime = Time.time + character.GetAnimationDuration(AnimationType.Attack1);
+        attackingTilTime = Time.time + character.GetAnimationDuration(AnimationType.Attack2);
     }
 
     void OnAttack3(object sender, EventArgs args)
@@ -146,7 +146,7 @@ public class BaseCharacterAnimator : MonoBehaviour
         CancelAnimation();
         animCond[AnimationType.Attack3] = true;
         attacking = true;
-        attackingTilTime = Time.time + character.GetAnimationDuration(AnimationType.Attack1);
+        attackingTilTime = Time.time + character.GetAnimationDuration(AnimationType.Attack3);
     }
 
     void OnUltimate(object sender, EventArgs args)
@@ -204,9 +204,9 @@ public class BaseCharacterAnimator : MonoBehaviour
         CancelAnimation();
         animCond[AnimationType.Hit] = true;
         animCond[AnimationType.RecoveryFromHit] = true;
-        stunTilTime = Time.time + args.StunDuration;
-        character.SetRecoveryDuration(args.StunDuration);
-        ShakeOnHit(args.StunDuration);
+        stunTilTime = Time.time + args.HitStunDuration;
+        character.SetRecoveryDuration(args.HitStunDuration);
+        ShakeOnHit(args.HitStunDuration);
         DamageFlash();
     }
 
@@ -229,17 +229,16 @@ public class BaseCharacterAnimator : MonoBehaviour
     {
         CancelAnimation();
         animCond[AnimationType.DefendHit] = true;
-        blockTilTime = Time.time + data.StunDuration * GameManager.Instance.HitShakeAnim / 100;
-        ShakeOnHit(data.StunDuration * GameManager.Instance.HitShakeAnim / 100);
-        character.SetRecoveryDuration(data.StunDuration);
+        blockTilTime = Time.time + data.BlockStunDuration * GameManager.Instance.HitShakeAnim / 100;
+        ShakeOnHit(data.BlockStunDuration * GameManager.Instance.HitShakeAnim / 100);
+        character.SetRecoveryDuration(data.BlockStunDuration);
     }
 
     void ShakeOnHit(float duration)
     {
         spriteRenderer.transform.DOKill();
         spriteRenderer.transform.DOShakePosition(Mathf.Clamp(duration * GameManager.Instance.HitShakeAnim / 100,
-            .01f, 2f), 
-            new Vector3(GameManager.Instance.ShakeStrengthX,
+            .01f, 2f), new Vector3(GameManager.Instance.ShakeStrengthX,
             GameManager.Instance.ShakeStrengthY, 0),
             GameManager.Instance.Vibrato, default, false, true, ShakeRandomnessMode.Harmonic)
             .OnComplete(() =>

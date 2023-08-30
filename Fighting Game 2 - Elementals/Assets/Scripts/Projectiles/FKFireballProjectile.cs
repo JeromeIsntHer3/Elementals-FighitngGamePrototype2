@@ -8,38 +8,16 @@ public class FKFireballProjectile : BaseProjectile
 
     void OnEnable()
     {
-        OnTriggerEvent += OnTrigger;
+        AfterMainTrigger = AfterTrigger;
     }
 
     void OnDisable()
     {
-        OnTriggerEvent -= OnTrigger;
+        AfterMainTrigger = null;
     }
 
-    void OnTrigger(object sender, Collider2D col)
+    void AfterTrigger(Collider2D col)
     {
-        if (hitSomething) return;
-        if (col.TryGetComponent(out Hurtbox hurtbox))
-        {
-            if (BelongsToOwner(hurtbox)) return;
-
-            Vector3 spawnPoint = GetComponent<Collider2D>().ClosestPoint(hurtbox.transform.position);
-            EffectManager.Instance.SpawnHitSplash(spawnPoint, owner.IsFacingLeft);
-            hitSomething = true;
-            if (hurtbox.BoxOwner.IsGuarding)
-            {
-                if (owner.IsFacingLeft && hurtbox.BoxOwner.IsFacingLeft)
-                {
-                    hurtbox.Hit(damageData);
-                    hurtbox.BoxOwner.OnBlockCanceled?.Invoke(this, System.EventArgs.Empty);
-                    return;
-                }
-
-                hurtbox.BlockHit(damageData);
-                return;
-            }
-            hurtbox.Hit(damageData);
-        }
         if (onHit) Destroy(gameObject);
     }
 

@@ -12,12 +12,12 @@ public class CMRockProjectile : BaseProjectile
 
     void OnEnable()
     {
-        OnTriggerEvent += OnTrigger;
+        BeforeGuardCheck = BeforeGuard;
     }
 
     void OnDisable()
     {
-        OnTriggerEvent -= OnTrigger;
+        BeforeGuardCheck = null;
     }
 
     public CMRockProjectile SetupProjectile(DamageData data, BaseCharacter owner, bool flipX, Vector2 dir, float speed, float lifespan
@@ -57,35 +57,12 @@ public class CMRockProjectile : BaseProjectile
         Destroy(gameObject);
     }
 
-    void OnTrigger(object sender, Collider2D col)
+    void BeforeGuard(Collider2D col)
     {
-        if (hitSomething) return;
-        if (!col.TryGetComponent(out Hurtbox hurtbox)) return;
-        if (BelongsToOwner(hurtbox)) return;
-
-        hitSomething = true;
-
-        Vector3 fxSpawnPoint = explosionCol.ClosestPoint(hurtbox.transform.position);
-        EffectManager.Instance.SpawnHitSplash(fxSpawnPoint, owner.IsFacingLeft);
-
         rb.velocity = Vector2.zero;
         rb.constraints = RigidbodyConstraints2D.FreezeAll;
         gameObject.layer = LayerMask.NameToLayer("Ground");
         rockCol.gameObject.layer = gameObject.layer;
-
-        if (hurtbox.BoxOwner.IsGuarding)
-        {
-            if (owner.IsFacingLeft && hurtbox.BoxOwner.IsFacingLeft)
-            {
-                hurtbox.Hit(damageData);
-                hurtbox.BoxOwner.OnBlockCanceled?.Invoke(this, EventArgs.Empty);
-                return;
-            }
-
-            hurtbox.BlockHit(damageData);
-            return;
-        }
-        hurtbox.Hit(damageData);
     }
 
     public void HitRock(Vector2 direction, float hitForce)

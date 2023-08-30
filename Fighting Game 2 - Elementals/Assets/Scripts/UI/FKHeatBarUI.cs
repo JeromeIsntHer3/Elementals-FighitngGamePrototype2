@@ -9,7 +9,7 @@ public class FKHeatBarUI : MonoBehaviour
     [SerializeField] Vector2 positionalValue;
     
 
-    public void SetMeterValue(float value)
+    public void SetHeatMeterValue(float value)
     {
         barFillImage.fillAmount = value;
     }

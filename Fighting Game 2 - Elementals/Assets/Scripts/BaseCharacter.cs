@@ -5,36 +5,37 @@ using UnityEngine;
 
 public class BaseCharacter : MonoBehaviour
 {
-    [SerializeField] int player;
+    [SerializeField] int hitsBlockedConsecutively = 0;
     [SerializeField] CharacterAnimationSO animationData;
-    protected BaseCharacter enemy;
+    [SerializeField] protected BaseCharacter enemy;
     protected readonly Dictionary<AnimationType, float> animationDuration = new();
 
-    [SerializeField] int hitsBlockedConsecutively;
-    [SerializeField] int maxHits = 20;
-    [SerializeField] float reductionPerBlockLevel;
-    [SerializeField] float startingReduction;
-    [SerializeField] float timeBetweenHits = 3f;
-    float timeTilReset;
+
+    int comboHit = 0;
     float recoveryTime;
+    float stunTilTime;
+    float currentDamageReductionPercentage;
+    float timeLastBlockedHit;
     bool isGrounded = true;
     bool isGuarding = false;
     bool isFacingLeft;
-    bool isAttacking = false;
     bool broken = false;
+    bool isAttacking = false;
 
-    float damageReductionPercentage;
+    BaseCharacterAttacks m_Attacks;
+    BaseCharacterAttacks enemyAttacks;
 
     #region Getters & Setters
 
     public bool IsGrounded { get { return isGrounded; } }
     public bool IsGuarding { get {  return isGuarding ; } }
     public bool IsFacingLeft { get { return isFacingLeft; } }
-    public bool IsAttacking { get { return isAttacking ; } }
     public CharacterAnimationSO AnimationData { get { return animationData; } }
     public BaseCharacter Enemy { get { return enemy; } }
-    public float DamageReduction {  get { return damageReductionPercentage; } }
+    public float DamageReduction {  get { return currentDamageReductionPercentage; } }
     public bool DefenseBroken {  get { return broken; } }
+    public int ComboHit { get {  return comboHit; } }
+    public bool IsAttacking {  get { return isAttacking; } }
 
     #endregion
 
@@ -62,14 +63,24 @@ public class BaseCharacter : MonoBehaviour
     public EventHandler<DamageData> OnHit;
     public EventHandler<DamageData> OnBlockHit;
     public EventHandler<bool> OnChangeFaceDirection;
-    public EventHandler OnHitEnemy;
-    public EventHandler OnHitBlocked;
+    public EventHandler<BaseCharacter> OnHitEnemy;
+    public EventHandler<BaseCharacter> OnHitBlocked;
+    public EventHandler<int> OnHitCombo;
+    public EventHandler<string> OnHitType;
 
     #endregion
+
+    //public void SetupCharacter(BaseCharacter enemy, )
+    //{
+    //    this.enemy = enemy;
+
+    //    enemyAttacks = enemy.GetComponent<BaseCharacterAttacks>();
+    //}
 
     void Awake()
     {
         animationData.AddToDuration(animationDuration);
+        enemyAttacks = enemy.GetComponent<BaseCharacterAttacks>();
     }
 
     void OnEnable()
@@ -78,6 +89,8 @@ public class BaseCharacter : MonoBehaviour
         OnBlockCanceled += BlockCanceled;
         OnChangeFaceDirection += ChangeFaceDirection;
         OnBlockHit += BlockHit;
+        OnHitEnemy += HitEnemy;
+        OnHit += Hit;
     }
 
     void OnDisable()
@@ -86,19 +99,14 @@ public class BaseCharacter : MonoBehaviour
         OnBlockCanceled -= BlockCanceled;
         OnChangeFaceDirection -= ChangeFaceDirection;
         OnBlockHit -= BlockHit;
+        OnHitEnemy -= HitEnemy;
+        OnHit -= Hit;
     }
 
     void Start()
     {
-        if (player == 1)
-        {
-            enemy = GameManager.Instance.PlayerTwo;
-        }
-        else if (player == 2)
-        {
-            enemy = GameManager.Instance.PlayerOne;
-        }
-        damageReductionPercentage = startingReduction;
+        currentDamageReductionPercentage = GameManager.BaseDamageReduction;
+        InvokeRepeating(nameof(CheckCombo), 1f, .1f);
     }
 
     void BlockActive(object sender, EventArgs e)
@@ -118,27 +126,64 @@ public class BaseCharacter : MonoBehaviour
 
     void BlockHit(object sender, DamageData dd)
     {
-        Debug.Log($"{gameObject.name} Blocked Hit From {dd.Source.name}.");
+        Invoke(nameof(CheckBlock), GameManager.BlockResetDuration);
 
-        if(Time.time > timeTilReset)
-        {
-            hitsBlockedConsecutively = 0;
-        }
-
-        timeTilReset = Time.time + timeBetweenHits;
         hitsBlockedConsecutively++;
-        if (hitsBlockedConsecutively >= maxHits)
+        timeLastBlockedHit = Time.time;
+
+        if (hitsBlockedConsecutively >= GameManager.MaxBlockHits)
         {
-            hitsBlockedConsecutively = maxHits;
+            hitsBlockedConsecutively = GameManager.MaxBlockHits;
             broken = true;
         }
         else
         {
             broken = false;
-            float reduction = startingReduction;
-            reduction -= reductionPerBlockLevel * hitsBlockedConsecutively;
-            damageReductionPercentage = reduction;
+            float reduction = GameManager.BaseDamageReduction;
+            reduction -= GameManager.BaseDamageReductionPerLevel * hitsBlockedConsecutively;
+            currentDamageReductionPercentage = reduction;
         }
+
+        Debug.Log(currentDamageReductionPercentage);
+    }
+
+    void HitEnemy(object sender, BaseCharacter enemy)
+    {
+        if (enemy.Stunned())
+        {
+            comboHit++;
+            OnHitCombo?.Invoke(this, comboHit);
+        }
+        else
+        {
+            comboHit = 1;
+        }
+        if (!enemy.IsAttacking) return;
+        OnHitType?.Invoke(this, "COUNTER");
+        Invoke(nameof(CheckHitStateType), 1f);
+    }
+
+    void CheckBlock()
+    {
+        if (timeLastBlockedHit + GameManager.BlockResetDuration > Time.time) return;
+        hitsBlockedConsecutively = 0;
+    }
+
+    void CheckCombo()
+    {
+        if (enemy.Stunned()) return;
+        comboHit = 0;
+        OnHitCombo?.Invoke(this, comboHit);
+    }
+
+    void CheckHitStateType()
+    {
+        OnHitType?.Invoke(this, "");
+    }
+
+    void Hit(object sender, DamageData e)
+    {
+        isAttacking = false;
     }
 
     public float GetAnimationDuration(AnimationType t)
@@ -156,6 +201,16 @@ public class BaseCharacter : MonoBehaviour
         return Time.time > recoveryTime;
     }
 
+    public void SetStunnedDuration(float t)
+    {
+        stunTilTime = Time.time + t;
+    }
+
+    public bool Stunned()
+    {
+        return Time.time < stunTilTime;
+    }
+
     public void CancelRecovery()
     {
         recoveryTime = 0;
@@ -164,5 +219,20 @@ public class BaseCharacter : MonoBehaviour
     public void SetGroundedState(bool s)
     {
         isGrounded = s;
+    }
+
+    public void IncreaseCombo()
+    {
+        comboHit++;
+    }
+
+    public void SetAttackingState(int state)
+    {
+        isAttacking = state switch
+        {
+            0 => false,
+            1 => true,
+            _ => false,
+        };
     }
 }

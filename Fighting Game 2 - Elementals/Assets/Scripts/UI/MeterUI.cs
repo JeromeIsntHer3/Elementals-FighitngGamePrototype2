@@ -10,7 +10,7 @@ public class MeterUI : MonoBehaviour
 
     public void OnMeterUsed(object sender, BaseCharacterAttacks.OnMeterUsedArgs args)
     {
-        meterFillImg.fillAmount = args.amount;
+        meterFillImg.fillAmount = args.amount / GameManager.MaxMeterValue;
         meterCountText.text = args.count.ToString();
     }
 }

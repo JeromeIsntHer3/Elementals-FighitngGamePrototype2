@@ -14,65 +14,79 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Attacks:
   - AttackType: 0
-    DamageType: 0
     Damage: 5
     HorizontalKnockback: 5
     VerticalKnockback: 5
-    StunDuration: 1
+    HitStunDuration: 0.75
+    BlockStunDuration: 0.2
     MeterUsage: 50
   - AttackType: 1
-    DamageType: 0
     Damage: 2
     HorizontalKnockback: 3
     VerticalKnockback: 3
-    StunDuration: 0.2
+    HitStunDuration: 0.2
+    BlockStunDuration: 0.2
     MeterUsage: 100
   - AttackType: 2
-    DamageType: 0
     Damage: 2
     HorizontalKnockback: 3
     VerticalKnockback: 3
-    StunDuration: 0.15
+    HitStunDuration: 0.2
+    BlockStunDuration: 0.2
     MeterUsage: 50
   - AttackType: 3
-    DamageType: 0
     Damage: 20
     HorizontalKnockback: 5
     VerticalKnockback: 5
-    StunDuration: 1
+    HitStunDuration: 0.2
+    BlockStunDuration: 0.2
     MeterUsage: 50
   - AttackType: 4
-    DamageType: 0
     Damage: 0
     HorizontalKnockback: 0
     VerticalKnockback: 0
-    StunDuration: 0
+    HitStunDuration: 0.2
+    BlockStunDuration: 0.2
     MeterUsage: 50
   - AttackType: 5
-    DamageType: 0
     Damage: 0
     HorizontalKnockback: 0
     VerticalKnockback: 0
-    StunDuration: 0
+    HitStunDuration: 0.2
+    BlockStunDuration: 0.2
     MeterUsage: 50
   - AttackType: 6
-    DamageType: 0
     Damage: 2
     HorizontalKnockback: 0.2
     VerticalKnockback: 2
-    StunDuration: 0.2
+    HitStunDuration: 0.2
+    BlockStunDuration: 0.2
     MeterUsage: 100
   - AttackType: 7
-    DamageType: 0
     Damage: 0
     HorizontalKnockback: 0
     VerticalKnockback: 0
-    StunDuration: 0
+    HitStunDuration: 0.2
+    BlockStunDuration: 0.2
     MeterUsage: 0
   - AttackType: 8
-    DamageType: 0
     Damage: 0
     HorizontalKnockback: 0
     VerticalKnockback: 0
-    StunDuration: 0
+    HitStunDuration: 0.2
+    BlockStunDuration: 0.2
     MeterUsage: 50
+  - AttackType: 10
+    Damage: 0
+    HorizontalKnockback: 0
+    VerticalKnockback: 0
+    HitStunDuration: 0.5
+    BlockStunDuration: 0.25
+    MeterUsage: 0
+  - AttackType: 9
+    Damage: 0
+    HorizontalKnockback: 0
+    VerticalKnockback: 0
+    HitStunDuration: 0.2
+    BlockStunDuration: 0.2
+    MeterUsage: 0

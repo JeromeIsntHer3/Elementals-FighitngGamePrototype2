@@ -20,11 +20,11 @@ public class CharacterHitbox : Hitbox
 
     void HitSuccess(Hurtbox hb)
     {
-        owner.OnHitEnemy?.Invoke(this, EventArgs.Empty);
+        owner.OnHitEnemy?.Invoke(this, hb.BoxOwner);
     }
 
     void HitFailed(Hurtbox hb)
     {
-        owner.OnHitBlocked?.Invoke(this, EventArgs.Empty);
+        owner.OnHitBlocked?.Invoke(this, hb.BoxOwner);
     }
 }

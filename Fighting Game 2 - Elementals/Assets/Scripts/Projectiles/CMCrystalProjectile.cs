@@ -21,12 +21,12 @@ public class CMCrystalProjectile : BaseProjectile
     void OnEnable()
     {
         anim = GetComponent<Animator>();
-        OnTriggerEvent += OnTrigger;
+        BeforeMainTrigger = BeforeTrigger;
     }
 
     void OnDisable()
     {
-        OnTriggerEvent -= OnTrigger;
+        BeforeMainTrigger = null;
     }
 
     public void SetupCrystal(BaseCharacter owner, DamageData data, float time, bool flipX, Vector2 direction,
@@ -58,7 +58,7 @@ public class CMCrystalProjectile : BaseProjectile
         }
     }
 
-    void OnTrigger(object sender, Collider2D collision)
+    void BeforeTrigger(Collider2D collision)
     {
         if (isParent)
         {
@@ -70,25 +70,7 @@ public class CMCrystalProjectile : BaseProjectile
             rock.Explode();
             Invoke(nameof(DestroyCrystal), .1f);
         }
-
         if (!isEnhanced) return;
-        if (!collision.TryGetComponent(out Hurtbox hurtbox)) return;
-        if (BelongsToOwner(hurtbox)) return;
-
-        hitSomething = true;
-
-        if (hurtbox.BoxOwner.IsGuarding)
-        {
-            if (owner.IsFacingLeft && hurtbox.BoxOwner.IsFacingLeft)
-            {
-                hurtbox.Hit(damageData);
-                hurtbox.BoxOwner.OnBlockCanceled?.Invoke(this, System.EventArgs.Empty);
-                return;
-            }
-            hurtbox.BlockHit(damageData);
-            return;
-        }
-        hurtbox.Hit(damageData);
     }
 
     bool TravelledMaxDistance()

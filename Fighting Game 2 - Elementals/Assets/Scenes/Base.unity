@@ -526,52 +526,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 97931860}
   m_CullTransparentMesh: 1
---- !u!1 &214157358
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 214157360}
-  - component: {fileID: 214157359}
-  m_Layer: 0
-  m_Name: Test
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &214157359
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 214157358}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5dd3da4d76a66f647bdbccb626763f7e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rb: {fileID: 0}
-  pushforce: 5
---- !u!4 &214157360
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 214157358}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &287127572
 GameObject:
   m_ObjectHideFlags: 0
@@ -692,6 +646,7 @@ GameObject:
   - component: {fileID: 302931830}
   - component: {fileID: 302931829}
   - component: {fileID: 302931828}
+  - component: {fileID: 302931832}
   m_Layer: 5
   m_Name: '[Canvas] GameUI'
   m_TagString: Untagged
@@ -785,6 +740,26 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &302931832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 302931827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dd3da4d76a66f647bdbccb626763f7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  top: {fileID: 766952609}
+  left: {fileID: 1811240268}
+  right: {fileID: 287127573}
+  bottom: {fileID: 1783178774}
+  topPos: {x: 0, y: 48}
+  leftPos: {x: -100, y: 0}
+  rightPos: {x: 100, y: 0}
+  bottomPos: {x: 0, y: 220}
 --- !u!1 &334922900
 GameObject:
   m_ObjectHideFlags: 0
@@ -3023,9 +2998,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9f7222cb5279394485baf4f135f3a5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FrameRate: 60
-  playerOne: {fileID: 2487263468655435635}
-  playerTwo: {fileID: 8601698921844408080}
+  GameState: 0
   HpAnimDuration: 0.25
   MeterBurnThresholdTime: 0.25
   ProjectileDuration: 5
@@ -3033,8 +3006,6 @@ MonoBehaviour:
   ShakeStrengthX: 0.2
   ShakeStrengthY: 0.01
   Vibrato: 20
-  RCColor: {r: 0, g: 0, b: 0, a: 0}
-  ECColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &1397349623
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4224,6 +4195,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hitSplash: {fileID: 497451749600651970, guid: 76bc8e923e98f92458cee7cfb555beca, type: 3}
+  meterSplash: {fileID: -4062441863488579398, guid: 740ce071b9874524db7e9a797dfe4663, type: 3}
 --- !u!4 &2027142399
 Transform:
   m_ObjectHideFlags: 0
@@ -4356,30 +4328,6 @@ PrefabInstance:
       propertyPath: enemy
       value: 
       objectReference: {fileID: 8601698921844408080}
-    - target: {fileID: 5793372659133731495, guid: dc953acca3727ce47a8f6df392ffa598, type: 3}
-      propertyPath: maxHits
-      value: 21
-      objectReference: {fileID: 0}
-    - target: {fileID: 5793372659133731495, guid: dc953acca3727ce47a8f6df392ffa598, type: 3}
-      propertyPath: timeBetweenHits
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5793372659133731495, guid: dc953acca3727ce47a8f6df392ffa598, type: 3}
-      propertyPath: startingReduction
-      value: 95
-      objectReference: {fileID: 0}
-    - target: {fileID: 5793372659133731495, guid: dc953acca3727ce47a8f6df392ffa598, type: 3}
-      propertyPath: reductionPerBlockLevel
-      value: 2.25
-      objectReference: {fileID: 0}
-    - target: {fileID: 7552092709346110438, guid: dc953acca3727ce47a8f6df392ffa598, type: 3}
-      propertyPath: currentMeterCount
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 7552092709346110438, guid: dc953acca3727ce47a8f6df392ffa598, type: 3}
-      propertyPath: currentMeterValue
-      value: 75
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4393,18 +4341,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1870336017813161291, guid: 42a995805a3e7db48a75646e93fb41b6, type: 3}
-      propertyPath: timeBetweenHits
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1870336017813161291, guid: 42a995805a3e7db48a75646e93fb41b6, type: 3}
-      propertyPath: startingReduction
-      value: 95
-      objectReference: {fileID: 0}
-    - target: {fileID: 1870336017813161291, guid: 42a995805a3e7db48a75646e93fb41b6, type: 3}
-      propertyPath: reductionPerBlockLevel
-      value: 2.25
-      objectReference: {fileID: 0}
     - target: {fileID: 3443946004017060514, guid: 42a995805a3e7db48a75646e93fb41b6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.53
@@ -4470,29 +4406,13 @@ PrefabInstance:
       propertyPath: enemy
       value: 
       objectReference: {fileID: 2487263468655435635}
-    - target: {fileID: 341329944630434763, guid: edcd38532c5ae9049bb368944876520b, type: 3}
-      propertyPath: maxHits
-      value: 21
-      objectReference: {fileID: 0}
-    - target: {fileID: 341329944630434763, guid: edcd38532c5ae9049bb368944876520b, type: 3}
-      propertyPath: timeBetweenHits
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 341329944630434763, guid: edcd38532c5ae9049bb368944876520b, type: 3}
-      propertyPath: startingReduction
-      value: 95
-      objectReference: {fileID: 0}
-    - target: {fileID: 341329944630434763, guid: edcd38532c5ae9049bb368944876520b, type: 3}
-      propertyPath: reductionPerBlockLevel
-      value: 2.25
-      objectReference: {fileID: 0}
     - target: {fileID: 1291111575060499987, guid: edcd38532c5ae9049bb368944876520b, type: 3}
       propertyPath: m_Name
       value: Leaf_Ranger
       objectReference: {fileID: 0}
     - target: {fileID: 1291111575060499987, guid: edcd38532c5ae9049bb368944876520b, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4367027235888750937, guid: edcd38532c5ae9049bb368944876520b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4533,18 +4453,6 @@ PrefabInstance:
     - target: {fileID: 4367027235888750937, guid: edcd38532c5ae9049bb368944876520b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6409298291436382391, guid: edcd38532c5ae9049bb368944876520b, type: 3}
-      propertyPath: meterGainOnHit
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 6409298291436382391, guid: edcd38532c5ae9049bb368944876520b, type: 3}
-      propertyPath: currentMeterCount
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 6409298291436382391, guid: edcd38532c5ae9049bb368944876520b, type: 3}
-      propertyPath: currentMeterValue
-      value: 75
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4599,18 +4507,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7048232359290930755, guid: f76e8839c52cd3a4e8a4c01d12a219c6, type: 3}
-      propertyPath: timeBetweenHits
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7048232359290930755, guid: f76e8839c52cd3a4e8a4c01d12a219c6, type: 3}
-      propertyPath: startingReduction
-      value: 95
-      objectReference: {fileID: 0}
-    - target: {fileID: 7048232359290930755, guid: f76e8839c52cd3a4e8a4c01d12a219c6, type: 3}
-      propertyPath: reductionPerBlockLevel
-      value: 2.25
-      objectReference: {fileID: 0}
     - target: {fileID: 8778245931803500752, guid: f76e8839c52cd3a4e8a4c01d12a219c6, type: 3}
       propertyPath: m_Name
       value: Crystal_Mauler
@@ -4658,7 +4554,6 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 619394802}
   - {fileID: 1230703678}
-  - {fileID: 214157360}
   - {fileID: 506202163657450822}
   - {fileID: 1983107640487158081}
   - {fileID: 797247024011909645}

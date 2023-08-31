@@ -88,6 +88,9 @@ public class BaseCharacterAttacks : MonoBehaviour
         character.OnTryCancel += OnTryCancelAnimation;
 
         character.OnHitEnemy += OnHitEnemy;
+        character.OnHitBlocked += OnHitBlocked;
+        character.OnHit += OnHit;
+        character.OnBlockHit += OnEnemyBlockHit;
     }
 
     protected virtual void OnDisable()
@@ -102,6 +105,9 @@ public class BaseCharacterAttacks : MonoBehaviour
         character.OnTryEnhance -= OnTryEnhanceAttack;
         character.OnTryCancel -= OnTryCancelAnimation;
         character.OnHitEnemy -= OnHitEnemy;
+        character.OnHitBlocked -= OnHitBlocked;
+        character.OnHit -= OnHit;
+        character.OnBlockHit -= OnEnemyBlockHit;
     }
 
     void OnAttack1(object sender, EventArgs e)
@@ -171,11 +177,11 @@ public class BaseCharacterAttacks : MonoBehaviour
 
     void OnTryEnhanceAttack(object sender, EventArgs e)
     {
-        if(currentMeterCount == 0 && currentMeterValue <= 0) return;
+        if(currentMeterCount == 0 && currentMeterValue < 100) return;
         if (GameManager.Instance.MeterBurnThresholdTime + recentAttackTime < Time.time) return;
         if (meterUsedTime > Time.time) return;
         meterUsedTime = Time.time + character.GetAnimationDuration(currentAnimationType);
-        UseMeter(GetAttackData(currentAttackType).MeterUsage, false);
+        UseMeter(100, false);
         enhance = true;
     }
 
@@ -187,24 +193,30 @@ public class BaseCharacterAttacks : MonoBehaviour
         UseMeter(50,true);
     }
 
+    void OnHit(object sender, DamageData e)
+    {
+        GainMeter(GameManager.BaseMeterGainOnHit);
+        OnMeterValueChanged?.Invoke(this, new OnMeterUsedArgs(
+            currentMeterValue, currentMeterCount));
+    }
+
+    void OnHitBlocked(object sender, BaseCharacter e)
+    {
+        GainMeter(GameManager.BaseMeterGainOnBlockHit);
+        OnMeterValueChanged?.Invoke(this, new OnMeterUsedArgs(
+            currentMeterValue, currentMeterCount));
+    }
+
     void OnHitEnemy(object sender, BaseCharacter e)
     {
-        currentMeterValue += GameManager.BaseMeterGainOnEnemyHit;
+        GainMeter(GameManager.BaseMeterGainOnEnemyHit);
+        OnMeterValueChanged?.Invoke(this, new OnMeterUsedArgs(
+            currentMeterValue, currentMeterCount));
+    }
 
-        if(currentMeterValue > GameManager.MaxMeterValue)
-        {
-            if(currentMeterCount >= GameManager.MaxMeterCount)
-            {
-                currentMeterValue = 100;
-            }
-            else
-            {
-                int meterProfit = currentMeterValue - GameManager.MaxMeterValue;
-                currentMeterCount++;
-                currentMeterValue = meterProfit;
-            }
-        }
-
+    void OnEnemyBlockHit(object sender, DamageData e)
+    {
+        GainMeter(GameManager.BaseMeterGainOnEnemyBlockHit);
         OnMeterValueChanged?.Invoke(this, new OnMeterUsedArgs(
             currentMeterValue, currentMeterCount));
     }
@@ -242,6 +254,25 @@ public class BaseCharacterAttacks : MonoBehaviour
             BlockStunDuration = attackData.BlockStunDuration,
             Source = character
         };
+    }
+
+    void GainMeter(int amount)
+    {
+        currentMeterValue += amount;
+
+        if (currentMeterValue > GameManager.MaxMeterValue)
+        {
+            if (currentMeterCount >= GameManager.MaxMeterCount)
+            {
+                currentMeterValue = 100;
+            }
+            else
+            {
+                int meterProfit = currentMeterValue - GameManager.MaxMeterValue;
+                currentMeterCount++;
+                currentMeterValue = meterProfit;
+            }
+        }
     }
 
     public void UseMeter(int usage, bool cancel)

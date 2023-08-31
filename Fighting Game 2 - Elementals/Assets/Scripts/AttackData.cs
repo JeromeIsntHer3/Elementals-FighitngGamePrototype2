@@ -12,5 +12,4 @@ public class AttackData
     public float VerticalKnockback;
     public float HitStunDuration = .2f;
     public float BlockStunDuration = .2f;
-    public int MeterUsage = 50;
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 
-public class CharacterSelectProxyUI : MonoBehaviour
+public class PlayerInputProxy : MonoBehaviour
 {
     [SerializeField] CharacterButtonUI ranger, knight, bladekeeper, mauler;
     [SerializeField] MultiplayerEventSystem es;
@@ -34,7 +34,7 @@ public class CharacterSelectProxyUI : MonoBehaviour
         playerInput.actions["Back"].performed -= CharacterSelectProxyUI_performed;
     }
 
-    public CharacterSelectProxyUI SetupProxy(MenuSceneManager m, int index)
+    public PlayerInputProxy SetupProxy(MenuSceneManager m, int index)
     {
         ranger.SetupButtonUI(m, m.Ranger, index);
         knight.SetupButtonUI(m, m.Knight, index);

@@ -255,6 +255,7 @@ public class BaseCharacterAnimator : MonoBehaviour
     void OnEnhanceAttack(object sender, EventArgs args)
     {
         SetSpriteColour(Color.yellow, .5f);
+        EffectManager.Instance.SpawnMeterSplash(character.Centre.position, 1);
         spriteRenderer.material.SetColor("_GradientOutline1", Color.yellow);
     }
 
@@ -264,6 +265,7 @@ public class BaseCharacterAnimator : MonoBehaviour
         CancelAnimation();
         character.CancelRecovery();
         attacking = false;
+        EffectManager.Instance.SpawnMeterSplash(character.Centre.position, 0);
         SetSpriteColour(Color.cyan, .2f);
         spriteRenderer.material.SetColor("_GradientOutline1", Color.cyan);
     }

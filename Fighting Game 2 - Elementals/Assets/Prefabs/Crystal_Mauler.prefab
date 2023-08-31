@@ -1176,20 +1176,20 @@ GameObject:
   - component: {fileID: 2849282795434813268}
   - component: {fileID: 4361233828049483950}
   - component: {fileID: 4416607004956679377}
-  - component: {fileID: 3981950418970558337}
   - component: {fileID: 7048232359290930755}
   - component: {fileID: 8594357860000754350}
   - component: {fileID: 3932423499382923225}
   - component: {fileID: 2797237297807654382}
   - component: {fileID: 2327441573688084672}
   - component: {fileID: 259732049996971644}
+  - component: {fileID: -4785412280007189895}
   m_Layer: 7
   m_Name: Crystal_Mauler
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &102249557182970175
 Transform:
   m_ObjectHideFlags: 0
@@ -1199,7 +1199,7 @@ Transform:
   m_GameObject: {fileID: 8778245931803500752}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3, y: -0.058, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1318,36 +1318,6 @@ MonoBehaviour:
   colliders:
   - {fileID: 2849282795434813268}
   color: {r: 1, g: 0.94731724, b: 0, a: 0.39215687}
---- !u!114 &3981950418970558337
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8778245931803500752}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: ead93b3707114db40b236f21120e35b7, type: 3}
-  m_NotificationBehavior: 3
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: Keyboard
-  m_DefaultActionMap: Player
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
 --- !u!114 &7048232359290930755
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1360,8 +1330,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f21c9ceff33ee4e4eb0deb33ef05582b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: 2
+  hitsBlockedConsecutively: 0
   animationData: {fileID: 11400000, guid: d07d36c78a28f0c44b328cb42c382dc2, type: 2}
+  characterCentre: {fileID: 1305160504933820592}
 --- !u!114 &8594357860000754350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1374,6 +1345,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12243bd08137b3c409dafe3e627df513, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerInput: {fileID: 0}
 --- !u!114 &3932423499382923225
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1435,10 +1407,8 @@ MonoBehaviour:
   centre: {fileID: 1305160504933820592}
   attacksData: {fileID: 11400000, guid: 096e77262dac671438e7ebeebbfecb97, type: 2}
   hitboxes: {fileID: 5066680782980152323}
-  maxMeterValue: 100
   currentMeterValue: 100
-  meterCount: 3
-  meterGainOnHit: 0
+  currentMeterCount: 0
   rockPrefab: {fileID: 3419949629967175955, guid: 6c67a520aa705a140aa61e47707dff6a, type: 3}
   crystalPrefab: {fileID: 8485001256430249308, guid: 8451ec08a7103ac4eb1772cc685c590a, type: 3}
   rockSpawn: {fileID: 7431953236754748723}
@@ -1450,6 +1420,36 @@ MonoBehaviour:
   hammerHitbox: {fileID: 5393148141328872643}
   hitForce: 85
   deflectDuration: 5
+--- !u!114 &-4785412280007189895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8778245931803500752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: ead93b3707114db40b236f21120e35b7, type: 3}
+  m_NotificationBehavior: 3
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &9210588691114751103
 GameObject:
   m_ObjectHideFlags: 0

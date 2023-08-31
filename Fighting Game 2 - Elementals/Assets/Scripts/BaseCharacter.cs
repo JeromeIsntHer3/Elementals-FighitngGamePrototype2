@@ -7,7 +7,8 @@ public class BaseCharacter : MonoBehaviour
 {
     [SerializeField] int hitsBlockedConsecutively = 0;
     [SerializeField] CharacterAnimationSO animationData;
-    [SerializeField] protected BaseCharacter enemy;
+    protected BaseCharacter enemy;
+    [SerializeField] Transform characterCentre;
     protected readonly Dictionary<AnimationType, float> animationDuration = new();
 
 
@@ -36,6 +37,8 @@ public class BaseCharacter : MonoBehaviour
     public bool DefenseBroken {  get { return broken; } }
     public int ComboHit { get {  return comboHit; } }
     public bool IsAttacking {  get { return isAttacking; } }
+
+    public Transform Centre { get { return characterCentre; } }
 
     #endregion
 
@@ -70,16 +73,14 @@ public class BaseCharacter : MonoBehaviour
 
     #endregion
 
-    //public void SetupCharacter(BaseCharacter enemy, )
-    //{
-    //    this.enemy = enemy;
-
-    //    enemyAttacks = enemy.GetComponent<BaseCharacterAttacks>();
-    //}
-
     void Awake()
     {
         animationData.AddToDuration(animationDuration);
+    }
+
+    public void SetupCharacter(BaseCharacter enemy)
+    {
+        this.enemy = enemy;
         enemyAttacks = enemy.GetComponent<BaseCharacterAttacks>();
     }
 
@@ -171,6 +172,7 @@ public class BaseCharacter : MonoBehaviour
 
     void CheckCombo()
     {
+        if (!enemy) return;
         if (enemy.Stunned()) return;
         comboHit = 0;
         OnHitCombo?.Invoke(this, comboHit);

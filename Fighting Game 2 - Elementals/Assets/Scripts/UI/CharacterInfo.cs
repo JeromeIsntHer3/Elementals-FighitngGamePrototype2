@@ -6,6 +6,7 @@ using UnityEngine;
 [Serializable]
 public class CharacterInfo
 {
-    public GameObject Prefab;
+    public GameObject DisplayPrefab;
+    public GameObject GamePrefab;
     public Vector3 RelativeSpawn;
 }

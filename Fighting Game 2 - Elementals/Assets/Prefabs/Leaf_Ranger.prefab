@@ -49,20 +49,20 @@ GameObject:
   - component: {fileID: 981816101921399886}
   - component: {fileID: 7464323826817805374}
   - component: {fileID: 341329944630434763}
-  - component: {fileID: 7490786886529862240}
   - component: {fileID: 2501544307023915541}
   - component: {fileID: 7012056060927738581}
   - component: {fileID: 1746414328874851460}
   - component: {fileID: 6409298291436382391}
   - component: {fileID: 7800639259932121571}
   - component: {fileID: 447917140995756773}
+  - component: {fileID: 7477832212806723157}
   m_Layer: 7
   m_Name: Leaf_Ranger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4367027235888750937
 Transform:
   m_ObjectHideFlags: 0
@@ -72,7 +72,7 @@ Transform:
   m_GameObject: {fileID: 1291111575060499987}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.727, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -187,98 +187,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f21c9ceff33ee4e4eb0deb33ef05582b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: 2
+  hitsBlockedConsecutively: 0
   animationData: {fileID: 11400000, guid: 59b9b19f1c4931843a43135828a482d1, type: 2}
---- !u!114 &7490786886529862240
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1291111575060499987}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: ead93b3707114db40b236f21120e35b7, type: 3}
-  m_NotificationBehavior: 2
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents:
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 00c6ac29-f362-49ad-a895-14b236051bc5
-    m_ActionName: Player/Movement[/Keyboard/a,/Keyboard/d,/XInputControllerWindows/dpad/left,/XInputControllerWindows/dpad/right]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 7c8144c5-cb21-468d-9716-3dab89e363f3
-    m_ActionName: Player/Attack1[/Keyboard/j,/XInputControllerWindows/buttonWest]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: a7315cb6-436d-4dfa-bf52-8c0ee00d7f61
-    m_ActionName: Player/Attack2[/Keyboard/i,/XInputControllerWindows/buttonNorth]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 3a5bdd6b-5a76-4434-8e04-263d20da2003
-    m_ActionName: Player/Attack3[/Keyboard/k,/XInputControllerWindows/buttonSouth]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 0eebeeaa-6718-4f8b-b0c6-d8e3cd4d5590
-    m_ActionName: Player/Roll[/Keyboard/shift,/XInputControllerWindows/leftStickPress]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: e2d821d4-396e-4cdf-be4d-8bcf220cc78f
-    m_ActionName: Player/Jump[/Keyboard/space,/XInputControllerWindows/dpad/up]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: cd9ca316-49a1-408f-81a1-3553fc4f50f0
-    m_ActionName: Player/Ultimate[/Keyboard/u,/XInputControllerWindows/rightShoulder]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 26195679-d264-4297-84f7-63cc05582c76
-    m_ActionName: Player/Option[/Keyboard/o,/XInputControllerWindows/rightTrigger]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 17a1060c-0f12-4359-9327-5c860f48e8e3
-    m_ActionName: Player/Enhance[/Keyboard/h,/XInputControllerWindows/rightStickPress]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 6a421922-3f19-4cbd-888c-b3d57e219956
-    m_ActionName: Player/Block[/Keyboard/l,/XInputControllerWindows/leftShoulder]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 5162c187-b12c-4663-adf5-cdda6c0d6bb6
-    m_ActionName: Player/Cancel[/Keyboard/semicolon,/XInputControllerWindows/leftTrigger]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 8b0145de-f60f-491f-a55d-91f5983384a0
-    m_ActionName: UI/Navigation[/XInputControllerWindows/leftStick/up,/XInputControllerWindows/rightStick/up,/XInputControllerWindows/leftStick/down,/XInputControllerWindows/rightStick/down,/XInputControllerWindows/leftStick/left,/XInputControllerWindows/rightStick/left,/XInputControllerWindows/leftStick/right,/XInputControllerWindows/rightStick/right,/XInputControllerWindows/dpad,/Keyboard/w,/Keyboard/upArrow,/Keyboard/s,/Keyboard/downArrow,/Keyboard/a,/Keyboard/leftArrow,/Keyboard/d,/Keyboard/rightArrow]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 2d3fb2d6-4fb7-4846-870c-f33b99f3b4b1
-    m_ActionName: UI/Cancel[/Keyboard/escape,/XInputControllerWindows/buttonEast]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: b8234edc-7f01-4699-b9ba-6dd930fdd017
-    m_ActionName: UI/Submit[/Keyboard/enter,/XInputControllerWindows/buttonSouth]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 4d91615e-ad24-4b52-81e6-1c8951e4abd6
-    m_ActionName: UI/Back[/Keyboard/l,/XInputControllerWindows/buttonEast]
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: Keyboard
-  m_DefaultActionMap: Player
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
+  characterCentre: {fileID: 4424333736252540302}
 --- !u!114 &2501544307023915541
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -291,6 +202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12243bd08137b3c409dafe3e627df513, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerInput: {fileID: 0}
 --- !u!114 &7012056060927738581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -339,10 +251,8 @@ MonoBehaviour:
   centre: {fileID: 4424333736252540302}
   attacksData: {fileID: 11400000, guid: 5d691b723a082ee49ac4c5cd1fbd99bc, type: 2}
   hitboxes: {fileID: 6411290513960682326}
-  maxMeterValue: 100
-  currentMeterValue: 100
-  meterCount: 3
-  meterGainOnHit: 0
+  currentMeterValue: 0
+  currentMeterCount: 0
   arrowPrefab: {fileID: -345113762163150280, guid: e1b37aac3ee4501408b6823adbccc0b8, type: 3}
   ultimateBeamPrefab: {fileID: 6628246287202306316, guid: 5de746c521a23fe4790fd727e32523c0, type: 3}
   stormPrefab: {fileID: 7280461822294780868, guid: d3b51869dc49d994b87ae892a2340414, type: 3}
@@ -390,6 +300,36 @@ MonoBehaviour:
   colliders:
   - {fileID: 981816101921399886}
   color: {r: 1, g: 0.94731724, b: 0, a: 0.39215687}
+--- !u!114 &7477832212806723157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291111575060499987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: ead93b3707114db40b236f21120e35b7, type: 3}
+  m_NotificationBehavior: 3
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 1
+  m_DefaultControlScheme: Keyboard
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &1351292779445153077
 GameObject:
   m_ObjectHideFlags: 0

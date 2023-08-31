@@ -1,7 +1,9 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -23,7 +25,7 @@ public class MenuSceneManager : MonoBehaviour
     [Header("Character Select")]
     [SerializeField] List<TextMeshProUGUI> playerCharacterNames;
     [SerializeField] List<ColorBlock> colorBlocks;
-    [SerializeField] List<Transform> spawns;
+    [SerializeField] List<Transform> displaySpawns;
     [SerializeField] List<TextMeshProUGUI> playerReadyTexts;
 
     [Header("Multiplayer")]
@@ -37,6 +39,10 @@ public class MenuSceneManager : MonoBehaviour
     [SerializeField] CharacterContainerUI bladekeeper;
     [SerializeField] CharacterContainerUI mauler;
 
+    [Header("UI Animations")]
+    [SerializeField] List<AnimatedUIElement> listOfMenuAnimatedElements;
+    [SerializeField] List<AnimatedUIElement> listOfCharacterSelectAnimatedElements;
+
     #region Getter & Setters
 
     public CharacterContainerUI Ranger { get { return ranger; } }
@@ -49,15 +55,17 @@ public class MenuSceneManager : MonoBehaviour
     readonly Dictionary<int, CharacterContainerUI> selectedCharacter = new();
     readonly Dictionary<int, ColorBlock> indexColorBlock = new();
     readonly Dictionary<int, TextMeshProUGUI> indexName = new();
-    readonly Dictionary<int, Transform> indexSpawn = new();
+    readonly Dictionary<int, Transform> displaySpawn = new();
     readonly Dictionary<int, TextMeshProUGUI> indexReadyText = new();
-    readonly Dictionary<int, CharacterSelectProxyUI> indexProxy = new();
+    readonly Dictionary<int, PlayerInputProxy> playerInputProxy = new();
     readonly Dictionary<int, CharacterContainerUI> confirmedCharacter = new();
+    readonly Dictionary<int, bool> playerIsReady = new();
+    readonly Dictionary<int, PlayerInput> playerInputs = new();
 
-    CharacterSelectProxyUI proxyOne;
-    CharacterSelectProxyUI proxyTwo;
+    PlayerInputProxy proxyOne;
+    PlayerInputProxy proxyTwo;
 
-    MenuState state = MenuState.Main;
+    Sequence sequence;
 
     void Start()
     {
@@ -73,34 +81,73 @@ public class MenuSceneManager : MonoBehaviour
         {
             indexColorBlock.Add(i, colorBlocks[i]);
             indexName.Add(i, playerCharacterNames[i]);
-            indexSpawn.Add(i, spawns[i]);
+            displaySpawn.Add(i, displaySpawns[i]);
             indexReadyText.Add(i, playerReadyTexts[i]);
+            playerIsReady.Add(i, false);
+            confirmedCharacter.Add(i, null);
         }
 
-        confirmedCharacter.Add(0, null);
-        confirmedCharacter.Add(1, null);
+        CameraManager.Instance.SetMenuCams();
+    }
+
+    void OnEnable()
+    {
+        GameManager.Instance.OnPlayersReady += OnPlayersReady;
+    }
+
+    void OnDisable()
+    {
+        GameManager.Instance.OnPlayersReady -= OnPlayersReady;
+    }
+
+    void OnPlayersReady(object sender, GameManager.OnPlayersReadyArgs e)
+    {
+        foreach (var spawn in displaySpawns)
+        {
+            if (spawn.childCount > 0) Utils.DestroyChildren(spawn);
+        }
+
+        indexReadyText[0].gameObject.SetActive(false);
+        indexReadyText[1].gameObject.SetActive(false);
+
+        RemoveProxies();
     }
 
     void ToCharacterSelect()
     {
-        state = MenuState.Select;
+        GameManager.Instance.GameState = GameState.CharacterSelect;
 
         es.gameObject.SetActive(false);
 
-        mainMenu.SetActive(false);
+        //mainMenu.SetActive(false);
         characterSelect.SetActive(true);
 
         PlayerInput one = pim.JoinPlayer(0, default, "Keyboard");
         PlayerInput two = pim.JoinPlayer(1, default, "Controller");
 
-        proxyOne = one.GetComponent<CharacterSelectProxyUI>().SetupProxy(this, one.playerIndex);
-        proxyTwo = two.GetComponent<CharacterSelectProxyUI>().SetupProxy(this, two.playerIndex);
+        playerInputs.Add(0, one);
+        playerInputs.Add(1, two);
 
-        indexProxy.Add(0, proxyOne);
-        indexProxy.Add(1, proxyTwo);
+        AddProxies(one,two);
 
-        proxyOne.OnDeselect += ProxyOneDeselect;
-        proxyTwo.OnDeselect += ProxyTwoDeselect;
+        CameraManager.Instance.SetCharacterSelectCams();
+
+        characterSelect.SetActive(true);
+        sequence?.Kill();
+        sequence = DOTween.Sequence();
+        foreach (var element in listOfMenuAnimatedElements)
+        {
+            sequence.Join(element.GetComponent<RectTransform>().DOAnchorPos(element.AnimateToPos, 1));
+        }
+        sequence.AppendInterval(1f);
+        foreach (var element in listOfCharacterSelectAnimatedElements)
+        {
+            sequence.Join(element.GetComponent<RectTransform>().DOAnchorPos(element.OriginalPosition, 1));
+        }
+        sequence.OnComplete(() =>
+        {
+            mainMenu.SetActive(false);
+        });
     }
 
     void ToSettings()
@@ -110,9 +157,9 @@ public class MenuSceneManager : MonoBehaviour
 
     void BackToMainMenu()
     {
-        state = MenuState.Main;
+        GameManager.Instance.GameState = GameState.Menu;
 
-        foreach(var spawn in spawns)
+        foreach (var spawn in displaySpawns)
         {
             if(spawn.childCount > 0) Utils.DestroyChildren(spawn);
         }
@@ -120,26 +167,35 @@ public class MenuSceneManager : MonoBehaviour
         indexReadyText[0].gameObject.SetActive(false);
         indexReadyText[1].gameObject.SetActive(false);
 
-        proxyOne.OnDeselect -= ProxyOneDeselect;
-        proxyTwo.OnDeselect -= ProxyTwoDeselect;
+        playerInputs.Clear();
 
-        indexProxy.Clear();
-
-        Destroy(proxyOne.gameObject);
-        Destroy(proxyTwo.gameObject);
-
-        proxyOne = null;
-        proxyTwo = null;
+        RemoveProxies();
 
         es.gameObject.SetActive(true);
 
+        CameraManager.Instance.SetMenuCams();
+
         mainMenu.SetActive(true);
-        characterSelect.SetActive(false);
+        sequence?.Kill();
+        sequence = DOTween.Sequence();
+        foreach (var element in listOfCharacterSelectAnimatedElements)
+        {
+            sequence.Join(element.GetComponent<RectTransform>().DOAnchorPos(element.AnimateToPos, 1));
+        }
+        sequence.AppendInterval(1f);
+        foreach (var element in listOfMenuAnimatedElements)
+        {
+            sequence.Join(element.GetComponent<RectTransform>().DOAnchorPos(element.OriginalPosition, 1));
+        }
+        sequence.OnComplete(() =>
+        {
+            characterSelect.SetActive(false);
+        });
     }
 
-    void ProxyOneDeselect(object sender, EventArgs args)
+    void ProxyOneUnconfirmCharacter(object sender, EventArgs args)
     {
-        if (state != MenuState.Select) return;
+        if (GameManager.Instance.GameState != GameState.CharacterSelect) return;
         if (confirmedCharacter[0])
         {
             indexReadyText[0].gameObject.SetActive(false);
@@ -152,9 +208,9 @@ public class MenuSceneManager : MonoBehaviour
         }
     }
 
-    void ProxyTwoDeselect(object sender, EventArgs args)
+    void ProxyTwoUnconfirmCharacter(object sender, EventArgs args)
     {
-        if (state != MenuState.Select) return;
+        if (GameManager.Instance.GameState != GameState.CharacterSelect) return;
         if (confirmedCharacter[1])
         {
             indexReadyText[1].gameObject.SetActive(false);
@@ -174,47 +230,78 @@ public class MenuSceneManager : MonoBehaviour
         selectedCharacter[playerIndex].Select(indexColorBlock[playerIndex], playerIndex);
         indexName[playerIndex].text = c.pb_CharacterName;
         //Spawn the character Display
-        Transform spawnedT = Instantiate(c.pb_Info.Prefab, indexSpawn[playerIndex], false).transform;
+        Transform spawnedT = Instantiate(c.pb_Info.DisplayPrefab, displaySpawn[playerIndex], false).transform;
         spawnedT.localPosition = c.pb_Info.RelativeSpawn;
     }
 
-    public void SelectCharacter(CharacterContainerUI c, int playerIndex)
+    public void SelectCharacter(CharacterContainerUI con, int playerIndex)
     {
         if(selectedCharacter.ContainsKey(playerIndex))
         {
             if (selectedCharacter[playerIndex])
             {
                 selectedCharacter[playerIndex].Deselect(playerIndex);
-                if (indexSpawn[playerIndex].childCount > 0) Utils.DestroyChildren(indexSpawn[playerIndex]);
+                if (displaySpawn[playerIndex].childCount > 0) Utils.DestroyChildren(displaySpawn[playerIndex]);
             }
-            SelectNewCharacter(c, playerIndex);
+            SelectNewCharacter(con, playerIndex);
         }
         else
         {
-            selectedCharacter.Add(playerIndex, c);
-            SelectNewCharacter(c, playerIndex);
+            selectedCharacter.Add(playerIndex, con);
+            SelectNewCharacter(con, playerIndex);
         }
     }
 
     public void ConfirmCharacter(CharacterContainerUI c, int playerIndex)
     {
-        Debug.Log($"Player {playerIndex + 1} confirmed {c.name}.");
+        indexReadyText[playerIndex].gameObject.SetActive(true);
+        playerInputProxy[playerIndex].SetSelectionState(false);
+        confirmedCharacter[playerIndex] = c;
+        playerIsReady[playerIndex] = true;
 
-        if (indexReadyText.ContainsKey(playerIndex))
+        foreach (var ready in playerIsReady.Values)
         {
-            indexReadyText[playerIndex].gameObject.SetActive(true);
-            indexProxy[playerIndex].SetSelectionState(false);
-            confirmedCharacter[playerIndex] = c;
+            if (!ready) return;
         }
+        StartCoroutine(Utils.DelayEndFrame(PlayersAreReady));
+    }
+
+    void PlayersAreReady()
+    {
+        GameManager.Instance.OnPlayersReady?.Invoke(this, e:
+            new(confirmedCharacter[0].pb_Info.RelativeSpawn,
+            confirmedCharacter[1].pb_Info.RelativeSpawn,
+            confirmedCharacter[0].pb_Info.GamePrefab, confirmedCharacter[1].pb_Info.GamePrefab));
+    }
+
+    void AddProxies(PlayerInput one, PlayerInput two)
+    {
+        proxyOne = one.GetComponent<PlayerInputProxy>().SetupProxy(this, one.playerIndex);
+        proxyTwo = two.GetComponent<PlayerInputProxy>().SetupProxy(this, two.playerIndex);
+
+        playerInputProxy.Add(0, proxyOne);
+        playerInputProxy.Add(1, proxyTwo);
+
+        proxyOne.OnDeselect += ProxyOneUnconfirmCharacter;
+        proxyTwo.OnDeselect += ProxyTwoUnconfirmCharacter;
+    }
+
+    void RemoveProxies()
+    {
+        proxyOne.OnDeselect -= ProxyOneUnconfirmCharacter;
+        proxyTwo.OnDeselect -= ProxyTwoUnconfirmCharacter;
+
+        playerInputProxy.Clear();
+
+        Destroy(proxyOne.gameObject);
+        Destroy(proxyTwo.gameObject);
+
+        proxyOne = null;
+        proxyTwo = null;
     }
 
     public ColorBlock GetColorBlock(int index)
     {
         return colorBlocks[index];
     }
-}
-
-public enum MenuState
-{
-    Main, Select, Settings
 }

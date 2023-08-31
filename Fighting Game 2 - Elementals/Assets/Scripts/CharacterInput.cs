@@ -6,7 +6,7 @@ using Ctx = UnityEngine.InputSystem.InputAction.CallbackContext;
 
 public class CharacterInput : MonoBehaviour
 {
-    PlayerInput playerInput;
+    [SerializeField] PlayerInput playerInput;
     BaseCharacter character;
     Vector2 movement;
 
@@ -26,10 +26,11 @@ public class CharacterInput : MonoBehaviour
 
     #endregion
 
-    void Awake()
+    public PlayerInput SetInput(PlayerInput playerInput)
     {
+        this.playerInput = playerInput;
+
         character = GetComponent<BaseCharacter>();
-        playerInput = GetComponent<PlayerInput>();
         movementAction = playerInput.actions["Movement"];
         rollAction = playerInput.actions["Roll"];
         jumpAction = playerInput.actions["Jump"];
@@ -41,10 +42,7 @@ public class CharacterInput : MonoBehaviour
         attack3Action = playerInput.actions["Attack3"];
         ultimateAction = playerInput.actions["Ultimate"];
         optionAction = playerInput.actions["Option"];
-    }
 
-    void OnEnable()
-    {
         movementAction.performed += MovePerformed;
         movementAction.canceled += MoveCanceled;
 
@@ -64,6 +62,8 @@ public class CharacterInput : MonoBehaviour
 
         blockAction.performed += BlockPerformed;
         blockAction.canceled += BlockCanceled;
+
+        return playerInput;
     }
 
     void OnDisable()

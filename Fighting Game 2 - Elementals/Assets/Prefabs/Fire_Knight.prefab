@@ -416,19 +416,19 @@ GameObject:
   - component: {fileID: 1484145976270858318}
   - component: {fileID: 3470026126407549166}
   - component: {fileID: 5793372659133731495}
-  - component: {fileID: 6299250691616737938}
   - component: {fileID: 8176631367999286026}
   - component: {fileID: 6410756223458124487}
   - component: {fileID: 7552092709346110438}
   - component: {fileID: 1716197220594380512}
   - component: {fileID: 1854866168005180793}
+  - component: {fileID: -3624606799205304577}
   m_Layer: 7
   m_Name: Fire_Knight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2367716765569625234
 Transform:
   m_ObjectHideFlags: 0
@@ -438,7 +438,7 @@ Transform:
   m_GameObject: {fileID: 4214976667934324848}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.03, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -570,94 +570,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f21c9ceff33ee4e4eb0deb33ef05582b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: 1
+  hitsBlockedConsecutively: 0
   animationData: {fileID: 11400000, guid: b04b1c1ad944ac64487b24a7be319177, type: 2}
---- !u!114 &6299250691616737938
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4214976667934324848}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: ead93b3707114db40b236f21120e35b7, type: 3}
-  m_NotificationBehavior: 3
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents:
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 00c6ac29-f362-49ad-a895-14b236051bc5
-    m_ActionName: Player/Movement[/Keyboard/a,/Keyboard/d,/XInputControllerWindows/dpad/left,/XInputControllerWindows/dpad/right]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 7c8144c5-cb21-468d-9716-3dab89e363f3
-    m_ActionName: Player/Attack1[/Keyboard/j,/XInputControllerWindows/buttonWest]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: a7315cb6-436d-4dfa-bf52-8c0ee00d7f61
-    m_ActionName: Player/Attack2[/Keyboard/i,/XInputControllerWindows/buttonNorth]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 3a5bdd6b-5a76-4434-8e04-263d20da2003
-    m_ActionName: Player/Attack3[/Keyboard/k,/XInputControllerWindows/buttonSouth]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 0eebeeaa-6718-4f8b-b0c6-d8e3cd4d5590
-    m_ActionName: Player/Roll[/Keyboard/shift,/XInputControllerWindows/leftStickPress]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: e2d821d4-396e-4cdf-be4d-8bcf220cc78f
-    m_ActionName: Player/Jump[/Keyboard/space,/XInputControllerWindows/dpad/up]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: cd9ca316-49a1-408f-81a1-3553fc4f50f0
-    m_ActionName: Player/Ultimate[/Keyboard/u,/XInputControllerWindows/rightShoulder]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 26195679-d264-4297-84f7-63cc05582c76
-    m_ActionName: Player/Option[/Keyboard/o,/XInputControllerWindows/rightTrigger]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 17a1060c-0f12-4359-9327-5c860f48e8e3
-    m_ActionName: Player/Enhance[/Keyboard/h,/XInputControllerWindows/rightStickPress]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 6a421922-3f19-4cbd-888c-b3d57e219956
-    m_ActionName: Player/Block[/Keyboard/l,/XInputControllerWindows/leftShoulder]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 5162c187-b12c-4663-adf5-cdda6c0d6bb6
-    m_ActionName: Player/Cancel[/Keyboard/semicolon,/XInputControllerWindows/leftTrigger]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 8b0145de-f60f-491f-a55d-91f5983384a0
-    m_ActionName: UI/Navigation[/XInputControllerWindows/leftStick/up,/XInputControllerWindows/rightStick/up,/XInputControllerWindows/leftStick/down,/XInputControllerWindows/rightStick/down,/XInputControllerWindows/leftStick/left,/XInputControllerWindows/rightStick/left,/XInputControllerWindows/leftStick/right,/XInputControllerWindows/rightStick/right,/XInputControllerWindows/dpad,/Keyboard/w,/Keyboard/upArrow,/Keyboard/s,/Keyboard/downArrow,/Keyboard/a,/Keyboard/leftArrow,/Keyboard/d,/Keyboard/rightArrow]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 2d3fb2d6-4fb7-4846-870c-f33b99f3b4b1
-    m_ActionName: UI/Cancel[/Keyboard/escape,/XInputControllerWindows/buttonEast]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: b8234edc-7f01-4699-b9ba-6dd930fdd017
-    m_ActionName: UI/Submit[/Keyboard/enter,/XInputControllerWindows/buttonSouth]
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: Controller
-  m_DefaultActionMap: Player
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
+  characterCentre: {fileID: 1370827014942233493}
 --- !u!114 &8176631367999286026
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -670,6 +585,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12243bd08137b3c409dafe3e627df513, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerInput: {fileID: 0}
 --- !u!114 &6410756223458124487
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -698,12 +614,10 @@ MonoBehaviour:
   centre: {fileID: 1370827014942233493}
   attacksData: {fileID: 11400000, guid: 5514a620f7362bf41a2b312920e3e181, type: 2}
   hitboxes: {fileID: 1299453400927659162}
-  maxMeterValue: 100
-  currentMeterValue: 100
-  meterCount: 3
-  meterGainOnHit: 5
+  currentMeterValue: 0
+  currentMeterCount: 0
   heatBar: {fileID: 8680804333047858680}
-  maxValue: 100
+  maxHeatValue: 0
   currentHeatValue: 200
   drainSpeed: 2.5
   gainPerHit: 5
@@ -750,6 +664,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   currentHealth: 0
+--- !u!114 &-3624606799205304577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4214976667934324848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: ead93b3707114db40b236f21120e35b7, type: 3}
+  m_NotificationBehavior: 3
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &4268491159204340370
 GameObject:
   m_ObjectHideFlags: 0

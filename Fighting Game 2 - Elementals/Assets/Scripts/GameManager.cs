@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-    public GameState GameState = GameState.Menu;
+    public static GameState GameState = GameState.Menu;
 
     public class OnPlayersReadyArgs : EventArgs
     {
@@ -15,17 +15,10 @@ public class GameManager : MonoBehaviour
         public Vector2 PlayerTwoSpawnPos;
         public GameObject PlayerOnePrefab;
         public GameObject PlayerTwoPrefab;
-
-        public OnPlayersReadyArgs(Vector2 playerOneSpawnPos, Vector2 playerTwoSpawnPos, 
-            GameObject pOnePrefab, GameObject pTwoPrefab)
-        {
-            PlayerOneSpawnPos = playerOneSpawnPos;
-            PlayerTwoSpawnPos = playerTwoSpawnPos;
-            PlayerOnePrefab = pOnePrefab;
-            PlayerTwoPrefab = pTwoPrefab;
-        }
+        public PlayerInput PlayerOneInput;
+        public PlayerInput PlayerTwoInput;
     }
-    public EventHandler<OnPlayersReadyArgs> OnPlayersReady;
+    public static EventHandler<OnPlayersReadyArgs> OnPlayersReady;
 
     //Meter
     public static int StartingMeterCount = 2;
@@ -46,68 +39,108 @@ public class GameManager : MonoBehaviour
     //UI Animation
     public static float UIAnimationDuration = 1f;
 
-    int FrameRate = 60;
+    readonly int FrameRate = 60;
 
-    [Header("Game Data")]
-    public float HpAnimDuration;
-    public float MeterBurnThresholdTime;
-    public float ProjectileDuration;
-    [Range(1,100)] public float HitShakeAnim;
-    public float ShakeStrengthX;
-    public float ShakeStrengthY;
-    public int Vibrato;
+    //Game Data
+    public static float HealthChangeAnimationDuration = .25f;
+    public static float MeterBurnThresholdTime = .25f;
+    public static float ProjectileLifetime = 5f;
+    public static float OnHitShakeAnimationMultiplier = .5f;
+    public static float OnHitShakeStrengthX = .15f;
+    public static float OnHitShakeStrengthY = .01f;
+    public static int OnHitVibrato = 15;
 
-    Vector3 playerOneSpawnPosition;
-    Vector3 playerTwoSpawnPosition;
-    GameObject prefabOne;
-    GameObject prefabTwo;
-    PlayerInput playerOneInput;
-    PlayerInput playerTwoInput;
-
-    public BaseCharacter PlayerOne => playerOneInput.GetComponent<BaseCharacter>();
-    public BaseCharacter PlayerTwo => playerTwoInput.GetComponent<BaseCharacter>();
+    readonly Dictionary<int, PlayerInput> playerInputOfPlayer = new();
+    readonly Dictionary<int, PlayerInputProxy> playerProxyOfPlayer = new();
 
     void Awake()
     {
         Instance = this;
         Application.targetFrameRate = FrameRate;
+
+        playerInputOfPlayer.Add(0, null);
+        playerInputOfPlayer.Add(1, null);
+        playerProxyOfPlayer.Add(0, null);
+        playerProxyOfPlayer.Add(1, null);
     }
 
     void OnEnable()
     {
         OnPlayersReady += PlayerReady;
+        MenuSceneManager.OnGoToCharacterSelect += PlayPressed;
+        MenuSceneManager.OnGoToMenu += BackToMenu;
     }
 
     void OnDisable()
     {
         OnPlayersReady -= PlayerReady;
+        MenuSceneManager.OnGoToCharacterSelect -= PlayPressed;
+        MenuSceneManager.OnGoToMenu -= BackToMenu;
     }
 
     void PlayerReady(object sender, OnPlayersReadyArgs args)
     {
-        playerOneSpawnPosition = args.PlayerOneSpawnPos;
-        playerTwoSpawnPosition = args.PlayerTwoSpawnPos;
-        prefabOne = args.PlayerOnePrefab;
-        prefabTwo = args.PlayerTwoPrefab;
+        var playerOneCharacter = Instantiate(args.PlayerOnePrefab, args.PlayerOneSpawnPos, Quaternion.identity);
+        playerOneCharacter.GetComponent<CharacterInput>().SetInput(args.PlayerOneInput);
+        args.PlayerOneInput.SwitchCurrentActionMap("Player");
+        args.PlayerOneInput.SwitchCurrentControlScheme("Keyboard", Keyboard.current);
 
-        var playerOneCharacter = Instantiate(prefabOne, playerOneSpawnPosition, Quaternion.identity);
-        playerOneInput = playerOneCharacter.GetComponent<PlayerInput>();
-        playerOneInput.GetComponent<CharacterInput>().SetInput(playerOneInput);
-        playerOneInput.SwitchCurrentControlScheme("Keyboard", Keyboard.current);
+        Vector3 playerTwoSpawn = new(-args.PlayerTwoSpawnPos.x, args.PlayerTwoSpawnPos.y);
 
-        var playerTwoCharacter = Instantiate(prefabTwo, playerTwoSpawnPosition * -1, Quaternion.identity);
-        playerTwoInput = playerTwoCharacter.GetComponent<PlayerInput>();
-        playerTwoInput.GetComponent<CharacterInput>().SetInput(playerTwoInput);
-        playerTwoInput.SwitchCurrentControlScheme("Controller", Gamepad.current);
+        var playerTwoCharacter = Instantiate(args.PlayerTwoPrefab, playerTwoSpawn, Quaternion.identity);
+        playerTwoCharacter.GetComponent<CharacterInput>().SetInput(args.PlayerTwoInput);
+        args.PlayerTwoInput.SwitchCurrentActionMap("Player");
+        args.PlayerTwoInput.SwitchCurrentControlScheme("Controller", Gamepad.current);
 
         CameraManager.Instance.SetTargetGroup(playerOneCharacter.transform, playerTwoCharacter.transform);
-        CameraManager.Instance.SetGamCams();
         GameState = GameState.Game;
+
+        MenuSceneManager.OnGoToGame?.Invoke(this, EventArgs.Empty);
     }
 
-    public float PlayerDistance()
+    void PlayPressed(object sender, EventArgs args)
     {
-        return Vector2.Distance(playerOneInput.transform.position, playerTwoInput.transform.position);
+        
+    }
+
+    void BackToMenu(object sender, EventArgs args)
+    {
+        
+    }
+
+    public void SetupPlayerInputAndProxies(int playerIndex, PlayerInput input)
+    {
+        playerInputOfPlayer[playerIndex] = input;
+        playerProxyOfPlayer[playerIndex] = input.GetComponent<PlayerInputProxy>();
+        playerProxyOfPlayer[playerIndex].SetupProxy(playerIndex);
+    }
+
+    public void ClearPlayerInputAndProxies(int playerIndex)
+    {
+        playerInputOfPlayer[playerIndex] = null;
+        playerProxyOfPlayer[playerIndex] = null;
+    }
+
+    public PlayerInput GetPlayerInput(int index)
+    {
+        return playerInputOfPlayer[index];
+    }
+
+    public PlayerInputProxy GetPlayerProxy(int index)
+    {
+        return playerProxyOfPlayer[index];
+    }
+
+    public void SwitchMapsToUI()
+    {
+        playerInputOfPlayer[0].SwitchCurrentActionMap("UI");
+        playerInputOfPlayer[1].SwitchCurrentActionMap("UI");
+    }
+
+    public void SetSelectionStateOfPlayers(bool state)
+    {
+        playerProxyOfPlayer[0].SetSelectionState(state);
+        playerProxyOfPlayer[1].SetSelectionState(state);
     }
 }
 

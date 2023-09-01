@@ -63,12 +63,12 @@ public class CharacterContainerUI : MonoBehaviour
         {
             if(index == 0)
             {
-                containerButton.colors = MenuSceneManager.Instance.GetColorBlock(1);
+                //containerButton.colors = MenuSceneManager.Instance.GetColorBlock(1);
                 indicator[0].gameObject.SetActive(false);
             }
             else
             {
-                containerButton.colors = MenuSceneManager.Instance.GetColorBlock(0);
+                //containerButton.colors = MenuSceneManager.Instance.GetColorBlock(0);
                 indicator[1].gameObject.SetActive(false);
             }
         }

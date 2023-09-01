@@ -1,307 +1,179 @@
 using DG.Tweening;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using TMPro;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
-using UnityEngine.UI;
+using UnityEngine.InputSystem.UI;
 
 public class MenuSceneManager : MonoBehaviour
 {
     public static MenuSceneManager Instance;
 
+    public class OnSelectCharacterArgs : EventArgs
+    {
+        public PlayableCharacter Character;
+        public int PlayerIndex;
+    }
+    public static EventHandler<OnSelectCharacterArgs> OnSelectCharacter;
+    public static EventHandler<OnSelectCharacterArgs> OnConfirmCharacter;
+
+    public static EventHandler OnGoToCharacterSelect;
+    public static EventHandler OnGoToMenu;
+    public static EventHandler OnGoToGame;
+    public static EventHandler<int> OnGamePause;
+
+    [SerializeField] MultiplayerEventSystem menuEventSystem;
+
     [Header("Menus")]
-    [SerializeField] GameObject mainMenu;
-    [SerializeField] GameObject characterSelect;
-
-    [Header("Main Menu")]
-    [SerializeField] Button startButton;
-    [SerializeField] Button settingsButton;
-    [SerializeField] Button quitButton;
-
-    [Header("Character Select")]
-    [SerializeField] List<TextMeshProUGUI> playerCharacterNames;
-    [SerializeField] List<ColorBlock> colorBlocks;
-    [SerializeField] List<Transform> displaySpawns;
-    [SerializeField] List<TextMeshProUGUI> playerReadyTexts;
-
-    [Header("Multiplayer")]
-    [SerializeField] PlayerInputManager pim;
-    [SerializeField] EventSystem es;
-    [SerializeField] GameObject playerPrefab;
-
-    [Header("Character Containers")]
-    [SerializeField] CharacterContainerUI ranger;
-    [SerializeField] CharacterContainerUI knight;
-    [SerializeField] CharacterContainerUI bladekeeper;
-    [SerializeField] CharacterContainerUI mauler;
+    [SerializeField] MainMenuUI mainMenu;
+    [SerializeField] CharacterSelectMenuUI characterSelect;
+    [SerializeField] GameUI gameUI;
+    [SerializeField] PauseMenuUI pauseUI;
 
     [Header("UI Animations")]
     [SerializeField] List<AnimatedUIElement> listOfMenuAnimatedElements;
     [SerializeField] List<AnimatedUIElement> listOfCharacterSelectAnimatedElements;
+    [SerializeField] List<AnimatedUIElement> listOfGameAnimatedElements;
 
     #region Getter & Setters
 
-    public CharacterContainerUI Ranger { get { return ranger; } }
-    public CharacterContainerUI Knight { get { return knight; } }
-    public CharacterContainerUI Bladekeeper { get { return bladekeeper; } }
-    public CharacterContainerUI Mauler { get { return mauler; } }
+    public MultiplayerEventSystem MEventSystem { get { return menuEventSystem; } }
+    public MainMenuUI MainMenu { get { return mainMenu; } }
+    public CharacterSelectMenuUI CharacterSelect { get {  return characterSelect; } }
+    public GameUI GamUI { get {  return gameUI; } }
+    public PauseMenuUI PauseUI { get { return pauseUI; } }
 
     #endregion
 
-    readonly Dictionary<int, CharacterContainerUI> selectedCharacter = new();
-    readonly Dictionary<int, ColorBlock> indexColorBlock = new();
-    readonly Dictionary<int, TextMeshProUGUI> indexName = new();
-    readonly Dictionary<int, Transform> displaySpawn = new();
-    readonly Dictionary<int, TextMeshProUGUI> indexReadyText = new();
-    readonly Dictionary<int, PlayerInputProxy> playerInputProxy = new();
-    readonly Dictionary<int, CharacterContainerUI> confirmedCharacter = new();
-    readonly Dictionary<int, bool> playerIsReady = new();
-    readonly Dictionary<int, PlayerInput> playerInputs = new();
-
-    PlayerInputProxy proxyOne;
-    PlayerInputProxy proxyTwo;
-
     Sequence sequence;
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
-        Instance = this;
-
-        startButton.onClick.AddListener(ToCharacterSelect);
-        settingsButton.onClick.AddListener(ToSettings);
-        quitButton.onClick.AddListener(() => { Application.Quit(); });
-
-        pim.playerPrefab = playerPrefab;
-
-        for(int i = 0; i < 2; i++)
-        {
-            indexColorBlock.Add(i, colorBlocks[i]);
-            indexName.Add(i, playerCharacterNames[i]);
-            displaySpawn.Add(i, displaySpawns[i]);
-            indexReadyText.Add(i, playerReadyTexts[i]);
-            playerIsReady.Add(i, false);
-            confirmedCharacter.Add(i, null);
-        }
-
         CameraManager.Instance.SetMenuCams();
+        mainMenu.Show();
+        characterSelect.Show();
     }
 
     void OnEnable()
     {
-        GameManager.Instance.OnPlayersReady += OnPlayersReady;
+        GameManager.OnPlayersReady += OnPlayersReady;
+        OnGamePause += GamePaused;
+        OnGoToCharacterSelect += ToCharacterSelect;
+        OnGoToMenu += ToMainMenu;
+        OnGoToGame += ToGame;
     }
 
     void OnDisable()
     {
-        GameManager.Instance.OnPlayersReady -= OnPlayersReady;
+        GameManager.OnPlayersReady -= OnPlayersReady;
+        OnGamePause -= GamePaused;
+        OnGoToCharacterSelect -= ToCharacterSelect;
+        OnGoToMenu -= ToMainMenu;
+        OnGoToGame -= ToGame;
     }
 
     void OnPlayersReady(object sender, GameManager.OnPlayersReadyArgs e)
     {
-        foreach (var spawn in displaySpawns)
-        {
-            if (spawn.childCount > 0) Utils.DestroyChildren(spawn);
-        }
+        //foreach (var spawn in displaySpawns)
+        //{
+        //    if (spawn.childCount > 0) Utils.DestroyChildren(spawn);
+        //}
+        //indexReadyText[0].gameObject.SetActive(false);
+        //indexReadyText[1].gameObject.SetActive(false);
+        ////RemoveProxies();
 
-        indexReadyText[0].gameObject.SetActive(false);
-        indexReadyText[1].gameObject.SetActive(false);
+        //foreach(var proxy in playerInputProxy.Values)
+        //{
+        //    proxy.SetEventSystemState(false);
+        //}
 
-        RemoveProxies();
+        //gameUI.SetActive(true);
+        //AnimateUIElementsTransition(listOfCharacterSelectAnimatedElements, listOfGameAnimatedElements, () =>
+        //{
+        //    characterSelect.SetActive(false);
+        //});
     }
 
-    void ToCharacterSelect()
+    void GamePaused(object sender, int index)
     {
-        GameManager.Instance.GameState = GameState.CharacterSelect;
+        pauseUI.Show();
+        GameManager.Instance.SwitchMapsToUI();
+        CanvasGroup group = pauseUI.GetComponent<CanvasGroup>();
+        group.DOFade(1, .3f);
+        menuEventSystem.gameObject.SetActive(true);
+        GameManager.Instance.GetPlayerProxy(index).SetEventSystem(menuEventSystem);
+        GameManager.Instance.GetPlayerProxy(index).SetSelectedObject(pauseUI.ResumeButton.gameObject);
+    }
 
-        es.gameObject.SetActive(false);
-
-        //mainMenu.SetActive(false);
-        characterSelect.SetActive(true);
-
-        PlayerInput one = pim.JoinPlayer(0, default, "Keyboard");
-        PlayerInput two = pim.JoinPlayer(1, default, "Controller");
-
-        playerInputs.Add(0, one);
-        playerInputs.Add(1, two);
-
-        AddProxies(one,two);
-
+    void ToCharacterSelect(object sender, EventArgs args)
+    {
+        StartCoroutine(Utils.DelayEndFrame(() =>
+        {
+            menuEventSystem.playerRoot = pauseUI.gameObject;
+            menuEventSystem.gameObject.SetActive(false);
+        }));
+        
         CameraManager.Instance.SetCharacterSelectCams();
 
-        characterSelect.SetActive(true);
-        sequence?.Kill();
-        sequence = DOTween.Sequence();
-        foreach (var element in listOfMenuAnimatedElements)
+        AnimateUIElementsTransition(listOfMenuAnimatedElements, listOfCharacterSelectAnimatedElements, () =>
         {
-            sequence.Join(element.GetComponent<RectTransform>().DOAnchorPos(element.AnimateToPos, 1));
-        }
-        sequence.AppendInterval(1f);
-        foreach (var element in listOfCharacterSelectAnimatedElements)
-        {
-            sequence.Join(element.GetComponent<RectTransform>().DOAnchorPos(element.OriginalPosition, 1));
-        }
-        sequence.OnComplete(() =>
-        {
-            mainMenu.SetActive(false);
-        });
+            mainMenu.Hide();
+            GameManager.Instance.SetSelectionStateOfPlayers(true);
+            GameManager.GameState = GameState.CharacterSelect;
+        }, sequence);
     }
 
-    void ToSettings()
+    void ToMainMenu(object sender, EventArgs args)
     {
-
-    }
-
-    void BackToMainMenu()
-    {
-        GameManager.Instance.GameState = GameState.Menu;
-
-        foreach (var spawn in displaySpawns)
-        {
-            if(spawn.childCount > 0) Utils.DestroyChildren(spawn);
-        }
-
-        indexReadyText[0].gameObject.SetActive(false);
-        indexReadyText[1].gameObject.SetActive(false);
-
-        playerInputs.Clear();
-
-        RemoveProxies();
-
-        es.gameObject.SetActive(true);
-
         CameraManager.Instance.SetMenuCams();
+        mainMenu.Show();
 
-        mainMenu.SetActive(true);
+        AnimateUIElementsTransition(listOfCharacterSelectAnimatedElements, listOfMenuAnimatedElements, () =>
+        {
+            menuEventSystem.gameObject.SetActive(true);
+            menuEventSystem.playerRoot = mainMenu.gameObject;
+            menuEventSystem.SetSelectedGameObject(mainMenu.PlayButton.gameObject);
+            GameManager.GameState = GameState.Menu;
+        }, sequence);
+    }
+
+    void ToGame(object sender, EventArgs args)
+    {
+        CameraManager.Instance.SetGamCams();
+        gameUI.Show();
+        characterSelect.ClearDisplays();
+
+        AnimateUIElementsTransition(listOfCharacterSelectAnimatedElements, listOfGameAnimatedElements, () =>
+        {
+            menuEventSystem.gameObject.SetActive(true);
+            menuEventSystem.SetSelectedGameObject(pauseUI.ResumeButton.gameObject);
+            characterSelect.Hide();
+            GameManager.GameState = GameState.Game;
+        }, sequence);
+    }
+
+    public void AnimateUIElementsTransition(List<AnimatedUIElement> from, List<AnimatedUIElement> to, 
+        Action onCompleteAction, Sequence sequence, float duration = .75f, float interval = .75f)
+    {
         sequence?.Kill();
         sequence = DOTween.Sequence();
-        foreach (var element in listOfCharacterSelectAnimatedElements)
+
+        foreach (var element in from)
         {
-            sequence.Join(element.GetComponent<RectTransform>().DOAnchorPos(element.AnimateToPos, 1));
+            sequence.Join(element.Rect.DOAnchorPos(element.AnimateToPos, duration));
         }
-        sequence.AppendInterval(1f);
-        foreach (var element in listOfMenuAnimatedElements)
+        sequence.AppendInterval(interval);
+        foreach (var element in to)
         {
-            sequence.Join(element.GetComponent<RectTransform>().DOAnchorPos(element.OriginalPosition, 1));
+            sequence.Join(element.Rect.DOAnchorPos(element.OriginalPosition, duration));
         }
         sequence.OnComplete(() =>
         {
-            characterSelect.SetActive(false);
+            onCompleteAction?.Invoke();
         });
-    }
-
-    void ProxyOneUnconfirmCharacter(object sender, EventArgs args)
-    {
-        if (GameManager.Instance.GameState != GameState.CharacterSelect) return;
-        if (confirmedCharacter[0])
-        {
-            indexReadyText[0].gameObject.SetActive(false);
-            proxyOne.SetSelectionState(true);
-            confirmedCharacter[0] = null;
-        }
-        else
-        {
-            BackToMainMenu();
-        }
-    }
-
-    void ProxyTwoUnconfirmCharacter(object sender, EventArgs args)
-    {
-        if (GameManager.Instance.GameState != GameState.CharacterSelect) return;
-        if (confirmedCharacter[1])
-        {
-            indexReadyText[1].gameObject.SetActive(false);
-            proxyTwo.SetSelectionState(true);
-            confirmedCharacter[1] = null;
-        }
-        else
-        {
-            BackToMainMenu();
-        }
-    }
-
-    void SelectNewCharacter(CharacterContainerUI c, int playerIndex)
-    {
-        //Set Values
-        selectedCharacter[playerIndex] = c;
-        selectedCharacter[playerIndex].Select(indexColorBlock[playerIndex], playerIndex);
-        indexName[playerIndex].text = c.pb_CharacterName;
-        //Spawn the character Display
-        Transform spawnedT = Instantiate(c.pb_Info.DisplayPrefab, displaySpawn[playerIndex], false).transform;
-        spawnedT.localPosition = c.pb_Info.RelativeSpawn;
-    }
-
-    public void SelectCharacter(CharacterContainerUI con, int playerIndex)
-    {
-        if(selectedCharacter.ContainsKey(playerIndex))
-        {
-            if (selectedCharacter[playerIndex])
-            {
-                selectedCharacter[playerIndex].Deselect(playerIndex);
-                if (displaySpawn[playerIndex].childCount > 0) Utils.DestroyChildren(displaySpawn[playerIndex]);
-            }
-            SelectNewCharacter(con, playerIndex);
-        }
-        else
-        {
-            selectedCharacter.Add(playerIndex, con);
-            SelectNewCharacter(con, playerIndex);
-        }
-    }
-
-    public void ConfirmCharacter(CharacterContainerUI c, int playerIndex)
-    {
-        indexReadyText[playerIndex].gameObject.SetActive(true);
-        playerInputProxy[playerIndex].SetSelectionState(false);
-        confirmedCharacter[playerIndex] = c;
-        playerIsReady[playerIndex] = true;
-
-        foreach (var ready in playerIsReady.Values)
-        {
-            if (!ready) return;
-        }
-        StartCoroutine(Utils.DelayEndFrame(PlayersAreReady));
-    }
-
-    void PlayersAreReady()
-    {
-        GameManager.Instance.OnPlayersReady?.Invoke(this, e:
-            new(confirmedCharacter[0].pb_Info.RelativeSpawn,
-            confirmedCharacter[1].pb_Info.RelativeSpawn,
-            confirmedCharacter[0].pb_Info.GamePrefab, confirmedCharacter[1].pb_Info.GamePrefab));
-    }
-
-    void AddProxies(PlayerInput one, PlayerInput two)
-    {
-        proxyOne = one.GetComponent<PlayerInputProxy>().SetupProxy(this, one.playerIndex);
-        proxyTwo = two.GetComponent<PlayerInputProxy>().SetupProxy(this, two.playerIndex);
-
-        playerInputProxy.Add(0, proxyOne);
-        playerInputProxy.Add(1, proxyTwo);
-
-        proxyOne.OnDeselect += ProxyOneUnconfirmCharacter;
-        proxyTwo.OnDeselect += ProxyTwoUnconfirmCharacter;
-    }
-
-    void RemoveProxies()
-    {
-        proxyOne.OnDeselect -= ProxyOneUnconfirmCharacter;
-        proxyTwo.OnDeselect -= ProxyTwoUnconfirmCharacter;
-
-        playerInputProxy.Clear();
-
-        Destroy(proxyOne.gameObject);
-        Destroy(proxyTwo.gameObject);
-
-        proxyOne = null;
-        proxyTwo = null;
-    }
-
-    public ColorBlock GetColorBlock(int index)
-    {
-        return colorBlocks[index];
     }
 }

@@ -178,7 +178,7 @@ public class BaseCharacterAttacks : MonoBehaviour
     void OnTryEnhanceAttack(object sender, EventArgs e)
     {
         if(currentMeterCount == 0 && currentMeterValue < 100) return;
-        if (GameManager.Instance.MeterBurnThresholdTime + recentAttackTime < Time.time) return;
+        if (GameManager.MeterBurnThresholdTime + recentAttackTime < Time.time) return;
         if (meterUsedTime > Time.time) return;
         meterUsedTime = Time.time + character.GetAnimationDuration(currentAnimationType);
         UseMeter(100, false);

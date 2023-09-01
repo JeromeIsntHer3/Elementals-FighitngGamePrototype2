@@ -1182,7 +1182,6 @@ GameObject:
   - component: {fileID: 2797237297807654382}
   - component: {fileID: 2327441573688084672}
   - component: {fileID: 259732049996971644}
-  - component: {fileID: -4785412280007189895}
   m_Layer: 7
   m_Name: Crystal_Mauler
   m_TagString: Untagged
@@ -1420,36 +1419,6 @@ MonoBehaviour:
   hammerHitbox: {fileID: 5393148141328872643}
   hitForce: 85
   deflectDuration: 5
---- !u!114 &-4785412280007189895
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8778245931803500752}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: ead93b3707114db40b236f21120e35b7, type: 3}
-  m_NotificationBehavior: 3
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: Player
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
 --- !u!1 &9210588691114751103
 GameObject:
   m_ObjectHideFlags: 0

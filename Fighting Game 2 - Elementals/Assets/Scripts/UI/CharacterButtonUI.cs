@@ -1,14 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class CharacterButtonUI : MonoBehaviour, ISelectHandler
 {
-    MenuSceneManager manager;
-    CharacterContainerUI characterContainer;
+    PlayableCharacter character;
     Button button;
     int playerIndex;
 
@@ -18,20 +14,29 @@ public class CharacterButtonUI : MonoBehaviour, ISelectHandler
         button.onClick.AddListener(OnClick);
     }
 
-    public void SetupButtonUI(MenuSceneManager m, CharacterContainerUI c, int index)
+    public void SetupButtonUI(PlayableCharacter c, int index)
     {
-        manager = m;
-        characterContainer = c;
+        character = c;
         playerIndex = index;
     }
 
     public void OnSelect(BaseEventData eventData)
     {
-        manager.SelectCharacter(characterContainer, playerIndex);
+        MenuSceneManager.OnSelectCharacter?.Invoke(this,
+            new MenuSceneManager.OnSelectCharacterArgs
+            {
+                Character = character,
+                PlayerIndex = playerIndex
+            });
     }
 
     public void OnClick()
     {
-        manager.ConfirmCharacter(characterContainer, playerIndex);
+        MenuSceneManager.OnConfirmCharacter?.Invoke(this,
+            new MenuSceneManager.OnSelectCharacterArgs
+            {
+                Character = character,
+                PlayerIndex = playerIndex
+            });
     }
 }

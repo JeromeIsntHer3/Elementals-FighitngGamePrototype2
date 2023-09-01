@@ -55,7 +55,6 @@ GameObject:
   - component: {fileID: 6409298291436382391}
   - component: {fileID: 7800639259932121571}
   - component: {fileID: 447917140995756773}
-  - component: {fileID: 7477832212806723157}
   m_Layer: 7
   m_Name: Leaf_Ranger
   m_TagString: Untagged
@@ -300,36 +299,6 @@ MonoBehaviour:
   colliders:
   - {fileID: 981816101921399886}
   color: {r: 1, g: 0.94731724, b: 0, a: 0.39215687}
---- !u!114 &7477832212806723157
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1291111575060499987}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: ead93b3707114db40b236f21120e35b7, type: 3}
-  m_NotificationBehavior: 3
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 1
-  m_DefaultControlScheme: Keyboard
-  m_DefaultActionMap: Player
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
 --- !u!1 &1351292779445153077
 GameObject:
   m_ObjectHideFlags: 0

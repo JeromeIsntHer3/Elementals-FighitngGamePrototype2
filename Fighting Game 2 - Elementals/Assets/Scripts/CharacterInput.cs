@@ -6,9 +6,10 @@ using Ctx = UnityEngine.InputSystem.InputAction.CallbackContext;
 
 public class CharacterInput : MonoBehaviour
 {
-    [SerializeField] PlayerInput playerInput;
+    //PlayerInput playerInput;
     BaseCharacter character;
     Vector2 movement;
+    int playerIndex;
 
     #region InputActions
 
@@ -23,12 +24,14 @@ public class CharacterInput : MonoBehaviour
     InputAction attack3Action;
     InputAction ultimateAction;
     InputAction optionAction;
+    InputAction pauseGameAction;
 
     #endregion
 
     public PlayerInput SetInput(PlayerInput playerInput)
     {
-        this.playerInput = playerInput;
+        //this.playerInput = playerInput;
+        playerIndex = playerInput.playerIndex;
 
         character = GetComponent<BaseCharacter>();
         movementAction = playerInput.actions["Movement"];
@@ -42,6 +45,7 @@ public class CharacterInput : MonoBehaviour
         attack3Action = playerInput.actions["Attack3"];
         ultimateAction = playerInput.actions["Ultimate"];
         optionAction = playerInput.actions["Option"];
+        pauseGameAction = playerInput.actions["Pause"];
 
         movementAction.performed += MovePerformed;
         movementAction.canceled += MoveCanceled;
@@ -62,6 +66,8 @@ public class CharacterInput : MonoBehaviour
 
         blockAction.performed += BlockPerformed;
         blockAction.canceled += BlockCanceled;
+
+        pauseGameAction.performed += PauseGamePerformed;
 
         return playerInput;
     }
@@ -87,6 +93,8 @@ public class CharacterInput : MonoBehaviour
 
         blockAction.performed -= BlockPerformed;
         blockAction.canceled -= BlockCanceled;
+
+        pauseGameAction.performed -= PauseGamePerformed;
     }
 
     void Update()
@@ -177,6 +185,12 @@ public class CharacterInput : MonoBehaviour
     void BlockCanceled(Ctx obj)
     {
         character.OnBlockCanceled?.Invoke(this, EventArgs.Empty);
+    }
+
+    void PauseGamePerformed(Ctx obj)
+    {
+        if (GameManager.GameState == GameState.Pause) return;
+        MenuSceneManager.OnGamePause?.Invoke(this, playerIndex);
     }
 
     public Vector2 CurrentMovementInput()

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 
@@ -12,34 +13,34 @@ public class PlayerInputProxy : MonoBehaviour
     [SerializeField] Canvas canvas;
 
     PlayerInput playerInput;
-    public EventHandler OnDeselect;
+    public EventHandler<int> OnDeselect;
 
     void Awake()
     {
         playerInput = GetComponent<PlayerInput>();
     }
 
-    void CharacterSelectProxyUI_performed(InputAction.CallbackContext obj)
-    {
-        OnDeselect?.Invoke(this, EventArgs.Empty);
-    }
-
     void OnEnable()
     {
-        playerInput.actions["Back"].performed += CharacterSelectProxyUI_performed;
+        playerInput.actions["Back"].performed += BackPressed;
     }
 
     void OnDisable()
     {
-        playerInput.actions["Back"].performed -= CharacterSelectProxyUI_performed;
+        playerInput.actions["Back"].performed -= BackPressed;
     }
 
-    public PlayerInputProxy SetupProxy(MenuSceneManager m, int index)
+    void BackPressed(InputAction.CallbackContext obj)
     {
-        ranger.SetupButtonUI(m, m.Ranger, index);
-        knight.SetupButtonUI(m, m.Knight, index);
-        bladekeeper.SetupButtonUI(m,m.Bladekeeper, index);
-        mauler.SetupButtonUI(m, m.Mauler, index);
+        OnDeselect?.Invoke(this, playerInput.playerIndex);
+    }
+
+    public PlayerInputProxy SetupProxy(int index)
+    {
+        ranger.SetupButtonUI(PlayableCharacter.LeafRanger, index);
+        knight.SetupButtonUI(PlayableCharacter.FireKnight, index);
+        bladekeeper.SetupButtonUI(PlayableCharacter.MetalBladekeeper, index);
+        mauler.SetupButtonUI(PlayableCharacter.CrystalMauler, index);
 
         if(index == 0)
         {
@@ -57,4 +58,24 @@ public class PlayerInputProxy : MonoBehaviour
     {
         canvas.gameObject.SetActive(state);
     }
-}
+
+    public void SetEventSystemState(bool state)
+    {
+        es.gameObject.SetActive(state);
+    }
+
+    public void SetEventSystem(MultiplayerEventSystem system)
+    {
+        es = system;
+    }
+
+    public void SetSelectedObject(GameObject gameObject)
+    {
+        es.SetSelectedGameObject(gameObject);
+    }
+
+    public GameObject Selected()
+    {
+        return es.currentSelectedGameObject;
+    }
+ }

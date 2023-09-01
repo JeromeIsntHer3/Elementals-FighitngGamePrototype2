@@ -11,6 +11,6 @@ public class HealthBarUI : MonoBehaviour
 
     public void OnHealthDepleted(object sender, float currHealth)
     {
-        healthImg.DOFillAmount(currHealth, GameManager.Instance.HpAnimDuration);
+        healthImg.DOFillAmount(currHealth, GameManager.HealthChangeAnimationDuration);
     }
 }

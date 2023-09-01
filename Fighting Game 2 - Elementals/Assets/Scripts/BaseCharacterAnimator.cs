@@ -229,18 +229,18 @@ public class BaseCharacterAnimator : MonoBehaviour
     {
         CancelAnimation();
         animCond[AnimationType.DefendHit] = true;
-        blockTilTime = Time.time + data.BlockStunDuration * GameManager.Instance.HitShakeAnim / 100;
-        ShakeOnHit(data.BlockStunDuration * GameManager.Instance.HitShakeAnim / 100);
+        blockTilTime = Time.time + data.BlockStunDuration * GameManager.OnHitShakeAnimationMultiplier;
+        ShakeOnHit(data.BlockStunDuration * GameManager.OnHitShakeAnimationMultiplier / 100);
         character.SetRecoveryDuration(data.BlockStunDuration);
     }
 
     void ShakeOnHit(float duration)
     {
         spriteRenderer.transform.DOKill();
-        spriteRenderer.transform.DOShakePosition(Mathf.Clamp(duration * GameManager.Instance.HitShakeAnim / 100,
-            .01f, 2f), new Vector3(GameManager.Instance.ShakeStrengthX,
-            GameManager.Instance.ShakeStrengthY, 0),
-            GameManager.Instance.Vibrato, default, false, true, ShakeRandomnessMode.Harmonic)
+        spriteRenderer.transform.DOShakePosition(Mathf.Clamp(duration * GameManager.OnHitShakeAnimationMultiplier,
+            .01f, 2f), new Vector3(GameManager.OnHitShakeStrengthX,
+            GameManager.OnHitShakeStrengthY, 0),
+            GameManager.OnHitVibrato, default, false, true, ShakeRandomnessMode.Harmonic)
             .OnComplete(() =>
             {
                 spriteRenderer.transform.localPosition = Vector3.zero;

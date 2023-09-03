@@ -101,7 +101,7 @@ public class MenuSceneManager : MonoBehaviour
     void GamePaused(object sender, int index)
     {
         pauseUI.Show();
-        GameManager.Instance.SwitchMapsToUI();
+        GameManager.Instance.SwitchMapsTo("UI");
         CanvasGroup group = pauseUI.GetComponent<CanvasGroup>();
         group.DOFade(1, .3f);
         menuEventSystem.gameObject.SetActive(true);
@@ -123,7 +123,7 @@ public class MenuSceneManager : MonoBehaviour
         {
             mainMenu.Hide();
             GameManager.Instance.SetSelectionStateOfPlayers(true);
-            GameManager.GameState = GameState.CharacterSelect;
+            GameManager.Instance.SetGameState(GameState.CharacterSelect);
         }, sequence);
     }
 
@@ -137,12 +137,13 @@ public class MenuSceneManager : MonoBehaviour
             menuEventSystem.gameObject.SetActive(true);
             menuEventSystem.playerRoot = mainMenu.gameObject;
             menuEventSystem.SetSelectedGameObject(mainMenu.PlayButton.gameObject);
-            GameManager.GameState = GameState.Menu;
+            GameManager.Instance.SetGameState(GameState.Menu);
         }, sequence);
     }
 
     void ToGame(object sender, EventArgs args)
     {
+        
         CameraManager.Instance.SetGamCams();
         gameUI.Show();
         characterSelect.ClearDisplays();
@@ -152,7 +153,7 @@ public class MenuSceneManager : MonoBehaviour
             menuEventSystem.gameObject.SetActive(true);
             menuEventSystem.SetSelectedGameObject(pauseUI.ResumeButton.gameObject);
             characterSelect.Hide();
-            GameManager.GameState = GameState.Game;
+            GameManager.Instance.SetGameState(GameState.Game);
         }, sequence);
     }
 

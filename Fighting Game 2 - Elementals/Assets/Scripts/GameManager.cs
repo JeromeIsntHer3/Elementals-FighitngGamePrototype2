@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -53,10 +54,13 @@ public class GameManager : MonoBehaviour
     readonly Dictionary<int, PlayerInput> playerInputOfPlayer = new();
     readonly Dictionary<int, PlayerInputProxy> playerProxyOfPlayer = new();
 
+    [SerializeField] TextMeshProUGUI gameStateText;
+
     void Awake()
     {
         Instance = this;
         Application.targetFrameRate = FrameRate;
+        SetGameState(GameState.Menu);
 
         playerInputOfPlayer.Add(0, null);
         playerInputOfPlayer.Add(1, null);
@@ -82,18 +86,17 @@ public class GameManager : MonoBehaviour
     {
         var playerOneCharacter = Instantiate(args.PlayerOnePrefab, args.PlayerOneSpawnPos, Quaternion.identity);
         playerOneCharacter.GetComponent<CharacterInput>().SetInput(args.PlayerOneInput);
-        args.PlayerOneInput.SwitchCurrentActionMap("Player");
-        args.PlayerOneInput.SwitchCurrentControlScheme("Keyboard", Keyboard.current);
+        //SwapPlayerInputControlScheme(args.PlayerOneInput, "Keyboard", Keyboard.current);
 
         Vector3 playerTwoSpawn = new(-args.PlayerTwoSpawnPos.x, args.PlayerTwoSpawnPos.y);
 
         var playerTwoCharacter = Instantiate(args.PlayerTwoPrefab, playerTwoSpawn, Quaternion.identity);
         playerTwoCharacter.GetComponent<CharacterInput>().SetInput(args.PlayerTwoInput);
-        args.PlayerTwoInput.SwitchCurrentActionMap("Player");
-        args.PlayerTwoInput.SwitchCurrentControlScheme("Controller", Gamepad.current);
+        //SwapPlayerInputControlScheme(args.PlayerTwoInput, "Controller", Gamepad.current);
 
         CameraManager.Instance.SetTargetGroup(playerOneCharacter.transform, playerTwoCharacter.transform);
-        GameState = GameState.Game;
+        SetGameState(GameState.Game);
+        EnablePlayerInput(false);
 
         MenuSceneManager.OnGoToGame?.Invoke(this, EventArgs.Empty);
     }
@@ -131,16 +134,34 @@ public class GameManager : MonoBehaviour
         return playerProxyOfPlayer[index];
     }
 
-    public void SwitchMapsToUI()
+    public void SwitchMapsTo(string mapName)
     {
-        playerInputOfPlayer[0].SwitchCurrentActionMap("UI");
-        playerInputOfPlayer[1].SwitchCurrentActionMap("UI");
+        playerInputOfPlayer[0].SwitchCurrentActionMap(mapName);
+        playerInputOfPlayer[1].SwitchCurrentActionMap(mapName);
     }
 
     public void SetSelectionStateOfPlayers(bool state)
     {
         playerProxyOfPlayer[0].SetSelectionState(state);
         playerProxyOfPlayer[1].SetSelectionState(state);
+    }
+
+    public void SetGameState(GameState state)
+    {
+        GameState = state;
+        gameStateText.text = state.ToString();
+    }
+
+    public void EnablePlayerInput(bool state)
+    {
+        playerInputOfPlayer[0].enabled = state;
+        playerInputOfPlayer[1].enabled = state;
+        if (state) SwitchMapsTo("Player");
+    }
+
+    public void SwapPlayerInputControlScheme(PlayerInput player, string schemeName, params InputDevice[] devices)
+    {
+        player.SwitchCurrentControlScheme(schemeName, devices);
     }
 }
 

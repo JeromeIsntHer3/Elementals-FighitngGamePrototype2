@@ -53,6 +53,8 @@ public class GameManager : MonoBehaviour
 
     readonly Dictionary<int, PlayerInput> playerInputOfPlayer = new();
     readonly Dictionary<int, PlayerInputProxy> playerProxyOfPlayer = new();
+    readonly Dictionary<int, GameObject> playerGameObjectOfPlayer = new();
+    readonly Dictionary<int, Vector2> playerSpawnPosition = new();
 
     [SerializeField] TextMeshProUGUI gameStateText;
 
@@ -62,53 +64,75 @@ public class GameManager : MonoBehaviour
         Application.targetFrameRate = FrameRate;
         SetGameState(GameState.Menu);
 
-        playerInputOfPlayer.Add(0, null);
-        playerInputOfPlayer.Add(1, null);
-        playerProxyOfPlayer.Add(0, null);
-        playerProxyOfPlayer.Add(1, null);
+        for (int i = 0; i < 2; i++)
+        {
+            playerInputOfPlayer.Add(i, null);
+            playerProxyOfPlayer.Add(i, null);
+            playerGameObjectOfPlayer.Add(i, null);
+            playerSpawnPosition.Add(i, Vector2.zero);
+        }
     }
 
     void OnEnable()
     {
         OnPlayersReady += PlayerReady;
-        MenuSceneManager.OnGoToCharacterSelect += PlayPressed;
-        MenuSceneManager.OnGoToMenu += BackToMenu;
+        UIManager.OnGoToCharacterSelect += PlayPressed;
+        UIManager.OnGoToMenu += BackToMenu;
     }
 
     void OnDisable()
     {
         OnPlayersReady -= PlayerReady;
-        MenuSceneManager.OnGoToCharacterSelect -= PlayPressed;
-        MenuSceneManager.OnGoToMenu -= BackToMenu;
+        UIManager.OnGoToCharacterSelect -= PlayPressed;
+        UIManager.OnGoToMenu -= BackToMenu;
     }
 
     void PlayerReady(object sender, OnPlayersReadyArgs args)
     {
-        var playerOneCharacter = Instantiate(args.PlayerOnePrefab, args.PlayerOneSpawnPos, Quaternion.identity);
-        playerOneCharacter.GetComponent<CharacterInput>().SetInput(args.PlayerOneInput);
-        //SwapPlayerInputControlScheme(args.PlayerOneInput, "Keyboard", Keyboard.current);
-
+        SetupCharacter(args.PlayerOneInput, args.PlayerOneSpawnPos, args.PlayerOnePrefab);
         Vector3 playerTwoSpawn = new(-args.PlayerTwoSpawnPos.x, args.PlayerTwoSpawnPos.y);
+        SetupCharacter(args.PlayerTwoInput, playerTwoSpawn, args.PlayerTwoPrefab);
 
-        var playerTwoCharacter = Instantiate(args.PlayerTwoPrefab, playerTwoSpawn, Quaternion.identity);
-        playerTwoCharacter.GetComponent<CharacterInput>().SetInput(args.PlayerTwoInput);
-        //SwapPlayerInputControlScheme(args.PlayerTwoInput, "Controller", Gamepad.current);
-
-        CameraManager.Instance.SetTargetGroup(playerOneCharacter.transform, playerTwoCharacter.transform);
+        CameraManager.Instance.SetTargetGroup(playerGameObjectOfPlayer[0].transform, playerGameObjectOfPlayer[1].transform);
         SetGameState(GameState.Game);
         EnablePlayerInput(false);
 
-        MenuSceneManager.OnGoToGame?.Invoke(this, EventArgs.Empty);
+        GameUI.Instance.SubscribeGameEvents(playerGameObjectOfPlayer[0].GetComponent<BaseCharacter>(),
+            playerGameObjectOfPlayer[1].GetComponent<BaseCharacter>());
+
+        playerGameObjectOfPlayer[0].GetComponent<BaseCharacter>().SetupCharacter(playerGameObjectOfPlayer[1].GetComponent<BaseCharacter>());
+        playerGameObjectOfPlayer[1].GetComponent<BaseCharacter>().SetupCharacter(playerGameObjectOfPlayer[0].GetComponent<BaseCharacter>());
+
+        for (int i = 0; i < 2; i++)
+        {
+            var playerObject = playerGameObjectOfPlayer[i];
+
+            playerObject.GetComponent<BaseCharacterHealth>().SetupHealth(50, 100);
+            playerObject.GetComponent<BaseCharacterAttacks>().SetupMeter(75, 2);
+        }
+
+        UIManager.OnGoToGame?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void SetupCharacter(PlayerInput input, Vector2 position, GameObject prefab)
+    {
+        Vector2 spawnPos = position;
+
+        var player = Instantiate(prefab, spawnPos, Quaternion.identity);
+        player.GetComponent<CharacterInput>().SetInput(input);
+
+        playerGameObjectOfPlayer[input.playerIndex] = player;
+        playerSpawnPosition[input.playerIndex] = spawnPos;
     }
 
     void PlayPressed(object sender, EventArgs args)
     {
-        
+
     }
 
     void BackToMenu(object sender, EventArgs args)
     {
-        
+
     }
 
     public void SetupPlayerInputAndProxies(int playerIndex, PlayerInput input)
@@ -162,6 +186,32 @@ public class GameManager : MonoBehaviour
     public void SwapPlayerInputControlScheme(PlayerInput player, string schemeName, params InputDevice[] devices)
     {
         player.SwitchCurrentControlScheme(schemeName, devices);
+    }
+
+    public void ResetPlayers()
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            playerGameObjectOfPlayer[i].transform.position = playerSpawnPosition[i];
+            playerGameObjectOfPlayer[i].GetComponent<BaseCharacterAnimator>().SetDeathFalse();
+            playerGameObjectOfPlayer[i].GetComponent<BaseCharacterAttacks>().SetupMeter(100, 2);
+            playerGameObjectOfPlayer[i].GetComponent<BaseCharacterHealth>().SetupHealth(100, 100);
+        }
+    }
+
+    public int GetPlayerIndexWinner()
+    {
+        if (playerGameObjectOfPlayer[0].GetComponent<BaseCharacterHealth>().CurrentHealth >
+            playerGameObjectOfPlayer[1].GetComponent<BaseCharacterHealth>().CurrentHealth)
+        {
+            return 0;
+        }
+        if (playerGameObjectOfPlayer[1].GetComponent<BaseCharacterHealth>().CurrentHealth >
+            playerGameObjectOfPlayer[0].GetComponent<BaseCharacterHealth>().CurrentHealth)
+        {
+            return 1;
+        }
+        return -1;
     }
 }
 

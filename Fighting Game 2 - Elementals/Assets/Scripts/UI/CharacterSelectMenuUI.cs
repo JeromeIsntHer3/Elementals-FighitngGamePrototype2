@@ -8,10 +8,13 @@ using UnityEngine.UI;
 
 public class CharacterSelectMenuUI : BaseMenuUI
 {
+    public static CharacterSelectMenuUI Instance;
+
     [SerializeField] CharacterContainerUI rangerContainer;
     [SerializeField] CharacterContainerUI knightContainer;
     [SerializeField] CharacterContainerUI bladekeeperContainer;
     [SerializeField] CharacterContainerUI maulerContainer;
+    
 
     [Serializable]
     class PlayerMenuVariables
@@ -48,12 +51,21 @@ public class CharacterSelectMenuUI : BaseMenuUI
     [SerializeField] PlayerInputManager playerInputManager;
     [SerializeField] PlayerInputProxy playerInputPrefab;
     [SerializeField] float countdownDuration;
+    [SerializeField] TextMeshProUGUI readyCountdownText;
 
     float countdownTime;
     bool playersAreReady = false;
     bool countReady = false;
     Coroutine cr;
 
+    public Color PlayerOneColor {  get { return playerOneVariables.SelectContainerColor.normalColor; } }
+    public Color PlayerTwoColor { get { return playerTwoVariables.SelectContainerColor.normalColor; } }
+
+
+    void Awake()
+    {
+        Instance = this;   
+    }
 
     void Start()
     {
@@ -70,14 +82,14 @@ public class CharacterSelectMenuUI : BaseMenuUI
 
     void OnEnable()
     {
-        MenuSceneManager.OnGoToCharacterSelect += ToCharacterSelect;
-        MenuSceneManager.OnGoToMenu += ToMainMenu;
+        UIManager.OnGoToCharacterSelect += ToCharacterSelect;
+        UIManager.OnGoToMenu += ToMainMenu;
     }
 
     void OnDisable()
     {
-        MenuSceneManager.OnGoToCharacterSelect -= ToCharacterSelect;
-        MenuSceneManager.OnGoToMenu -= ToMainMenu;
+        UIManager.OnGoToCharacterSelect -= ToCharacterSelect;
+        UIManager.OnGoToMenu -= ToMainMenu;
     }
 
     void Update()
@@ -86,6 +98,7 @@ public class CharacterSelectMenuUI : BaseMenuUI
         if (countdownTime > 0)
         {
             countdownTime -= Time.deltaTime;
+            readyCountdownText.text = countdownTime.ToString("0");
         }
         else
         {
@@ -96,8 +109,8 @@ public class CharacterSelectMenuUI : BaseMenuUI
 
     void ToCharacterSelect(object sender, EventArgs args)
     {
-        MenuSceneManager.OnSelectCharacter += OnSelectCharacter;
-        MenuSceneManager.OnConfirmCharacter += OnConfirmCharacter;
+        UIManager.OnSelectCharacter += OnSelectCharacter;
+        UIManager.OnConfirmCharacter += OnConfirmCharacter;
 
         var inputOne = playerInputManager.JoinPlayer(0, default, "Keyboard");
         var inputTwo = playerInputManager.JoinPlayer(1, default, "Controller");
@@ -113,8 +126,8 @@ public class CharacterSelectMenuUI : BaseMenuUI
     {
         ClearDisplays();
 
-        MenuSceneManager.OnSelectCharacter -= OnSelectCharacter;
-        MenuSceneManager.OnConfirmCharacter -= OnConfirmCharacter;
+        UIManager.OnSelectCharacter -= OnSelectCharacter;
+        UIManager.OnConfirmCharacter -= OnConfirmCharacter;
 
         GameManager.Instance.GetPlayerProxy(0).OnDeselect -= OnPlayerPressBack;
         GameManager.Instance.GetPlayerProxy(1).OnDeselect -= OnPlayerPressBack;
@@ -139,10 +152,10 @@ public class CharacterSelectMenuUI : BaseMenuUI
             GameManager.Instance.GetPlayerProxy(index).SetSelectionState(true);
             return;
         }
-        MenuSceneManager.OnGoToMenu?.Invoke(this, EventArgs.Empty);
+        UIManager.OnGoToMenu?.Invoke(this, EventArgs.Empty);
     }
 
-    void OnSelectCharacter(object sender, MenuSceneManager.OnSelectCharacterArgs args)
+    void OnSelectCharacter(object sender, UIManager.OnSelectCharacterArgs args)
     {
         PlayerMenuVariables playerMenu = playerVariables[args.PlayerIndex];
         CharacterContainerUI container = characterContainer[args.Character];
@@ -161,7 +174,7 @@ public class CharacterSelectMenuUI : BaseMenuUI
         spawnedT.localPosition = container.pb_Info.RelativeSpawn;
     }
 
-    void OnConfirmCharacter(object sender, MenuSceneManager.OnSelectCharacterArgs args)
+    void OnConfirmCharacter(object sender, UIManager.OnSelectCharacterArgs args)
     {
         if (GameManager.GameState != GameState.CharacterSelect) return;
         PlayerMenuVariables playerMenu = playerVariables[args.PlayerIndex];
@@ -179,11 +192,14 @@ public class CharacterSelectMenuUI : BaseMenuUI
         countReady = true;
         countdownTime = countdownDuration;
         cr = StartCoroutine(DelayReadyUp());
+        readyCountdownText.gameObject.SetActive(true);
     }
 
     IEnumerator DelayReadyUp()
     {
         yield return new WaitUntil(() => playersAreReady);
+
+        readyCountdownText.gameObject.SetActive(false);
 
         GameManager.OnPlayersReady?.Invoke(this, new GameManager.OnPlayersReadyArgs
         {

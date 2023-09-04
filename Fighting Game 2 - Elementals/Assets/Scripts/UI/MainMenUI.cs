@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class MainMenuUI : BaseMenuUI
 {
-    [SerializeField] MenuSceneManager manager;
+    [SerializeField] UIManager manager;
     [SerializeField] Button playButton;
     [SerializeField] Button settingButton;
     [SerializeField] Button quitButton;
@@ -24,8 +24,8 @@ public class MainMenuUI : BaseMenuUI
     void PlayPress()
     {
         if (GameManager.GameState != GameState.Menu) return;
-        MenuSceneManager.Instance.CharacterSelect.Show();
-        MenuSceneManager.OnGoToCharacterSelect?.Invoke(this, System.EventArgs.Empty);
+        UIManager.Instance.CharacterSelect.Show();
+        UIManager.OnGoToCharacterSelect?.Invoke(this, System.EventArgs.Empty);
     }
 
     void SettingsPress()

@@ -11,7 +11,7 @@ public class CharacterContainerUI : MonoBehaviour
 {
     public string pb_CharacterName;
     public CharacterInfo pb_Info;
-    [SerializeField] MenuSceneManager manager;
+    [SerializeField] UIManager manager;
     [SerializeField] Image indicator1, indicator2;
 
     Button containerButton;

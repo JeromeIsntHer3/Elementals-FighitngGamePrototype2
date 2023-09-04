@@ -1097,7 +1097,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: UI_White_47
+      name: UI_Score
       rect:
         serializedVersion: 2
         x: 1152
@@ -1905,6 +1905,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      UI_Score: 847658826
       UI_White_11: -849775093
       UI_White_12: -356226426
       UI_White_19: -48693850
@@ -1935,7 +1936,6 @@ TextureImporter:
       UI_White_44: 47202413
       UI_White_45: 1821302618
       UI_White_46: -955513166
-      UI_White_47: 847658826
       UI_White_48: 1334464173
       UI_White_49: 616304770
       UI_White_50: -736471892

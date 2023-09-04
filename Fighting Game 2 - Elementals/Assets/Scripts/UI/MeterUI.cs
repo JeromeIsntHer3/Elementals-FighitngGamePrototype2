@@ -7,7 +7,6 @@ public class MeterUI : MonoBehaviour
     [SerializeField] Image meterFillImg;
     [SerializeField] TextMeshProUGUI meterCountText;
 
-
     public void OnMeterUsed(object sender, BaseCharacterAttacks.OnMeterUsedArgs args)
     {
         meterFillImg.fillAmount = args.amount / GameManager.MaxMeterValue;

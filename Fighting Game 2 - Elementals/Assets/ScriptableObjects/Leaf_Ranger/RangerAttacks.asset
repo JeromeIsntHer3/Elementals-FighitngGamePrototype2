@@ -14,79 +14,68 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Attacks:
   - AttackType: 0
-    Damage: 5
+    Damage: 100
     HorizontalKnockback: 5
     VerticalKnockback: 5
     HitStunDuration: 0.75
     BlockStunDuration: 0.2
-    MeterUsage: 50
   - AttackType: 1
     Damage: 2
     HorizontalKnockback: 3
     VerticalKnockback: 3
     HitStunDuration: 0.2
     BlockStunDuration: 0.2
-    MeterUsage: 100
   - AttackType: 2
     Damage: 2
     HorizontalKnockback: 3
     VerticalKnockback: 3
     HitStunDuration: 0.2
     BlockStunDuration: 0.2
-    MeterUsage: 50
   - AttackType: 3
     Damage: 20
     HorizontalKnockback: 5
     VerticalKnockback: 5
     HitStunDuration: 0.2
     BlockStunDuration: 0.2
-    MeterUsage: 50
   - AttackType: 4
     Damage: 0
     HorizontalKnockback: 0
     VerticalKnockback: 0
     HitStunDuration: 0.2
     BlockStunDuration: 0.2
-    MeterUsage: 50
   - AttackType: 5
     Damage: 0
     HorizontalKnockback: 0
     VerticalKnockback: 0
     HitStunDuration: 0.2
     BlockStunDuration: 0.2
-    MeterUsage: 50
   - AttackType: 6
     Damage: 2
     HorizontalKnockback: 0.2
     VerticalKnockback: 2
     HitStunDuration: 0.2
     BlockStunDuration: 0.2
-    MeterUsage: 100
   - AttackType: 7
     Damage: 0
     HorizontalKnockback: 0
     VerticalKnockback: 0
     HitStunDuration: 0.2
     BlockStunDuration: 0.2
-    MeterUsage: 0
   - AttackType: 8
     Damage: 0
     HorizontalKnockback: 0
     VerticalKnockback: 0
     HitStunDuration: 0.2
     BlockStunDuration: 0.2
-    MeterUsage: 50
   - AttackType: 10
-    Damage: 0
+    Damage: 5
     HorizontalKnockback: 0
     VerticalKnockback: 0
     HitStunDuration: 0.5
     BlockStunDuration: 0.25
-    MeterUsage: 0
   - AttackType: 9
     Damage: 0
     HorizontalKnockback: 0
     VerticalKnockback: 0
     HitStunDuration: 0.2
     BlockStunDuration: 0.2
-    MeterUsage: 0

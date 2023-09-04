@@ -69,6 +69,8 @@ public class BaseCharacterAnimator : MonoBehaviour
         character.OnEnhanceAttack += OnEnhanceAttack;
         character.OnCancelAnimation += OnAnimationCancel;
 
+        character.OnDeath += OnDeath;
+
         if (character.AnimationData.optionIsHeld)
         {
             character.OnOption += OnOption;
@@ -96,6 +98,8 @@ public class BaseCharacterAnimator : MonoBehaviour
         character.OnBlockCanceled -= OnBlockCanceled;
         character.OnEnhanceAttack -= OnEnhanceAttack;
         character.OnCancelAnimation -= OnAnimationCancel;
+
+        character.OnDeath -= OnDeath;
 
         if (character.AnimationData.optionIsHeld)
         {
@@ -270,6 +274,12 @@ public class BaseCharacterAnimator : MonoBehaviour
         spriteRenderer.material.SetColor("_GradientOutline1", Color.cyan);
     }
 
+    void OnDeath(object sender, EventArgs args)
+    {
+        CancelAnimation();
+        animCond[AnimationType.Death] = true;
+    }
+
     void SetSpriteColour(Color color, float totalDuration)
     {
         spriteRenderer.DOKill(true);
@@ -339,6 +349,8 @@ public class BaseCharacterAnimator : MonoBehaviour
     AnimationType GetAnimation()
     {
         if (Time.time < lockedTilTime) return currentState;
+
+        if (animCond[AnimationType.Death]) return AnimationType.Death;
 
         if (animCond[AnimationType.Hit]) return AnimationType.Hit;
         if (animCond[AnimationType.RecoveryFromHit])
@@ -454,5 +466,10 @@ public class BaseCharacterAnimator : MonoBehaviour
     bool CanChangeDirection(AnimationType t)
     {
         return animationCanChangeFaceDirection[t];
+    }
+
+    public void SetDeathFalse()
+    {
+        animCond[AnimationType.Death] = false;
     }
 }

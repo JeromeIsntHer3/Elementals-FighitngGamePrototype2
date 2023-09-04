@@ -6,10 +6,12 @@ using Ctx = UnityEngine.InputSystem.InputAction.CallbackContext;
 
 public class CharacterInput : MonoBehaviour
 {
-    //PlayerInput playerInput;
+    PlayerInput playerInput;
     BaseCharacter character;
     Vector2 movement;
     int playerIndex;
+
+    public int PlayerIndex {  get { return playerIndex; } }
 
     #region InputActions
 
@@ -30,7 +32,7 @@ public class CharacterInput : MonoBehaviour
 
     public PlayerInput SetInput(PlayerInput playerInput)
     {
-        //this.playerInput = playerInput;
+        this.playerInput = playerInput;
         playerIndex = playerInput.playerIndex;
 
         character = GetComponent<BaseCharacter>();
@@ -189,8 +191,8 @@ public class CharacterInput : MonoBehaviour
 
     void PauseGamePerformed(Ctx obj)
     {
-        if (GameManager.GameState == GameState.Pause) return;
-        MenuSceneManager.OnGamePause?.Invoke(this, playerIndex);
+        if(GameManager.GameState == GameState.Pause) return;
+        UIManager.OnGamePause?.Invoke(this, playerIndex);
     }
 
     public Vector2 CurrentMovementInput()

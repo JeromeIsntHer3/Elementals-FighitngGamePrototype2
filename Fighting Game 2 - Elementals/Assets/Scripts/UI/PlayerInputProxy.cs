@@ -12,6 +12,7 @@ public class PlayerInputProxy : MonoBehaviour
     [SerializeField] MultiplayerEventSystem es;
     [SerializeField] Canvas canvas;
 
+    MultiplayerEventSystem currentSystem;
     PlayerInput playerInput;
     public EventHandler<int> OnDeselect;
 
@@ -37,6 +38,7 @@ public class PlayerInputProxy : MonoBehaviour
 
     public PlayerInputProxy SetupProxy(int index)
     {
+        currentSystem = es;
         ranger.SetupButtonUI(PlayableCharacter.LeafRanger, index);
         knight.SetupButtonUI(PlayableCharacter.FireKnight, index);
         bladekeeper.SetupButtonUI(PlayableCharacter.MetalBladekeeper, index);
@@ -44,11 +46,11 @@ public class PlayerInputProxy : MonoBehaviour
 
         if(index == 0)
         {
-            es.firstSelectedGameObject = ranger.gameObject;
+            currentSystem.firstSelectedGameObject = ranger.gameObject;
         }
         else
         {
-            es.firstSelectedGameObject = knight.gameObject;
+            currentSystem.firstSelectedGameObject = knight.gameObject;
         }
 
         return this;
@@ -61,21 +63,26 @@ public class PlayerInputProxy : MonoBehaviour
 
     public void SetEventSystemState(bool state)
     {
-        es.gameObject.SetActive(state);
+        currentSystem.gameObject.SetActive(state);
     }
 
     public void SetEventSystem(MultiplayerEventSystem system)
     {
-        es = system;
+        currentSystem = system;
+    }
+
+    public void SetDefaultEventSystem()
+    {
+        currentSystem = es;
     }
 
     public void SetSelectedObject(GameObject gameObject)
     {
-        es.SetSelectedGameObject(gameObject);
+        currentSystem.SetSelectedGameObject(gameObject);
     }
 
     public GameObject Selected()
     {
-        return es.currentSelectedGameObject;
+        return currentSystem.currentSelectedGameObject;
     }
  }

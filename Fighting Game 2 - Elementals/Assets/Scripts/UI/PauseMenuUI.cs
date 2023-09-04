@@ -17,6 +17,6 @@ public class PauseMenuUI : BaseMenuUI
 
     void Start()
     {
-        
+        resumeButton.onClick.AddListener(UIManager.Instance.ClosePauseMenu);
     }
 }

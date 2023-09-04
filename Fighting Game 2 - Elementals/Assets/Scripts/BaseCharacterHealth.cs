@@ -1,21 +1,30 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class BaseCharacterHealth : MonoBehaviour
 {
-    [SerializeField] protected float maxHealth;
-    [SerializeField] protected float currentHealth;
+    protected float currentHealth;
+    float maxHealth;
 
     public EventHandler<float> OnHealthChanged;
 
     BaseCharacter character;
+    public float CurrentHealth { get { return currentHealth; } }
+
+
+    public void SetupHealth(float curr, float max)
+    {
+        currentHealth = curr;
+        maxHealth = max;
+        OnHealthChanged?.Invoke(this, currentHealth / maxHealth);
+    }
 
     void Awake()
     {
         character = GetComponent<BaseCharacter>();
-        currentHealth = maxHealth;
     }
 
     protected virtual void OnEnable()
@@ -33,13 +42,23 @@ public class BaseCharacterHealth : MonoBehaviour
     void OnHit(object sender, DamageData data)
     {
         currentHealth -= data.Damage;
-        character.SetStunnedDuration(data.HitStunDuration);
         OnHealthChanged?.Invoke(this, currentHealth / maxHealth);
+        if (currentHealth <= 0)
+        {
+            character.OnDeath?.Invoke(this, EventArgs.Empty);
+            GameUI.OnPlayerDeath?.Invoke(this, GetComponent<CharacterInput>().PlayerIndex);
+        }
+        character.SetStunnedDuration(data.HitStunDuration);
     }
 
     void BlockHit(object sender, DamageData data)
     {
         currentHealth -= data.Damage;
         OnHealthChanged?.Invoke(this, currentHealth / maxHealth);
+        if (currentHealth <= 0)
+        {
+            character.OnDeath?.Invoke(this, EventArgs.Empty);
+            GameUI.OnPlayerDeath?.Invoke(this, GetComponent<CharacterInput>().PlayerIndex);
+        }
     }
 }

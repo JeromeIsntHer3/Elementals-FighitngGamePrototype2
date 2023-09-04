@@ -11,9 +11,8 @@ public class BaseCharacterAttacks : MonoBehaviour
     [SerializeField] protected CharacterAttackSO attacksData;
     [SerializeField] protected GameBoxes hitboxes;
 
-    [Header("Meter")]
-    [SerializeField] int currentMeterValue;
-    [SerializeField] int currentMeterCount;
+    int currentMeterValue;
+    int currentMeterCount;
 
     protected readonly Dictionary<AttackType, AttackData> attackData = new();
 
@@ -58,17 +57,11 @@ public class BaseCharacterAttacks : MonoBehaviour
         attacksData.AddToDict(attackData);
     }
 
-    public void SetupAttacks(int startMeterVal, int startMeterCount)
+    public void SetupMeter(int currValue, int currCount)
     {
-        currentMeterValue = startMeterVal;
-        currentMeterCount = startMeterCount;
-        OnMeterValueChanged?.Invoke(this, 
-            new OnMeterUsedArgs(currentMeterValue, currentMeterCount));
-    }
-
-    void Start()
-    {
-        OnMeterValueChanged?.Invoke(this, 
+        currentMeterValue = currValue;
+        currentMeterCount = currCount;
+        OnMeterValueChanged?.Invoke(this,
             new OnMeterUsedArgs(currentMeterValue, currentMeterCount));
     }
 

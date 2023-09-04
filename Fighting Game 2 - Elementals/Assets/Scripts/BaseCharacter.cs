@@ -70,6 +70,7 @@ public class BaseCharacter : MonoBehaviour
     public EventHandler<BaseCharacter> OnHitBlocked;
     public EventHandler<int> OnHitCombo;
     public EventHandler<string> OnHitType;
+    public EventHandler OnDeath;
 
     #endregion
 
@@ -172,7 +173,6 @@ public class BaseCharacter : MonoBehaviour
 
     void CheckCombo()
     {
-        if (!enemy) return;
         if (enemy.Stunned()) return;
         comboHit = 0;
         OnHitCombo?.Invoke(this, comboHit);

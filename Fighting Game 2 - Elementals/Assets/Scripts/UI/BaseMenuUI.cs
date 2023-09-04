@@ -16,6 +16,11 @@ public class BaseMenuUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    public bool Shown()
+    {
+        return gameObject.activeInHierarchy;
+    }
+
     void Awake()
     {
         canvas = GetComponent<Canvas>();

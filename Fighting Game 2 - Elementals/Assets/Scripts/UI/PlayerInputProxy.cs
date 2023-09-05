@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 
@@ -12,7 +9,7 @@ public class PlayerInputProxy : MonoBehaviour
     [SerializeField] MultiplayerEventSystem es;
     [SerializeField] Canvas canvas;
 
-    MultiplayerEventSystem currentSystem;
+    [SerializeField] MultiplayerEventSystem currentSystem;
     PlayerInput playerInput;
     public EventHandler<int> OnDeselect;
 

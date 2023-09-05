@@ -1,8 +1,4 @@
-using DG.Tweening;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using Unity.Burst;
 using UnityEngine;
 
 public class LRAttacks : BaseCharacterAttacks

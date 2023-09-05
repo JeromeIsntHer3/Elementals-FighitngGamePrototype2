@@ -1,13 +1,13 @@
 using Cinemachine;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.ShaderGraph.Internal;
+using System;
 using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
     public static CameraManager Instance;
 
+    [SerializeField] Camera MainCamera;
+    [SerializeField] float gameInitialOrthoSize = 4.5f;
     [SerializeField] CinemachineVirtualCamera menuCam;
     [SerializeField] CinemachineVirtualCamera characterSelectCam;
     [SerializeField] CinemachineVirtualCamera gameCam;
@@ -16,6 +16,30 @@ public class CameraManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+    }
+
+    void OnEnable()
+    {
+        GameManager.OnToMenu += SetCameraOrtho;
+        GameManager.OnToCharacterSelect += SetCameraOrtho;
+        GameManager.OnEnterGame += SetGameOrthoSize;
+    }
+
+    void OnDisable()
+    {
+        GameManager.OnToMenu -= SetCameraOrtho;
+        GameManager.OnToCharacterSelect -= SetCameraOrtho;
+        GameManager.OnEnterGame -= SetGameOrthoSize;
+    }
+
+    void SetCameraOrtho(object sender, EventArgs args)
+    {
+        gameCam.m_Lens.OrthographicSize = MainCamera.orthographicSize;
+    }
+
+    void SetGameOrthoSize(object sender, EventArgs args)
+    {
+        gameCam.m_Lens.OrthographicSize = gameInitialOrthoSize;
     }
 
     public void SetMenuCams()
@@ -32,7 +56,7 @@ public class CameraManager : MonoBehaviour
         gameCam.gameObject.SetActive(false);
     }
 
-    public void SetGamCams()
+    public void SetGameCams()
     {
         menuCam.gameObject.SetActive(false);
         characterSelectCam.gameObject.SetActive(false);
@@ -50,5 +74,20 @@ public class CameraManager : MonoBehaviour
         {
             targetGroup.AddMember(t, 1, .2F);
         }
+    }
+
+    public void ClearTargetGroup(params Transform[] targets)
+    {
+        Debug.Log("Clear Targets");
+        foreach (Transform t in targets)
+        {
+            if (t == null) return;
+            targetGroup.RemoveMember(t);
+        }
+    }
+
+    public bool NoTargets()
+    {
+        return targetGroup.m_Targets == null;
     }
 }

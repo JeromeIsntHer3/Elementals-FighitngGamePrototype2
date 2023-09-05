@@ -18,5 +18,7 @@ public class PauseMenuUI : BaseMenuUI
     void Start()
     {
         resumeButton.onClick.AddListener(UIManager.Instance.ClosePauseMenu);
+        characterSelectButton.onClick.AddListener(() => { GameManager.OnToCharacterSelect?.Invoke(this, System.EventArgs.Empty); });
+        quitToMenuButton.onClick.AddListener(() => { GameManager.OnToMenu?.Invoke(this, System.EventArgs.Empty); });
     }
 }

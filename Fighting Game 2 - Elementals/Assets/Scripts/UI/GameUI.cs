@@ -1,15 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using TMPro;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameUI : BaseMenuUI
 {
     public static GameUI Instance;
+
+    [Header("Icons")]
+    [SerializeField] Image playerOneIcon;
+    [SerializeField] Image playerTwoIcon;
 
     [Header("Health Bar")]
     [SerializeField] HealthBarUI playerOneHealthBar;
@@ -30,6 +32,10 @@ public class GameUI : BaseMenuUI
 
     [Header("Scores")]
     [SerializeField] List<ScoreSoloUI> scoreList;
+
+    Coroutine GameOverCR;
+    Coroutine StartRoundCR;
+    Coroutine RoundOverCR;
 
     readonly List<int> playerWins = new();
 
@@ -56,13 +62,15 @@ public class GameUI : BaseMenuUI
 
     void OnEnable()
     {
-        UIManager.OnGoToGame += OnGoToGame;
+        GameManager.OnToGame += OnGoToGame;
+        GameManager.OnEnterGame += OnEnterGame;
         OnPlayerDeath += PlayerDeath;
     }
 
     void OnDisable()
     {
-        UIManager.OnGoToGame -= OnGoToGame;
+        GameManager.OnToGame -= OnGoToGame;
+        GameManager.OnEnterGame -= OnEnterGame;
         OnPlayerDeath -= PlayerDeath;
     }
 
@@ -88,13 +96,23 @@ public class GameUI : BaseMenuUI
     {
         currentTime = countdownDuration;
         UpdateTimerText();
-        StartCoroutine(RoundStartCountdown());
+    }
+
+    void OnEnterGame(object sender, EventArgs args)
+    {
+        StartRoundCR = StartCoroutine(RoundStartCountdown());
     }
 
     void PlayerDeath(object sender, int index)
     {
         playerLostIndex = index;
         RoundOver();
+    }
+
+    public void SetupIcons(Sprite one, Sprite two)
+    {
+        playerOneIcon.sprite = one;
+        playerTwoIcon.sprite = two;
     }
 
     public void SubscribeGameEvents(BaseCharacter playerOne, BaseCharacter playerTwo)
@@ -133,11 +151,12 @@ public class GameUI : BaseMenuUI
         currentTime = countdownDuration;
         UpdateTimerText();
         GameManager.Instance.ResetPlayers();
-        StartCoroutine(RoundStartCountdown());
-    }
+        StartRoundCR = StartCoroutine(RoundStartCountdown());
+    }   
 
     IEnumerator RoundStartCountdown()
     {
+        GameManager.Instance.SetGameState(GameState.Game);
         yield return new WaitForSeconds(1);
         centreText.gameObject.SetActive(true);
         centreText.text = "ROUND " + round;
@@ -145,9 +164,9 @@ public class GameUI : BaseMenuUI
         centreText.text = "READY?";
         yield return new WaitForSeconds(1);
         centreText.text = "FIGHT!";
-        GameManager.Instance.EnablePlayerInput(true);
-        yield return new WaitForSeconds(.5f);
+        yield return new WaitForSeconds(1f);
         centreText.gameObject.SetActive(false);
+        GameManager.Instance.EnablePlayerInput(true);
         isGameRunning = true;
     }
 
@@ -201,11 +220,12 @@ public class GameUI : BaseMenuUI
             }
         }
 
-        StartCoroutine(RoundOverSequence());
+        RoundOverCR = StartCoroutine(RoundOverSequence());
     }
 
     IEnumerator RoundOverSequence()
     {
+        GameManager.Instance.SetGameState(GameState.GameOver);
         scoreList[round - 1].Show(true);
         round++;
         centreText.gameObject.SetActive(true);
@@ -220,17 +240,17 @@ public class GameUI : BaseMenuUI
             bool bothPlayersWin = playerWins[0] >= 2 && playerWins[1] >= 2;
             if (bothPlayersWin)
             {
-                StartCoroutine(GameOverSequence("Draw!"));
+                GameOverCR = StartCoroutine(GameOverSequence("Draw!"));
             }
             else
             {
                 if (playerWins[0] >= 2)
                 {
-                    StartCoroutine(GameOverSequence("Player 1 Wins!"));
+                    GameOverCR = StartCoroutine(GameOverSequence("Player 1 Wins!"));
                 }
-                else
+                else if (playerWins[1] >= 2)
                 {
-                    StartCoroutine(GameOverSequence("Player 2 Wins!"));
+                    GameOverCR = StartCoroutine(GameOverSequence("Player 2 Wins!"));
                 }
             }
             if (aPlayerWon) yield break;
@@ -246,5 +266,20 @@ public class GameUI : BaseMenuUI
         centreText.text = gameOverText;
         yield return new WaitForSeconds(1);
         Debug.Log("Open GameOver Menu");
+    }
+
+    public void StopGame()
+    {
+        if(StartRoundCR != null) StopCoroutine(StartRoundCR);
+        if(RoundOverCR != null) StopCoroutine(RoundOverCR);
+        if(GameOverCR != null) StopCoroutine(GameOverCR);
+
+        isGameRunning = false;
+        //for(int i = 0; i < 2; i++)
+        //{
+        //    Destroy(GameManager.Instance.GetPlayerProxy(i).gameObject);
+        //    GameManager.Instance.ClearPlayerInputAndProxies(i);
+        //}
+        //GameManager.Instance.RemovePlayerGameObjects();
     }
 }

@@ -14,13 +14,22 @@ public class CharacterSelectMenuUI : BaseMenuUI
     [SerializeField] CharacterContainerUI knightContainer;
     [SerializeField] CharacterContainerUI bladekeeperContainer;
     [SerializeField] CharacterContainerUI maulerContainer;
-    
+    readonly Dictionary<PlayableCharacter, CharacterContainerUI> characterContainer = new();
 
     [Serializable]
     class PlayerMenuVariables
     {
         public TextMeshProUGUI SelectedCharacterNameText;
-        public ColorBlock SelectContainerColor;
+        public ColorBlock SelectContainerColor = new()
+        {
+            selectedColor = Color.white,
+            disabledColor = Color.white,
+            highlightedColor = Color.white,
+            normalColor = Color.white,
+            pressedColor = Color.white,
+            colorMultiplier = 3f,
+            fadeDuration = .1f
+        };
         public Transform DisplaySpawn;
         public TextMeshProUGUI PlayerReadyText;
 
@@ -40,12 +49,7 @@ public class CharacterSelectMenuUI : BaseMenuUI
             isReady = state;
         }
     }
-
-    [SerializeField] PlayerMenuVariables playerOneVariables;
-    [SerializeField] PlayerMenuVariables playerTwoVariables;
-
-    readonly Dictionary<int, PlayerMenuVariables> playerVariables = new();
-    readonly Dictionary<PlayableCharacter, CharacterContainerUI> characterContainer = new();
+    [SerializeField] List<PlayerMenuVariables> playerVariables = new();
 
     [Header("Multiplayer")]
     [SerializeField] PlayerInputManager playerInputManager;
@@ -58,8 +62,14 @@ public class CharacterSelectMenuUI : BaseMenuUI
     bool countReady = false;
     Coroutine cr;
 
-    public Color PlayerOneColor {  get { return playerOneVariables.SelectContainerColor.normalColor; } }
-    public Color PlayerTwoColor { get { return playerTwoVariables.SelectContainerColor.normalColor; } }
+    #region Getter & Setters
+    public Color PlayerOneColor {  get { return playerVariables[0].SelectContainerColor.normalColor; } }
+    public Color PlayerTwoColor { get { return playerVariables[1].SelectContainerColor.normalColor; } }
+
+    public ColorBlock PlayerOneColorBlock { get { return playerVariables[0].SelectContainerColor; } }
+    public ColorBlock PlayerTwoColorBlock { get { return playerVariables[1].SelectContainerColor; } }
+
+    #endregion
 
 
     void Awake()
@@ -69,9 +79,6 @@ public class CharacterSelectMenuUI : BaseMenuUI
 
     void Start()
     {
-        playerVariables.Add(0, playerOneVariables);
-        playerVariables.Add(1, playerTwoVariables);
-
         characterContainer.Add(PlayableCharacter.LeafRanger, rangerContainer);
         characterContainer.Add(PlayableCharacter.FireKnight, knightContainer);
         characterContainer.Add(PlayableCharacter.MetalBladekeeper, bladekeeperContainer);
@@ -82,14 +89,14 @@ public class CharacterSelectMenuUI : BaseMenuUI
 
     void OnEnable()
     {
-        UIManager.OnGoToCharacterSelect += ToCharacterSelect;
-        UIManager.OnGoToMenu += ToMainMenu;
+        GameManager.OnEnterCharacterSelect += OnEnterChracterSelect;
+        GameManager.OnToMenu += ToMainMenu;
     }
 
     void OnDisable()
     {
-        UIManager.OnGoToCharacterSelect -= ToCharacterSelect;
-        UIManager.OnGoToMenu -= ToMainMenu;
+        GameManager.OnEnterCharacterSelect -= OnEnterChracterSelect;
+        GameManager.OnToMenu -= ToMainMenu;
     }
 
     void Update()
@@ -98,19 +105,24 @@ public class CharacterSelectMenuUI : BaseMenuUI
         if (countdownTime > 0)
         {
             countdownTime -= Time.deltaTime;
-            readyCountdownText.text = countdownTime.ToString("0");
         }
         else
         {
             countReady = false;
             playersAreReady = true;
         }
+        UpdateCountdownText();
     }
 
-    void ToCharacterSelect(object sender, EventArgs args)
+    void UpdateCountdownText()
     {
-        UIManager.OnSelectCharacter += OnSelectCharacter;
-        UIManager.OnConfirmCharacter += OnConfirmCharacter;
+        readyCountdownText.text = countdownTime.ToString("0");
+    }
+
+    void OnEnterChracterSelect(object sender, EventArgs args)
+    {
+        GameManager.OnSelectCharacter += OnSelectCharacter;
+        GameManager.OnConfirmCharacter += OnConfirmCharacter;
 
         var inputOne = playerInputManager.JoinPlayer(0, default, "Keyboard");
         var inputTwo = playerInputManager.JoinPlayer(1, default, "Controller");
@@ -126,17 +138,17 @@ public class CharacterSelectMenuUI : BaseMenuUI
     {
         ClearDisplays();
 
-        UIManager.OnSelectCharacter -= OnSelectCharacter;
-        UIManager.OnConfirmCharacter -= OnConfirmCharacter;
+        GameManager.OnSelectCharacter -= OnSelectCharacter;
+        GameManager.OnConfirmCharacter -= OnConfirmCharacter;
 
-        GameManager.Instance.GetPlayerProxy(0).OnDeselect -= OnPlayerPressBack;
-        GameManager.Instance.GetPlayerProxy(1).OnDeselect -= OnPlayerPressBack;
-
-        Destroy(GameManager.Instance.GetPlayerInput(0).gameObject);
-        Destroy(GameManager.Instance.GetPlayerInput(1).gameObject);
-
-        GameManager.Instance.ClearPlayerInputAndProxies(0);
-        GameManager.Instance.ClearPlayerInputAndProxies(1);
+        for(int i = 0; i < 2; i++)
+        {
+            GameManager.Instance.GetPlayerProxy(i).OnDeselect -= OnPlayerPressBack;
+            GameManager.Instance.ClearPlayerInputAndProxies(i);
+            playerVariables[i].SetPlayerReady(false);
+            playerVariables[i].CurrentContainer.Deselect(i);
+            playerVariables[i].SelectContainerUI(null);
+        }
     }
 
     void OnPlayerPressBack(object sender, int index)
@@ -146,16 +158,17 @@ public class CharacterSelectMenuUI : BaseMenuUI
         {
             countReady = false;
             countdownTime = countdownDuration;
+            readyCountdownText.gameObject.SetActive(false);
             if(cr != null) StopCoroutine(cr);
             playerVariables[index].SetPlayerReady(false);
             playerVariables[index].PlayerReadyText.gameObject.SetActive(false);
             GameManager.Instance.GetPlayerProxy(index).SetSelectionState(true);
             return;
         }
-        UIManager.OnGoToMenu?.Invoke(this, EventArgs.Empty);
+        GameManager.OnToMenu?.Invoke(this, EventArgs.Empty);
     }
 
-    void OnSelectCharacter(object sender, UIManager.OnSelectCharacterArgs args)
+    void OnSelectCharacter(object sender, GameManager.OnSelectCharacterArgs args)
     {
         PlayerMenuVariables playerMenu = playerVariables[args.PlayerIndex];
         CharacterContainerUI container = characterContainer[args.Character];
@@ -168,22 +181,22 @@ public class CharacterSelectMenuUI : BaseMenuUI
 
         playerMenu.SelectContainerUI(container);
         playerMenu.CurrentContainer.Select(playerMenu.SelectContainerColor, args.PlayerIndex);
-        playerMenu.SelectedCharacterNameText.text = container.pb_CharacterName;
+        playerMenu.SelectedCharacterNameText.text = container.Info.Name;
 
-        Transform spawnedT = Instantiate(container.pb_Info.DisplayPrefab, playerMenu.DisplaySpawn, false).transform;
-        spawnedT.localPosition = container.pb_Info.RelativeSpawn;
+        Transform spawnedT = Instantiate(container.Info.DisplayPrefab, playerMenu.DisplaySpawn, false).transform;
+        spawnedT.localPosition = container.Info.RelativeSpawn;
     }
 
-    void OnConfirmCharacter(object sender, UIManager.OnSelectCharacterArgs args)
+    void OnConfirmCharacter(object sender, GameManager.OnSelectCharacterArgs args)
     {
         if (GameManager.GameState != GameState.CharacterSelect) return;
-        PlayerMenuVariables playerMenu = playerVariables[args.PlayerIndex];
+        PlayerMenuVariables playerVar = playerVariables[args.PlayerIndex];
 
         GameManager.Instance.GetPlayerProxy(args.PlayerIndex).SetSelectionState(false);
-        playerMenu.PlayerReadyText.gameObject.SetActive(true);
-        playerMenu.SetPlayerReady(true);
+        playerVar.PlayerReadyText.gameObject.SetActive(true);
+        playerVar.SetPlayerReady(true);
 
-        foreach(var player in playerVariables.Values)
+        foreach(var player in playerVariables)
         {
             if (!player.IsReady) return;
         }
@@ -191,8 +204,9 @@ public class CharacterSelectMenuUI : BaseMenuUI
         playersAreReady = false;
         countReady = true;
         countdownTime = countdownDuration;
-        cr = StartCoroutine(DelayReadyUp());
+        UpdateCountdownText();
         readyCountdownText.gameObject.SetActive(true);
+        cr = StartCoroutine(DelayReadyUp());
     }
 
     IEnumerator DelayReadyUp()
@@ -200,26 +214,29 @@ public class CharacterSelectMenuUI : BaseMenuUI
         yield return new WaitUntil(() => playersAreReady);
 
         readyCountdownText.gameObject.SetActive(false);
-
-        GameManager.OnPlayersReady?.Invoke(this, new GameManager.OnPlayersReadyArgs
+        GameManager.OnToGame?.Invoke(this, new GameManager.CharacterInfoArgs
         {
             PlayerOneInput = GameManager.Instance.GetPlayerInput(0),
-            PlayerOnePrefab = playerVariables[0].CurrentContainer.pb_Info.GamePrefab,
-            PlayerOneSpawnPos = playerVariables[0].CurrentContainer.pb_Info.RelativeSpawn,
+            PlayerOneInfo = playerVariables[0].CurrentContainer.Info,
 
             PlayerTwoInput = GameManager.Instance.GetPlayerInput(1),
-            PlayerTwoPrefab = playerVariables[1].CurrentContainer.pb_Info.GamePrefab,
-            PlayerTwoSpawnPos = playerVariables[1].CurrentContainer.pb_Info.RelativeSpawn
+            PlayerTwoInfo = playerVariables[1].CurrentContainer.Info
         });
+
+        ClearDisplays();
     }
 
     public void ClearDisplays()
     {
-        if (playerOneVariables.DisplaySpawn.childCount > 0) Utils.DestroyChildren(playerOneVariables.DisplaySpawn);
-        if (playerTwoVariables.DisplaySpawn.childCount > 0) Utils.DestroyChildren(playerTwoVariables.DisplaySpawn);
-
-        playerOneVariables.PlayerReadyText.gameObject.SetActive(false);
-        playerTwoVariables.PlayerReadyText.gameObject.SetActive(false);
+        for(int i = 0; i < 2; i++)
+        {
+            playersAreReady = false;
+            playerVariables[i].SetPlayerReady(false);
+            playerVariables[i].SelectedCharacterNameText.text = string.Empty;
+            playerVariables[i].CurrentContainer.Deselect(i);
+            if (playerVariables[i].DisplaySpawn.childCount > 0) Utils.DestroyChildren(playerVariables[i].DisplaySpawn);
+            playerVariables[i].PlayerReadyText.gameObject.SetActive(false);
+        }
     }
 }
 

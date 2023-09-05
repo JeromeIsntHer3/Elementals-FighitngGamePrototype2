@@ -22,8 +22,8 @@ public class CharacterButtonUI : MonoBehaviour, ISelectHandler
 
     public void OnSelect(BaseEventData eventData)
     {
-        UIManager.OnSelectCharacter?.Invoke(this,
-            new UIManager.OnSelectCharacterArgs
+        GameManager.OnSelectCharacter?.Invoke(this,
+            new GameManager.OnSelectCharacterArgs
             {
                 Character = character,
                 PlayerIndex = playerIndex
@@ -32,8 +32,8 @@ public class CharacterButtonUI : MonoBehaviour, ISelectHandler
 
     public void OnClick()
     {
-        UIManager.OnConfirmCharacter?.Invoke(this,
-            new UIManager.OnSelectCharacterArgs
+        GameManager.OnConfirmCharacter?.Invoke(this,
+            new GameManager.OnSelectCharacterArgs
             {
                 Character = character,
                 PlayerIndex = playerIndex

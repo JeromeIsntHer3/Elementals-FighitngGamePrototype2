@@ -1,12 +1,12 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
 public class CharacterInfo
 {
+    public string Name;
     public GameObject DisplayPrefab;
     public GameObject GamePrefab;
-    public Vector3 RelativeSpawn;
+    public Vector2 RelativeSpawn;
+    public Sprite CharacterIcon;
 }

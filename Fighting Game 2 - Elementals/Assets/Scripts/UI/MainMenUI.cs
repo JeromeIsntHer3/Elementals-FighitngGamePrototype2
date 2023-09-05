@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,24 +14,23 @@ public class MainMenuUI : BaseMenuUI
 
     void Start()
     {
-        playButton.onClick.AddListener(PlayPress);
-        settingButton.onClick.AddListener(SettingsPress);
-        quitButton.onClick.AddListener(QuitPress);
+        playButton.onClick.AddListener(PlayPressed);
+        settingButton.onClick.AddListener(SettingsPressed);
+        quitButton.onClick.AddListener(QuitPressed);
     }
 
-    void PlayPress()
+    void PlayPressed()
     {
         if (GameManager.GameState != GameState.Menu) return;
-        UIManager.Instance.CharacterSelect.Show();
-        UIManager.OnGoToCharacterSelect?.Invoke(this, System.EventArgs.Empty);
+        GameManager.OnToCharacterSelect?.Invoke(this, System.EventArgs.Empty);
     }
 
-    void SettingsPress()
+    void SettingsPressed()
     {
 
     }
 
-    void QuitPress()
+    void QuitPressed()
     {
 
     }

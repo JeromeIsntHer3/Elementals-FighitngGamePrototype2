@@ -1,10 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class BaseMenuUI : MonoBehaviour
 {
     Canvas canvas;
+    [SerializeField] protected List<AnimatedUIElement> animatedElements = new();
+
+    public List<AnimatedUIElement> AnimatedElements { get { return animatedElements; } }
 
     public void Show()
     {
@@ -23,6 +25,7 @@ public class BaseMenuUI : MonoBehaviour
 
     void Awake()
     {
+        Show();
         canvas = GetComponent<Canvas>();
         Hide();
     }

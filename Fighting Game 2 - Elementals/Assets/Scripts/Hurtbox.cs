@@ -1,15 +1,15 @@
-using UnityEngine;
-
 public class Hurtbox : GameBox
 {
     public void Hit(DamageData damageData)
     {
+        if (GameManager.GameState == GameState.GameOver) return;
         damageData.KnockbackDirection = owner.transform.position - damageData.Source.transform.position;
         owner.OnHit?.Invoke(this, damageData);
     }
 
     public void BlockHit(DamageData damageData)
     {
+        if (GameManager.GameState == GameState.GameOver) return;
         damageData.KnockbackDirection = owner.transform.position - damageData.Source.transform.position;
 
         DamageData dd = damageData;

@@ -1,5 +1,4 @@
 using System;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Ctx = UnityEngine.InputSystem.InputAction.CallbackContext;
@@ -192,7 +191,7 @@ public class CharacterInput : MonoBehaviour
     void PauseGamePerformed(Ctx obj)
     {
         if(GameManager.GameState == GameState.Pause) return;
-        UIManager.OnGamePause?.Invoke(this, playerIndex);
+        GameManager.OnGamePause?.Invoke(this, playerIndex);
     }
 
     public Vector2 CurrentMovementInput()

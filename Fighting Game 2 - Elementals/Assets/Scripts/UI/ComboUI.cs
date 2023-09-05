@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
-using Unity.Burst.Intrinsics;
 using UnityEngine;
 
 public class ComboUI : MonoBehaviour

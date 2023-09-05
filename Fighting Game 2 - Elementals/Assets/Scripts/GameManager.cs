@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -10,16 +9,35 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     public static GameState GameState = GameState.Menu;
 
-    public class OnPlayersReadyArgs : EventArgs
+    #region Events
+
+    public class CharacterInfoArgs : EventArgs
     {
-        public Vector2 PlayerOneSpawnPos;
-        public Vector2 PlayerTwoSpawnPos;
-        public GameObject PlayerOnePrefab;
-        public GameObject PlayerTwoPrefab;
+        public CharacterInfo PlayerOneInfo;
+        public CharacterInfo PlayerTwoInfo;
         public PlayerInput PlayerOneInput;
         public PlayerInput PlayerTwoInput;
     }
-    public static EventHandler<OnPlayersReadyArgs> OnPlayersReady;
+
+    public class OnSelectCharacterArgs : EventArgs
+    {
+        public PlayableCharacter Character;
+        public int PlayerIndex;
+    }
+    public static EventHandler<OnSelectCharacterArgs> OnSelectCharacter;
+    public static EventHandler<OnSelectCharacterArgs> OnConfirmCharacter;
+
+    public static EventHandler OnToMenu;
+    public static EventHandler OnEnterMenu;
+    public static EventHandler OnToCharacterSelect;
+    public static EventHandler OnEnterCharacterSelect;
+    public static EventHandler<CharacterInfoArgs> OnToGame;
+    public static EventHandler OnEnterGame;
+    public static EventHandler<int> OnGamePause;
+
+    #endregion
+
+    #region Static Variables
 
     //Meter
     public static int StartingMeterCount = 2;
@@ -51,6 +69,12 @@ public class GameManager : MonoBehaviour
     public static float OnHitShakeStrengthY = .01f;
     public static int OnHitVibrato = 15;
 
+    //Input Variables
+    public static string UIInput = "UI";
+    public static string PlayerInput = "Player";
+
+    #endregion
+
     readonly Dictionary<int, PlayerInput> playerInputOfPlayer = new();
     readonly Dictionary<int, PlayerInputProxy> playerProxyOfPlayer = new();
     readonly Dictionary<int, GameObject> playerGameObjectOfPlayer = new();
@@ -60,8 +84,8 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        Instance = this;
         Application.targetFrameRate = FrameRate;
+        Instance = this;
         SetGameState(GameState.Menu);
 
         for (int i = 0; i < 2; i++)
@@ -75,46 +99,73 @@ public class GameManager : MonoBehaviour
 
     void OnEnable()
     {
-        OnPlayersReady += PlayerReady;
-        UIManager.OnGoToCharacterSelect += PlayPressed;
-        UIManager.OnGoToMenu += BackToMenu;
+        OnToMenu += GoToMenu;
+        OnToCharacterSelect += GoToCharacterSelect;
+        OnToGame += OnGoToGame;
+        OnGamePause += PauseGame;
     }
 
     void OnDisable()
     {
-        OnPlayersReady -= PlayerReady;
-        UIManager.OnGoToCharacterSelect -= PlayPressed;
-        UIManager.OnGoToMenu -= BackToMenu;
+        OnToMenu -= GoToMenu;
+        OnToCharacterSelect -= GoToCharacterSelect;
+        OnToGame -= OnGoToGame;
+        OnGamePause -= PauseGame;
     }
 
-    void PlayerReady(object sender, OnPlayersReadyArgs args)
+    void OnGoToGame(object sender, CharacterInfoArgs args)
     {
-        SetupCharacter(args.PlayerOneInput, args.PlayerOneSpawnPos, args.PlayerOnePrefab);
-        Vector3 playerTwoSpawn = new(-args.PlayerTwoSpawnPos.x, args.PlayerTwoSpawnPos.y);
-        SetupCharacter(args.PlayerTwoInput, playerTwoSpawn, args.PlayerTwoPrefab);
+        //Spawn Characters
+        SetupCharacter(args.PlayerOneInput, args.PlayerOneInfo.RelativeSpawn, args.PlayerOneInfo.GamePrefab);
+        Vector3 playerTwoSpawn = new(-args.PlayerTwoInfo.RelativeSpawn.x, args.PlayerTwoInfo.RelativeSpawn.y);
+        SetupCharacter(args.PlayerTwoInput, playerTwoSpawn, args.PlayerTwoInfo.GamePrefab);
 
+        //Add Characters to Camera and Disable Input First
         CameraManager.Instance.SetTargetGroup(playerGameObjectOfPlayer[0].transform, playerGameObjectOfPlayer[1].transform);
-        SetGameState(GameState.Game);
         EnablePlayerInput(false);
 
+        //Sub Events of Characters
         GameUI.Instance.SubscribeGameEvents(playerGameObjectOfPlayer[0].GetComponent<BaseCharacter>(),
             playerGameObjectOfPlayer[1].GetComponent<BaseCharacter>());
+        GameUI.Instance.SetupIcons(args.PlayerOneInfo.CharacterIcon, args.PlayerTwoInfo.CharacterIcon);
 
+        //Setup Enemies Between one another
         playerGameObjectOfPlayer[0].GetComponent<BaseCharacter>().SetupCharacter(playerGameObjectOfPlayer[1].GetComponent<BaseCharacter>());
         playerGameObjectOfPlayer[1].GetComponent<BaseCharacter>().SetupCharacter(playerGameObjectOfPlayer[0].GetComponent<BaseCharacter>());
-
+        
+        //Setup variables
         for (int i = 0; i < 2; i++)
         {
             var playerObject = playerGameObjectOfPlayer[i];
 
-            playerObject.GetComponent<BaseCharacterHealth>().SetupHealth(50, 100);
-            playerObject.GetComponent<BaseCharacterAttacks>().SetupMeter(75, 2);
+            playerObject.GetComponent<BaseCharacterHealth>().SetupHealth(100, 100);
+            playerObject.GetComponent<BaseCharacterAttacks>().SetupMeter(50, 2);
         }
-
-        UIManager.OnGoToGame?.Invoke(this, EventArgs.Empty);
     }
 
-    public void SetupCharacter(PlayerInput input, Vector2 position, GameObject prefab)
+    void GoToMenu(object sender, EventArgs args)
+    {
+        if (playerGameObjectOfPlayer[0] == null) return;
+        CameraManager.Instance.ClearTargetGroup(playerGameObjectOfPlayer[0].transform, playerGameObjectOfPlayer[1].transform);
+    }
+
+    void GoToCharacterSelect(object sender, EventArgs args)
+    {
+        if (playerGameObjectOfPlayer[0] == null) return;
+        CameraManager.Instance.ClearTargetGroup(playerGameObjectOfPlayer[0].transform, playerGameObjectOfPlayer[1].transform);
+    }
+
+    void GoToGame(object sender,EventArgs args)
+    {
+
+    }
+
+    void PauseGame(object sender, int pausedBy)
+    {
+
+    }
+
+    void SetupCharacter(PlayerInput input, Vector2 position, GameObject prefab)
     {
         Vector2 spawnPos = position;
 
@@ -123,16 +174,6 @@ public class GameManager : MonoBehaviour
 
         playerGameObjectOfPlayer[input.playerIndex] = player;
         playerSpawnPosition[input.playerIndex] = spawnPos;
-    }
-
-    void PlayPressed(object sender, EventArgs args)
-    {
-
-    }
-
-    void BackToMenu(object sender, EventArgs args)
-    {
-
     }
 
     public void SetupPlayerInputAndProxies(int playerIndex, PlayerInput input)
@@ -144,8 +185,14 @@ public class GameManager : MonoBehaviour
 
     public void ClearPlayerInputAndProxies(int playerIndex)
     {
-        playerInputOfPlayer[playerIndex] = null;
-        playerProxyOfPlayer[playerIndex] = null;
+        playerProxyOfPlayer[playerIndex].SetSelectedObject(null);
+
+        StartCoroutine(Utils.DelayEndFrame(() =>
+        {
+            Destroy(playerInputOfPlayer[playerIndex].gameObject);
+            playerInputOfPlayer[playerIndex] = null;
+            playerProxyOfPlayer[playerIndex] = null;
+        }));
     }
 
     public PlayerInput GetPlayerInput(int index)
@@ -170,6 +217,12 @@ public class GameManager : MonoBehaviour
         playerProxyOfPlayer[1].SetSelectionState(state);
     }
 
+    public void RemovePlayerGameObjects()
+    {
+        Destroy(playerGameObjectOfPlayer[0]);
+        Destroy(playerGameObjectOfPlayer[1]);
+    }
+
     public void SetGameState(GameState state)
     {
         GameState = state;
@@ -180,7 +233,7 @@ public class GameManager : MonoBehaviour
     {
         playerInputOfPlayer[0].enabled = state;
         playerInputOfPlayer[1].enabled = state;
-        if (state) SwitchMapsTo("Player");
+        if (state) SwitchMapsTo(PlayerInput);
     }
 
     public void SwapPlayerInputControlScheme(PlayerInput player, string schemeName, params InputDevice[] devices)
@@ -194,7 +247,7 @@ public class GameManager : MonoBehaviour
         {
             playerGameObjectOfPlayer[i].transform.position = playerSpawnPosition[i];
             playerGameObjectOfPlayer[i].GetComponent<BaseCharacterAnimator>().SetDeathFalse();
-            playerGameObjectOfPlayer[i].GetComponent<BaseCharacterAttacks>().SetupMeter(100, 2);
+            playerGameObjectOfPlayer[i].GetComponent<BaseCharacterAttacks>().SetupMeter(50, 2);
             playerGameObjectOfPlayer[i].GetComponent<BaseCharacterHealth>().SetupHealth(100, 100);
         }
     }

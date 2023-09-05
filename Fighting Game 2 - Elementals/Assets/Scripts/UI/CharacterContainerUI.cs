@@ -1,31 +1,23 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using TMPro;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class CharacterContainerUI : MonoBehaviour
 {
-    public string pb_CharacterName;
-    public CharacterInfo pb_Info;
-    [SerializeField] UIManager manager;
-    [SerializeField] Image indicator1, indicator2;
+    [SerializeField] CharacterInfo characterInfo;
+    [SerializeField] List<Image> indicators;
 
     Button containerButton;
     ColorBlock originalBlock;
     int selectedCount;
 
-    Dictionary<int, Image> indicator = new();
+    public CharacterInfo Info { get { return characterInfo; } }
+
 
     void Start()
     {
         containerButton = GetComponent<Button>();
         originalBlock = containerButton.colors;
-        indicator.Add(0, indicator1);
-        indicator.Add(1, indicator2);
     }
 
     public void Select(ColorBlock color, int index)
@@ -33,7 +25,7 @@ public class CharacterContainerUI : MonoBehaviour
         if(selectedCount == 0)
         {
             containerButton.colors = color;
-            indicator[index].gameObject.SetActive(true);
+            indicators[index].gameObject.SetActive(true);
         }
         else if(selectedCount == 1)
         {
@@ -42,8 +34,8 @@ public class CharacterContainerUI : MonoBehaviour
                 colorMultiplier = 3,
                 normalColor = Color.magenta
             };
-            indicator[0].gameObject.SetActive(true);
-            indicator[1].gameObject.SetActive(true);
+            indicators[0].gameObject.SetActive(true);
+            indicators[1].gameObject.SetActive(true);
         }
 
         selectedCount++;
@@ -54,7 +46,7 @@ public class CharacterContainerUI : MonoBehaviour
         if(selectedCount == 1)
         {
             containerButton.colors = originalBlock;
-            foreach(var ind in indicator.Values)
+            foreach(var ind in indicators)
             {
                 ind.gameObject.SetActive(false);
             }
@@ -63,13 +55,13 @@ public class CharacterContainerUI : MonoBehaviour
         {
             if(index == 0)
             {
-                //containerButton.colors = MenuSceneManager.Instance.GetColorBlock(1);
-                indicator[0].gameObject.SetActive(false);
+                indicators[0].gameObject.SetActive(false);
+                containerButton.colors = CharacterSelectMenuUI.Instance.PlayerTwoColorBlock;
             }
             else
             {
-                //containerButton.colors = MenuSceneManager.Instance.GetColorBlock(0);
-                indicator[1].gameObject.SetActive(false);
+                indicators[1].gameObject.SetActive(false);
+                containerButton.colors = CharacterSelectMenuUI.Instance.PlayerOneColorBlock;
             }
         }
         

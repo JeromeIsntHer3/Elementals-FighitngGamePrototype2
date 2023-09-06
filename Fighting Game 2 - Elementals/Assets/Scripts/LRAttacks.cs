@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class LRAttacks : BaseCharacterAttacks
 {
@@ -48,11 +49,13 @@ public class LRAttacks : BaseCharacterAttacks
     public void ShootArrow()
     {
         CreateArrow(arrowSpawn.position, IsFacingLeft ? Vector2.left : Vector2.right, arrowSpeed, 5f);
+        AudioManager.Instance.PlayOneShot(FModEvents.Instance.LFShootArrow, arrowSpawn.position);
         if (!enhance) return;
         enhance = false;
         CreateArrow(new Vector2(arrowSpawn.position.x, arrowSpawn.position.y + .1f), 
             IsFacingLeft ? Vector2.left : Vector2.right, arrowSpeed,
             5f, true);
+        AudioManager.Instance.PlayOneShot(FModEvents.Instance.LFShootArrow, arrowSpawn.position);
         CreateArrow(new Vector2(arrowSpawn.position.x, arrowSpawn.position.y - .1f),
             IsFacingLeft ? Vector2.left : Vector2.right, arrowSpeed,
             5f, true);

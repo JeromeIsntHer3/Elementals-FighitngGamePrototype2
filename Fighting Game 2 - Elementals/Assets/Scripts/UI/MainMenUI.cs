@@ -32,6 +32,6 @@ public class MainMenuUI : BaseMenuUI
 
     void QuitPressed()
     {
-
+        Application.Quit();
     }
 }

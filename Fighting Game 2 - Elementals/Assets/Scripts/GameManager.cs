@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour
     public static EventHandler<CharacterInfoArgs> OnToGame;
     public static EventHandler OnEnterGame;
     public static EventHandler<int> OnGamePause;
+    public static EventHandler OnToSettings;
 
     #endregion
 

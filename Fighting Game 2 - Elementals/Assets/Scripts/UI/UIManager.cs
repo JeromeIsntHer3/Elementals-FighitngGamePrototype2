@@ -15,6 +15,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] CharacterSelectMenuUI characterSelectUI;
     [SerializeField] GameUI gameUI;
     [SerializeField] PauseMenuUI pauseUI;
+    [SerializeField] SettingsUI settingsUI;
 
     #region Getter & Setters
 
@@ -60,6 +61,8 @@ public class UIManager : MonoBehaviour
     {
         CameraManager.Instance.SetMenuCams();
         mainMenuUI.Show();
+
+        AudioManager.Instance.SetBGM(LevelBGM.MainMenu);
 
         switch (GameManager.GameState)
         {
@@ -111,6 +114,8 @@ public class UIManager : MonoBehaviour
         CameraManager.Instance.SetCharacterSelectCams();
         characterSelectUI.Show();
 
+        AudioManager.Instance.SetBGM(LevelBGM.CharacterSelect);
+
         switch (GameManager.GameState)
         {
             case GameState.Menu:
@@ -154,6 +159,8 @@ public class UIManager : MonoBehaviour
     {
         CameraManager.Instance.SetGameCams();
         gameUI.Show();
+
+        AudioManager.Instance.SetBGM(LevelBGM.Battle);
 
         switch (GameManager.GameState)
         {

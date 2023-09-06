@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 
 public class UserInterfaceUtils : MonoBehaviour
@@ -12,15 +13,16 @@ public class UserInterfaceUtils : MonoBehaviour
         Instance = this;
     }
 
-    public void SelectNew(Button button)
+    public void SelectNew(Button button, MultiplayerEventSystem mes, GameObject root)
     {
-        StartCoroutine(DelaySelect(button));
+        StartCoroutine(DelaySelect(button, mes, root));
     }
 
-    IEnumerator DelaySelect(Button button)
+    IEnumerator DelaySelect(Button button, MultiplayerEventSystem mes, GameObject root)
     {
-        EventSystem.current.SetSelectedGameObject(null);
+        mes.SetSelectedGameObject(null);
+        mes.playerRoot = root;
         yield return new WaitForEndOfFrame();
-        button.Select();
+        mes.SetSelectedGameObject(button.gameObject);
     }
 }

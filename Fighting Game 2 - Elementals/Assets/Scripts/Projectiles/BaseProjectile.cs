@@ -47,15 +47,19 @@ public class BaseProjectile : MonoBehaviour
                 if (owner.IsFacingLeft && hurtbox.BoxOwner.IsFacingLeft)
                 {
                     hurtbox.Hit(damageData);
+                    AudioManager.Instance.PlayOneShot(FModEvents.Instance.Hit, spawnPoint);
                     owner.OnHitEnemy?.Invoke(this, hurtbox.BoxOwner);
                     hurtbox.BoxOwner.OnBlockCanceled?.Invoke(this, System.EventArgs.Empty);
                     return;
                 }
 
+                AudioManager.Instance.PlayOneShot(FModEvents.Instance.BlockHit, spawnPoint);
                 owner.OnHitBlocked?.Invoke(this, hurtbox.BoxOwner);
                 hurtbox.BlockHit(damageData);
                 return;
             }
+
+            AudioManager.Instance.PlayOneShot(FModEvents.Instance.Hit, spawnPoint);
             owner.OnHitEnemy?.Invoke(this, hurtbox.BoxOwner);
             hurtbox.Hit(damageData);
         }

@@ -244,7 +244,7 @@ TextureImporter:
         width: 48
         height: 22
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 6, y: 7, z: 6, w: 7}
       outline: []
       physicsShape: []
@@ -252,6 +252,48 @@ TextureImporter:
       bones: []
       spriteID: 797125197737423449bdef7a927e650a
       internalID: -862095631
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_Left
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 291
+        width: 9
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d9745b193f023ff4abd5e1dc67e402c4
+      internalID: -935521234
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_Right
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 291
+        width: 9
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c5253a7e717b0ae4a842534c6cfcbc4f
+      internalID: 334576311
       vertices: []
       indices: 
       edges: []
@@ -273,6 +315,8 @@ TextureImporter:
       FK_Heat2: -862095631
       Health_Red: 2711620
       UI_FK_Heat: -286724534
+      UI_Left: -935521234
+      UI_Right: 334576311
       Wood_HealthContainer: 391353997
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0

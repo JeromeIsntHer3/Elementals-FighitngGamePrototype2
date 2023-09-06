@@ -68,6 +68,7 @@ public class FKAttacks : BaseCharacterAttacks
 
     void OnAttack1(object sender, EventArgs args)
     {
+        AudioManager.Instance.PlayOneShot(FModEvents.Instance.FKSwordSlash, slashSpawn.position);
         if (!option) return;
         currentHeatValue -= attack1Drain;
         heatBar.SetHeatMeterValue(currentHeatValue / maxHeatValue);
@@ -116,7 +117,7 @@ public class FKAttacks : BaseCharacterAttacks
 
         DamageData data = GetDamageData(AttackType.One);
         data.Enhanced = true;
-        if(option) data.Damage *= heatMultipler;
+        if (option) data.Damage *= heatMultipler;
 
         slash.SetupFireball(data, character, IsFacingLeft,
             IsFacingLeft ? Vector2.left : Vector2.right, discSpeed, .25f, true);
@@ -143,5 +144,10 @@ public class FKAttacks : BaseCharacterAttacks
         explosion.SetupFireball(data, character, IsFacingLeft, 
             Vector2.zero, 0, .5f);
         enhance = false;
+    }
+
+    public void PlaySlashSound()
+    {
+        AudioManager.Instance.PlayOneShot(FModEvents.Instance.FKSwordSlash, slashSpawn.position);
     }
 }

@@ -17,11 +17,20 @@ public class CharacterAnimationSO : ScriptableObject
         }
     }
 
+    public void InitializeHashes()
+    {
+        foreach (CharacterAnimation animation in CharacterAnimations)
+        {
+            int hash = Animator.StringToHash(animation.Clip.name);
+            animation.SetHash(hash);
+        }
+    }
+
     public void AddToCanChangeDirectionDict(Dictionary<AnimationType, bool> changeDirectionDict)
     {
         foreach(CharacterAnimation animation in CharacterAnimations)
         {
-            changeDirectionDict.Add(animation.Type, animation.canChangeFaceDirection);
+            changeDirectionDict.Add(animation.Type, animation.CanChangeFaceDirection);
         }
     }
 
@@ -37,7 +46,7 @@ public class CharacterAnimationSO : ScriptableObject
     {
         foreach(CharacterAnimation animation in CharacterAnimations)
         {
-            fullyAnimateDict.Add(animation.Type, animation.FullyAnimate);
+            fullyAnimateDict.Add(animation.Type, animation.IsFullyAnimated);
         }
     }
 

@@ -13,7 +13,7 @@ public class CharacterAnimationEditor : PropertyDrawer
         var root = new VisualElement();
 
         var animTypeEnum = new PropertyField(property.FindPropertyRelative("Type"));
-        var canChange = new PropertyField(property.FindPropertyRelative("canChangeFaceDirection"));
+        var canChange = new PropertyField(property.FindPropertyRelative("CanChangeFaceDirection"));
         var animationClip = new PropertyField(property.FindPropertyRelative("Clip"));
         
 
@@ -28,7 +28,7 @@ public class CharacterAnimationEditor : PropertyDrawer
         fold.Add(canChange);
         fold.Add(animationClip);
         //fold.Add(new PropertyField(property.FindPropertyRelative("AnimationCondition")));
-        fold.Add(new PropertyField(property.FindPropertyRelative("FullyAnimate")));
+        fold.Add(new PropertyField(property.FindPropertyRelative("IsFullyAnimated")));
         //fold.Add(clipInspector);
         root.Add(fold);
 

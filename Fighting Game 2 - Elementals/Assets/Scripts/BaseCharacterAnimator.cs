@@ -12,7 +12,7 @@ public class BaseCharacterAnimator : MonoBehaviour
     protected SpriteRenderer spriteRenderer;
 
     readonly Dictionary<AnimationType, int> animationHashes = new();
-    readonly Dictionary<AnimationType, bool> animationCanChangeFaceDirection = new();
+    readonly Dictionary<AnimationType, bool> animationCanChangeFaceDirection = new Dictionary<AnimationType, bool>();
     readonly Dictionary<AnimationType, bool> animationFullyAnimate = new();
     readonly Dictionary<AnimationType, bool> animCond = new();
 

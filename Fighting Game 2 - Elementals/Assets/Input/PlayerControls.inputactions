@@ -93,7 +93,7 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Cancel",
@@ -115,39 +115,6 @@
                 }
             ],
             "bindings": [
-                {
-                    "name": "2D Vector",
-                    "id": "2a365952-dacb-4103-8360-7d3077441124",
-                    "path": "2DVector(mode=2)",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Movement",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "left",
-                    "id": "804823e3-a459-4fb0-808f-4b1c130f24c5",
-                    "path": "<Keyboard>/a",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard",
-                    "action": "Movement",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "right",
-                    "id": "b155a9cb-78b5-4c99-9d70-10a289f86405",
-                    "path": "<Keyboard>/d",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard",
-                    "action": "Movement",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
                 {
                     "name": "2D Vector",
                     "id": "b66d2f98-b0cd-4141-b2dc-6ddf72931839",
@@ -182,9 +149,64 @@
                     "isPartOfComposite": true
                 },
                 {
+                    "name": "2D Vector",
+                    "id": "21a90730-6fef-4d01-befb-1d239704847d",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Movement",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "58aa9036-9f72-4593-86d4-1157afc9459b",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "bc4469fb-7d9a-48df-862b-8cb30de970ac",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "f9d89f2c-25ac-45a0-b3ad-ad495d582610",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "3e905ae8-2f2b-44fa-9761-230aeea04e7b",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Movement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
                     "name": "",
                     "id": "53a9c9b8-acae-4e5f-a5c1-ce91f30a6f43",
-                    "path": "<Keyboard>/j",
+                    "path": "<Keyboard>/u",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
@@ -206,7 +228,7 @@
                 {
                     "name": "",
                     "id": "b483105e-b924-4faa-b742-0438b8f26f0b",
-                    "path": "<Keyboard>/k",
+                    "path": "<Keyboard>/i",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
@@ -228,7 +250,7 @@
                 {
                     "name": "",
                     "id": "3159a826-3b65-48ed-b82a-34b07e8306b5",
-                    "path": "<Keyboard>/l",
+                    "path": "<Keyboard>/j",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
@@ -250,7 +272,7 @@
                 {
                     "name": "",
                     "id": "4c9378b5-c1b0-4aec-a450-7e48ab179934",
-                    "path": "<Keyboard>/semicolon",
+                    "path": "<Keyboard>/k",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
@@ -272,7 +294,7 @@
                 {
                     "name": "",
                     "id": "1c2c27c0-2111-4b6b-ba27-c73118013b38",
-                    "path": "<Keyboard>/p",
+                    "path": "<Keyboard>/y",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
@@ -316,7 +338,7 @@
                 {
                     "name": "",
                     "id": "c90cbcc4-2951-4510-8d5e-2f50ef25ed7c",
-                    "path": "<Keyboard>/i",
+                    "path": "<Keyboard>/p",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
@@ -338,7 +360,7 @@
                 {
                     "name": "",
                     "id": "e23de745-02d8-4450-8728-68aab559d481",
-                    "path": "<Keyboard>/h",
+                    "path": "<Keyboard>/l",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
@@ -360,7 +382,7 @@
                 {
                     "name": "",
                     "id": "d3a71646-71d4-416f-ada8-7fa2587f5e89",
-                    "path": "<Keyboard>/u",
+                    "path": "<Keyboard>/h",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",

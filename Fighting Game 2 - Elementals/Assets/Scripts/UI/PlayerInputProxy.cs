@@ -60,7 +60,10 @@ public class PlayerInputProxy : MonoBehaviour
 
     public void SetEventSystemState(bool state)
     {
-        currentSystem.gameObject.SetActive(state);
+        StartCoroutine(Utils.DelayEndFrame(() =>
+        {
+            currentSystem.gameObject.SetActive(state);
+        }));
     }
 
     public void SetEventSystem(MultiplayerEventSystem system)
@@ -75,7 +78,16 @@ public class PlayerInputProxy : MonoBehaviour
 
     public void SetSelectedObject(GameObject gameObject)
     {
-        currentSystem.SetSelectedGameObject(gameObject);
+        currentSystem.SetSelectedGameObject(null);
+        StartCoroutine(Utils.DelayEndFrame(() =>
+        {
+            currentSystem.SetSelectedGameObject(gameObject);
+        }));
+    }
+
+    public void SetRootObject(GameObject gameObject)
+    {
+        currentSystem.playerRoot = gameObject;
     }
 
     public GameObject Selected()

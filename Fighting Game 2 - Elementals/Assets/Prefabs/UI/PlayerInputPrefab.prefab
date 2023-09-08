@@ -185,6 +185,7 @@ MonoBehaviour:
   mauler: {fileID: 1976764630726633019}
   es: {fileID: 2146944773183588392}
   canvas: {fileID: 2738017024694389371}
+  currentSystem: {fileID: 0}
 --- !u!1 &2728862377378240701
 GameObject:
   m_ObjectHideFlags: 0

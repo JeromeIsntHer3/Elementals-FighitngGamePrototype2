@@ -16,6 +16,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameUI gameUI;
     [SerializeField] PauseMenuUI pauseUI;
     [SerializeField] SettingsUI settingsUI;
+    [SerializeField] GameOverMenuUI gameOverUI;
 
     #region Getter & Setters
 
@@ -33,11 +34,23 @@ public class UIManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
+
+        mainMenuUI.gameObject.SetActive(true);
+        characterSelectUI.gameObject.SetActive(true);
+        gameUI.gameObject.SetActive(true);
+        pauseUI.gameObject.SetActive(true);
+        settingsUI.gameObject.SetActive(true);
+        gameOverUI.gameObject.SetActive(true);
     }
 
     void Start()
     {
         CameraManager.Instance.SetMenuCams();
+        characterSelectUI.Hide();
+        gameUI.Hide();
+        pauseUI.Hide();
+        settingsUI.Hide();
+        gameOverUI.Hide();
         mainMenuUI.Show();
     }
 
@@ -47,6 +60,7 @@ public class UIManager : MonoBehaviour
         GameManager.OnToCharacterSelect += OnGoToCharSelect;
         GameManager.OnGamePause += GamePaused;
         GameManager.OnToGame += OnGoToGame;
+        GameManager.OnGameOver += OnGameOver;
     }
 
     void OnDisable()
@@ -55,6 +69,7 @@ public class UIManager : MonoBehaviour
         GameManager.OnToCharacterSelect -= OnGoToCharSelect;
         GameManager.OnGamePause -= GamePaused;
         GameManager.OnToGame -= OnGoToGame;
+        GameManager.OnGameOver -= OnGameOver;
     }
 
     void OnGoToMainMenu(object sender, EventArgs args)
@@ -106,6 +121,26 @@ public class UIManager : MonoBehaviour
                 });
 
                 break;
+
+            case GameState.GameOver:
+
+                GameManager.Instance.RemovePlayerGameObjects();
+                GameManager.Instance.ClearPlayerInputAndProxies(0);
+                GameManager.Instance.ClearPlayerInputAndProxies(1);
+                AnimateUIElementsTransition(gameOverUI.AnimatedElements, mainMenuUI.AnimatedElements, sequence, () =>
+                {
+                    menuEventSystem.gameObject.SetActive(true);
+                    menuEventSystem.playerRoot = mainMenuUI.gameObject;
+                    menuEventSystem.SetSelectedGameObject(null);
+                    StartCoroutine(Utils.DelayEndFrame(() =>
+                    {
+                        menuEventSystem.SetSelectedGameObject(mainMenuUI.PlayButton.gameObject);
+                        gameUI.Hide();
+                        GameManager.Instance.SetGameState(GameState.Menu);
+                    }));
+                });
+
+                break;
         }
     }
 
@@ -152,6 +187,21 @@ public class UIManager : MonoBehaviour
                 });
 
                 break;
+
+            case GameState.GameOver:
+
+                GameManager.Instance.RemovePlayerGameObjects();
+                GameManager.Instance.ClearPlayerInputAndProxies(0);
+                GameManager.Instance.ClearPlayerInputAndProxies(1);
+
+                AnimateUIElementsTransition(gameUI.AnimatedElements, characterSelectUI.AnimatedElements, sequence, () =>
+                {
+                    GameManager.OnEnterCharacterSelect.Invoke(this, EventArgs.Empty);
+                    gameUI.Hide();
+                    GameManager.Instance.SetGameState(GameState.CharacterSelect);
+                });
+
+                break;
         }
     }
 
@@ -166,6 +216,7 @@ public class UIManager : MonoBehaviour
         {
             case GameState.CharacterSelect:
 
+                //GameManager.OnToGame?.Invoke(this, EventArgs.Empty);
                 AnimateUIElementsTransition(characterSelectUI.AnimatedElements, gameUI.AnimatedElements, sequence, () =>
                 {
                     characterSelectUI.Hide();
@@ -175,6 +226,25 @@ public class UIManager : MonoBehaviour
 
                 break;
         }
+    }
+
+    void OnGameOver(object sender, EventArgs args)
+    {
+        gameOverUI.Show();
+        AnimateUIElementsTransition(gameUI.AnimatedElements, gameOverUI.AnimatedElements, sequence, () =>
+        {
+            gameUI.Hide();
+            GameManager.Instance.EnablePlayerInput(true);
+            GameManager.Instance.SwitchMapsTo(GameManager.UIInput);
+            //Setup Proxies to select their canvases
+            
+            for(int i = 0; i < 2; i++)
+            {
+                GameOverUISide playerOneSide = gameOverUI.GetUISide(i);
+                GameManager.Instance.GetPlayerProxy(i).SetRootObject(playerOneSide.RootObject);
+                GameManager.Instance.GetPlayerProxy(i).SetSelectedObject(playerOneSide.SelectObject);
+            }
+        });
     }
 
     void GamePaused(object sender, int index)
@@ -190,11 +260,7 @@ public class UIManager : MonoBehaviour
         group.DOFade(1, .3f);
         menuEventSystem.gameObject.SetActive(true);
         GameManager.Instance.GetPlayerProxy(index).SetEventSystem(menuEventSystem);
-        GameManager.Instance.GetPlayerProxy(index).SetSelectedObject(null);
-        StartCoroutine(Utils.DelayEndFrame(() =>
-        {
-            GameManager.Instance.GetPlayerProxy(index).SetSelectedObject(pauseUI.ResumeButton.gameObject);
-        }));
+        GameManager.Instance.GetPlayerProxy(index).SetSelectedObject(pauseUI.ResumeButton.gameObject);
         pauseIndex = index;
         GameManager.Instance.SetGameState(GameState.Pause);
     }

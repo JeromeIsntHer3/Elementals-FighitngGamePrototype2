@@ -42,7 +42,7 @@ public class GameUI : BaseMenuUI
     bool isGameRunning;
     bool isTimeOut;
     float currentTime;
-    int round = 1;
+    int round = 0;
     int playerLostIndex = -1;
     bool aPlayerWon;
 
@@ -62,14 +62,12 @@ public class GameUI : BaseMenuUI
 
     void OnEnable()
     {
-        GameManager.OnToGame += OnGoToGame;
         GameManager.OnEnterGame += OnEnterGame;
         OnPlayerDeath += PlayerDeath;
     }
 
     void OnDisable()
     {
-        GameManager.OnToGame -= OnGoToGame;
         GameManager.OnEnterGame -= OnEnterGame;
         OnPlayerDeath -= PlayerDeath;
     }
@@ -92,14 +90,10 @@ public class GameUI : BaseMenuUI
         UpdateTimerText();
     }
 
-    void OnGoToGame(object sender, EventArgs args)
+    void OnEnterGame(object sender, EventArgs args)
     {
         currentTime = countdownDuration;
         UpdateTimerText();
-    }
-
-    void OnEnterGame(object sender, EventArgs args)
-    {
         StartRoundCR = StartCoroutine(RoundStartCountdown());
     }
 
@@ -159,7 +153,7 @@ public class GameUI : BaseMenuUI
         GameManager.Instance.SetGameState(GameState.Game);
         yield return new WaitForSeconds(1);
         centreText.gameObject.SetActive(true);
-        centreText.text = "ROUND " + round;
+        centreText.text = "ROUND " + round + 1;
         yield return new WaitForSeconds(1);
         centreText.text = "READY?";
         yield return new WaitForSeconds(1);
@@ -183,16 +177,16 @@ public class GameUI : BaseMenuUI
             {
                 case 0:
                     color = CharacterSelectMenuUI.Instance.PlayerOneColor;
-                    scoreList[round - 1].SetColor(color);
+                    scoreList[round].SetColor(color);
                     playerWins[0]++;
                     break;
                 case 1:
                     color = CharacterSelectMenuUI.Instance.PlayerTwoColor;
-                    scoreList[round - 1].SetColor(color);
+                    scoreList[round].SetColor(color);
                     playerWins[1]++;
                     break;
                 case -1:
-                    scoreList[round - 1].SetColor(Color.magenta);
+                    scoreList[round].SetColor(Color.magenta);
                     playerWins[0]++;
                     playerWins[1]++;
                     break;
@@ -204,16 +198,16 @@ public class GameUI : BaseMenuUI
             {
                 case 1:
                     color = CharacterSelectMenuUI.Instance.PlayerOneColor;
-                    scoreList[round - 1].SetColor(color);
+                    scoreList[round].SetColor(color);
                     playerWins[0]++;
                     break;
                 case 0:
                     color = CharacterSelectMenuUI.Instance.PlayerTwoColor;
-                    scoreList[round - 1].SetColor(color);
+                    scoreList[round].SetColor(color);
                     playerWins[1]++;
                     break;
                 case -1:
-                    scoreList[round - 1].SetColor(Color.magenta);
+                    scoreList[round].SetColor(Color.magenta);
                     playerWins[0]++;
                     playerWins[1]++;
                     break;
@@ -226,7 +220,7 @@ public class GameUI : BaseMenuUI
     IEnumerator RoundOverSequence()
     {
         GameManager.Instance.SetGameState(GameState.GameOver);
-        scoreList[round - 1].Show(true);
+        scoreList[round].Show(true);
         round++;
         centreText.gameObject.SetActive(true);
         centreText.text = "K.O.";
@@ -235,7 +229,7 @@ public class GameUI : BaseMenuUI
         centreText.text = "";
         yield return new WaitForSeconds(1f);
 
-        if (round - 1 >= 2)
+        if (round >= 2)
         {
             bool bothPlayersWin = playerWins[0] >= 2 && playerWins[1] >= 2;
             if (bothPlayersWin)
@@ -265,7 +259,20 @@ public class GameUI : BaseMenuUI
         yield return new WaitForSeconds(1);
         centreText.text = gameOverText;
         yield return new WaitForSeconds(1);
-        Debug.Log("Open GameOver Menu");
+        GameManager.OnGameOver?.Invoke(this, EventArgs.Empty);
+        ResetValues();
+    }
+
+    void ResetValues()
+    {
+        round = 0;
+        playerWins[0] = 0;
+        playerWins[1] = 0;
+        foreach(var score in scoreList)
+        {
+            score.SetColor(Color.white);
+            score.Show(false);
+        }
     }
 
     public void StopGame()

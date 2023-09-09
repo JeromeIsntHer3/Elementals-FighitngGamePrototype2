@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
     public static EventHandler<int> OnGamePause;
     public static EventHandler OnToSettings;
     public static EventHandler OnGameOver;
+    public static EventHandler OnGameRematch;
 
     #endregion
 
@@ -132,8 +133,8 @@ public class GameManager : MonoBehaviour
         GameUI.Instance.SetupIcons(args.PlayerOneInfo.CharacterIcon, args.PlayerTwoInfo.CharacterIcon);
 
         //Setup Enemies Between one another
-        playerGameObjectOfPlayer[0].GetComponent<BaseCharacter>().SetupCharacter(playerGameObjectOfPlayer[1].GetComponent<BaseCharacter>());
-        playerGameObjectOfPlayer[1].GetComponent<BaseCharacter>().SetupCharacter(playerGameObjectOfPlayer[0].GetComponent<BaseCharacter>());
+        playerGameObjectOfPlayer[0].GetComponent<BaseCharacter>().SetupCharacter(playerGameObjectOfPlayer[1].GetComponent<BaseCharacter>(), 0);
+        playerGameObjectOfPlayer[1].GetComponent<BaseCharacter>().SetupCharacter(playerGameObjectOfPlayer[0].GetComponent<BaseCharacter>(), 1);
         
         //Setup variables
         for (int i = 0; i < 2; i++)
@@ -251,6 +252,11 @@ public class GameManager : MonoBehaviour
             playerGameObjectOfPlayer[i].GetComponent<BaseCharacterAnimator>().SetDeathFalse();
             playerGameObjectOfPlayer[i].GetComponent<BaseCharacterAttacks>().SetupMeter(50, 2);
             playerGameObjectOfPlayer[i].GetComponent<BaseCharacterHealth>().SetupHealth(100, 100);
+
+            if (playerGameObjectOfPlayer[i].TryGetComponent(out FKAttacks fkAttacks))
+            {
+                fkAttacks.SetFKValue(0);
+            }
         }
     }
 

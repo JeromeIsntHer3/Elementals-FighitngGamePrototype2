@@ -12,6 +12,7 @@ public class BaseCharacter : MonoBehaviour
 
 
     int comboHit = 0;
+    int playerIndex;
     float recoveryTime;
     float stunTilTime;
     float currentDamageReductionPercentage;
@@ -78,10 +79,16 @@ public class BaseCharacter : MonoBehaviour
         animationData.AddToDuration(animationDuration);
     }
 
-    public void SetupCharacter(BaseCharacter enemy)
+    public void SetupCharacter(BaseCharacter enemy, int index)
     {
         this.enemy = enemy;
         enemyAttacks = enemy.GetComponent<BaseCharacterAttacks>();
+        playerIndex = index;
+
+        if(TryGetComponent(out FKAttacks fireknightAttacks))
+        {
+            fireknightAttacks.SetupFKHeatbar(playerIndex);
+        }
     }
 
     void OnEnable()

@@ -461,15 +461,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Cancel",
-                    "type": "Button",
-                    "id": "2d3fb2d6-4fb7-4846-870c-f33b99f3b4b1",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Submit",
                     "type": "Button",
                     "id": "b8234edc-7f01-4699-b9ba-6dd930fdd017",
@@ -767,7 +758,7 @@
                 {
                     "name": "",
                     "id": "e31c9fc6-a3df-4a1e-9d59-c043b18a7297",
-                    "path": "<Keyboard>/k",
+                    "path": "<Keyboard>/j",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
@@ -777,19 +768,8 @@
                 },
                 {
                     "name": "",
-                    "id": "ab61febf-f91c-426e-959c-198624bce4d7",
-                    "path": "*/{Cancel}",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Cancel",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "4ed4f6a8-bf55-4120-99d8-10000ff207f0",
-                    "path": "<Keyboard>/l",
+                    "path": "<Keyboard>/k",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",

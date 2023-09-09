@@ -613,19 +613,12 @@ MonoBehaviour:
   attacksData: {fileID: 11400000, guid: 5514a620f7362bf41a2b312920e3e181, type: 2}
   hitboxes: {fileID: 1299453400927659162}
   heatBar: {fileID: 8680804333047858680}
-  maxHeatValue: 0
-  currentHeatValue: 200
-  drainSpeed: 2.5
-  gainPerHit: 5
-  heatMultipler: 1.5
+  maxHeatValue: 100
+  currentHeatValue: 0
+  drainAmount: 7
+  gainAmount: 5
+  heatDamageMultiplier: 1.5
   fireslashPrefab: {fileID: -5101445385543251880, guid: 61a6b3c87fc78a343bb30a83d097f766, type: 3}
-  fireSlashSound:
-    Guid:
-      Data1: 839655336
-      Data2: 1145280465
-      Data3: 796526984
-      Data4: -1622572377
-    Path: event:/Slash
   slashSpawn: {fileID: 7623891967480595959}
   attack1Drain: 10
   firediscPrefab: {fileID: 5337433291930495243, guid: c76ba8a3d5ca809458f5666e5ecf9c70, type: 3}
@@ -1488,7 +1481,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   barFillImage: {fileID: 705901872656353482}
-  positionalValue: {x: 0, y: 0}
 --- !u!1 &8488041520038586966
 GameObject:
   m_ObjectHideFlags: 0

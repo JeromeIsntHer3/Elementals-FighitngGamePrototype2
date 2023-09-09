@@ -140,20 +140,20 @@ public class GameUI : BaseMenuUI
         timerText.text = currentTime.ToString("0");
     }
 
-    void ResetUI()
+    public void ResetStage()
     {
         currentTime = countdownDuration;
         UpdateTimerText();
         GameManager.Instance.ResetPlayers();
         StartRoundCR = StartCoroutine(RoundStartCountdown());
-    }   
+    }
 
     IEnumerator RoundStartCountdown()
     {
         GameManager.Instance.SetGameState(GameState.Game);
         yield return new WaitForSeconds(1);
         centreText.gameObject.SetActive(true);
-        centreText.text = "ROUND " + round + 1;
+        centreText.text = "ROUND " + (round + 1);
         yield return new WaitForSeconds(1);
         centreText.text = "READY?";
         yield return new WaitForSeconds(1);
@@ -250,7 +250,7 @@ public class GameUI : BaseMenuUI
             if (aPlayerWon) yield break;
         }
 
-        ResetUI();
+        ResetStage();
     }
 
     IEnumerator GameOverSequence(string gameOverText)
@@ -273,6 +273,7 @@ public class GameUI : BaseMenuUI
             score.SetColor(Color.white);
             score.Show(false);
         }
+        centreText.text = "";
     }
 
     public void StopGame()
@@ -282,11 +283,5 @@ public class GameUI : BaseMenuUI
         if(GameOverCR != null) StopCoroutine(GameOverCR);
 
         isGameRunning = false;
-        //for(int i = 0; i < 2; i++)
-        //{
-        //    Destroy(GameManager.Instance.GetPlayerProxy(i).gameObject);
-        //    GameManager.Instance.ClearPlayerInputAndProxies(i);
-        //}
-        //GameManager.Instance.RemovePlayerGameObjects();
     }
 }

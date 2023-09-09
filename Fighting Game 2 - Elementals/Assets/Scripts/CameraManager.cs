@@ -78,7 +78,6 @@ public class CameraManager : MonoBehaviour
 
     public void ClearTargetGroup(params Transform[] targets)
     {
-        Debug.Log("Clear Targets");
         foreach (Transform t in targets)
         {
             if (t == null) return;

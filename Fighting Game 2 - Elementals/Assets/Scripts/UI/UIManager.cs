@@ -61,6 +61,7 @@ public class UIManager : MonoBehaviour
         GameManager.OnGamePause += GamePaused;
         GameManager.OnToGame += OnGoToGame;
         GameManager.OnGameOver += OnGameOver;
+        GameManager.OnGameRematch += OnGoToGame;
     }
 
     void OnDisable()
@@ -70,6 +71,7 @@ public class UIManager : MonoBehaviour
         GameManager.OnGamePause -= GamePaused;
         GameManager.OnToGame -= OnGoToGame;
         GameManager.OnGameOver -= OnGameOver;
+        GameManager.OnGameRematch += OnGoToGame;
     }
 
     void OnGoToMainMenu(object sender, EventArgs args)
@@ -194,10 +196,10 @@ public class UIManager : MonoBehaviour
                 GameManager.Instance.ClearPlayerInputAndProxies(0);
                 GameManager.Instance.ClearPlayerInputAndProxies(1);
 
-                AnimateUIElementsTransition(gameUI.AnimatedElements, characterSelectUI.AnimatedElements, sequence, () =>
+                AnimateUIElementsTransition(gameOverUI.AnimatedElements, characterSelectUI.AnimatedElements, sequence, () =>
                 {
                     GameManager.OnEnterCharacterSelect.Invoke(this, EventArgs.Empty);
-                    gameUI.Hide();
+                    gameOverUI.Hide();
                     GameManager.Instance.SetGameState(GameState.CharacterSelect);
                 });
 
@@ -224,6 +226,13 @@ public class UIManager : MonoBehaviour
                     GameManager.Instance.SetGameState(GameState.Game);
                 });
 
+                break;
+            case GameState.GameOver:
+                gameUI.ResetStage();
+                AnimateUIElementsTransition(gameOverUI.AnimatedElements, gameUI.AnimatedElements, sequence, () =>
+                {
+                    gameOverUI.Hide();
+                });
                 break;
         }
     }

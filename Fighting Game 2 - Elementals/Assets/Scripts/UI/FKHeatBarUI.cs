@@ -4,18 +4,39 @@ using UnityEngine.UI;
 public class FKHeatBarUI : MonoBehaviour
 {
     [SerializeField] Image barFillImage;
-    [SerializeField] Vector2 positionalValue;
-    
 
-    public void SetHeatMeterValue(float value)
+    RectTransform rt;
+    FKAttacks manager;
+
+    public void SetupHeatBar(FKAttacks attacks, int index)
     {
-        barFillImage.fillAmount = value;
+        rt = GetComponent<RectTransform>();
+        manager = attacks;
+        manager.OnHeatValueChanged += UpdateHeatValue;
+
+        switch (index)
+        {
+            case 0:
+                break;
+            case 1:
+
+                Vector2 originalHPosition = rt.anchoredPosition;
+                rt.anchorMax = new Vector2(1, 0);
+                rt.anchorMin = new Vector2(1, 0);
+                rt.anchoredPosition = new Vector2(-originalHPosition.x, originalHPosition.y);
+                barFillImage.rectTransform.localScale = new Vector3(-1,1, 1);
+
+                break;
+        }
     }
 
-    public void SetupHeatBar(bool left)
+    void UpdateHeatValue(object sender, float newValue)
     {
-        GetComponent<RectTransform>().anchoredPosition = left ? new Vector2(positionalValue.x, positionalValue.y) :
-            new Vector2(-positionalValue.x, positionalValue.y);
-        barFillImage.fillOrigin = left ? (int)Image.OriginHorizontal.Left : (int)Image.OriginHorizontal.Right;
+        barFillImage.fillAmount = newValue / manager.MaxHeatValue;
+    }
+
+    void OnDisable()
+    {
+        manager.OnHeatValueChanged -= UpdateHeatValue;
     }
 }

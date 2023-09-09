@@ -7,9 +7,9 @@ public class FKAttacks : BaseCharacterAttacks
     [SerializeField] FKHeatBarUI heatBar;
     [SerializeField] float maxHeatValue;
     [SerializeField] float currentHeatValue;
-    [SerializeField] float drainSpeed;
-    [SerializeField] float gainPerHit;
-    [SerializeField][Range(1,2)] float heatMultipler;
+    [SerializeField] float drainAmount;
+    [SerializeField] float gainAmount;
+    [SerializeField][Range(1, 2)] float heatDamageMultiplier;
 
     [Header("Attack 1 Enhance")]
     [SerializeField] FKFireballProjectile fireslashPrefab;
@@ -29,7 +29,12 @@ public class FKAttacks : BaseCharacterAttacks
     bool option;
 
     public EventHandler<bool> OnOptionStateChanged;
+    public EventHandler<float> OnHeatValueChanged;
     public EventHandler OnHeatBurnComplete;
+
+    public float MaxHeatValue { get { return maxHeatValue; } }
+
+
 
     protected override void OnEnable()
     {
@@ -39,8 +44,6 @@ public class FKAttacks : BaseCharacterAttacks
         character.OnAttackOne += OnAttack1;
         character.OnAttackTwo += OnAttack2;
         character.OnAttackThree += OnAttack3;
-
-        character.OnHitEnemy += AddHeat;
     }
 
     protected override void OnDisable()
@@ -51,13 +54,6 @@ public class FKAttacks : BaseCharacterAttacks
         character.OnAttackOne -= OnAttack1;
         character.OnAttackTwo -= OnAttack2;
         character.OnAttackThree -= OnAttack3;
-
-        character.OnHitEnemy -= AddHeat;
-    }
-
-    void Start()
-    {
-        heatBar.SetHeatMeterValue(currentHeatValue / maxHeatValue);
     }
 
     void OnOptionPressed(object sender, EventArgs args)
@@ -71,39 +67,46 @@ public class FKAttacks : BaseCharacterAttacks
         AudioManager.Instance.PlayOneShot(FModEvents.Instance.FKSwordSlash, slashSpawn.position);
         if (!option) return;
         currentHeatValue -= attack1Drain;
-        heatBar.SetHeatMeterValue(currentHeatValue / maxHeatValue);
+        OnHeatValueChanged?.Invoke(this, currentHeatValue);
     }
     void OnAttack2(object sender, EventArgs args)
     {
         if (!option) return;
         currentHeatValue -= attack2Drain;
-        heatBar.SetHeatMeterValue(currentHeatValue / maxHeatValue);
+        OnHeatValueChanged?.Invoke(this, currentHeatValue);
     }
     void OnAttack3(object sender, EventArgs args)
     {
         if (!option) return;
         currentHeatValue -= attack3Drain;
-        heatBar.SetHeatMeterValue(currentHeatValue / maxHeatValue);
+        OnHeatValueChanged?.Invoke(this, currentHeatValue);
     }
 
-    public void SetupHeatbar(bool left)
+    public void SetupFKHeatbar(int index)
     {
         currentHeatValue = 0;
-        heatBar.SetupHeatBar(left);
+        heatBar.SetupHeatBar(this, index);
+        OnHeatValueChanged?.Invoke(this, currentHeatValue);
     }
 
-    public void AddHeat(object sender, BaseCharacter enemy)
+    public void SetFKValue(float value)
     {
-        if (option) return;
-        currentHeatValue += gainPerHit;
-        heatBar.SetHeatMeterValue(currentHeatValue / maxHeatValue);
+        currentHeatValue = value;
+        OnHeatValueChanged?.Invoke(this, currentHeatValue);
     }
 
     void FixedUpdate()
     {
-        if (!option) return;
-        currentHeatValue -= drainSpeed * Time.deltaTime;
-        heatBar.SetHeatMeterValue(currentHeatValue / maxHeatValue);
+        if (GameManager.GameState != GameState.Game) return;
+        if (!option)
+        {
+            currentHeatValue += gainAmount * Time.deltaTime;
+        }
+        else
+        {
+            currentHeatValue -= drainAmount * Time.deltaTime;
+        }
+        OnHeatValueChanged?.Invoke(this, currentHeatValue);
         if (currentHeatValue > 0) return;
         currentHeatValue = 0;
         option = false;
@@ -117,7 +120,7 @@ public class FKAttacks : BaseCharacterAttacks
 
         DamageData data = GetDamageData(AttackType.One);
         data.Enhanced = true;
-        if (option) data.Damage *= heatMultipler;
+        if (option) data.Damage *= heatDamageMultiplier;
 
         slash.SetupFireball(data, character, IsFacingLeft,
             IsFacingLeft ? Vector2.left : Vector2.right, discSpeed, .25f, true);
@@ -144,10 +147,5 @@ public class FKAttacks : BaseCharacterAttacks
         explosion.SetupFireball(data, character, IsFacingLeft, 
             Vector2.zero, 0, .5f);
         enhance = false;
-    }
-
-    public void PlaySlashSound()
-    {
-        AudioManager.Instance.PlayOneShot(FModEvents.Instance.FKSwordSlash, slashSpawn.position);
     }
 }

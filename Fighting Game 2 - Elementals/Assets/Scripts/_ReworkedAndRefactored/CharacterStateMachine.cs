@@ -9,12 +9,13 @@ public class CharacterStateMachine : MonoBehaviour
 
     Character character;
     CharacterAnimator animator;
-    CharacterState currentState;
+    CharacterState currentState, previousState;
     CharacterStateFactory stateFactory;
 
     public Character P_Character { get { return character; } }
     public CharacterAnimator P_Animator { get { return animator; } }
     public CharacterState P_CurrentState {  get {  return currentState; } set { currentState = value; } }
+    public CharacterState P_PreviousState { get { return previousState; } set { previousState = value; } }
 
 
     void Awake()
@@ -31,7 +32,7 @@ public class CharacterStateMachine : MonoBehaviour
     void Update()
     {
         currentState?.FrameUpdate();
-        if(currentState != null) animator.SetAnimation(currentState.UpdateAnimation());
+        currentState?.UpdateAnimation();
     }
 
     void FixedUpdate()

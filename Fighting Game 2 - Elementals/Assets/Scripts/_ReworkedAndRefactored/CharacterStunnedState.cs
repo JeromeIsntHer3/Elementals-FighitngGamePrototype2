@@ -28,9 +28,9 @@ public class CharacterStunnedState : CharacterState
         
     }
 
-    public override AnimationType UpdateAnimation()
+    public override void UpdateAnimation()
     {
-        return AnimationType.Hit;
+        //return AnimationType.Hit;
     }
 
     public override void CheckSwitchStates()

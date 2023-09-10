@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CharacterAnimator : MonoBehaviour
@@ -7,11 +8,13 @@ public class CharacterAnimator : MonoBehaviour
 
     readonly Dictionary<AnimationType, bool> animationCanChangeFaceDirection = new();
     readonly Dictionary<AnimationType, CharacterAnimation> animations = new();
+    readonly Dictionary<AnimationType, bool> animationCondition = new();
+    readonly Dictionary<AnimationType, float> animationDuration = new();
 
     SpriteRenderer spriteRenderer;
     Animator animator;
-    CharacterAnimation currentAnimation, newAnimation;
-    float lockedTilTime;
+    CharacterAnimation currentAnimation;
+    float lockedTilTime, attackTilTime;
 
     public SpriteRenderer Sr { get { return spriteRenderer; } }
 
@@ -20,6 +23,8 @@ public class CharacterAnimator : MonoBehaviour
         //Add Animations Here
         animationData.InitializeHashes();
         animationData.AddToCanChangeDirectionDict(animationCanChangeFaceDirection);
+        animationData.AddToConditionList(animationCondition);
+        animationData.AddToDuration(animationDuration);
 
         foreach(var animation in animationData.CharacterAnimations)
         {
@@ -30,18 +35,62 @@ public class CharacterAnimator : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
     }
 
-    //SWAP BACK TO USING CONDITIONS PLSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
-    void Update()
+    void SetDelay(float extend)
     {
-        if (Time.time < lockedTilTime) return;
+        lockedTilTime = Time.time + extend;
+    }
+
+    public void SetAnimation(AnimationType type)
+    {
+        if (lockedTilTime > Time.time) return;
+        var newAnimation = animations[type];
         if (currentAnimation == newAnimation) return;
-        if (newAnimation.IsFullyAnimated)
-        {
-            lockedTilTime = Time.time + newAnimation.Clip.averageDuration;
-            Debug.Log(newAnimation.Type);
-        }
+
+        if (newAnimation.IsFullyAnimated) SetDelay(GetDuration(type));
+
+        Debug.Log(type);
         animator.CrossFade(newAnimation.AnimationHash, 0, 0);
         currentAnimation = newAnimation;
+    }
+
+    public float GetDuration(AnimationType type)
+    {
+        return animationDuration[type];
+    }
+
+    public void ClearRecovery()
+    {
+        lockedTilTime = 0;
+    }
+
+    public void SetAttackDuration(int index)
+    {
+        float duration = 0;
+        switch (index)
+        {
+            case 0:
+                duration = GetDuration(AnimationType.Attack1);
+                break;
+            case 1:
+                duration = GetDuration(AnimationType.Attack2);
+                break;
+            case 2:
+                duration = GetDuration(AnimationType.Attack3);
+                break;
+            case 3:
+                duration = GetDuration(AnimationType.Ultimate);
+                break;
+            case 4:
+                duration = GetDuration(AnimationType.JumpAttack);
+                break;
+        }
+
+        attackTilTime = Time.time + duration;
+    }
+
+    public bool IsAttackCompleted()
+    {
+        return attackTilTime < Time.time;
     }
 
     //void ShakeOnHit(float duration)
@@ -69,62 +118,6 @@ public class CharacterAnimator : MonoBehaviour
     //    {
     //        spriteRenderer.DOColor(Color.white, totalDuration / 2);
     //    });
-    //}
-
-    public void SetAnimation(AnimationType type)
-    {
-        newAnimation = animations[type];
-    }
-
-    //AnimationType GetAnimation()
-    //{
-    //    //if (Time.time < lockedTilTime) return currentAnimation;
-
-    //    if (animCond[AnimationType.Death]) return AnimationType.Death;
-
-    //    if (animCond[AnimationType.Hit]) return AnimationType.Hit;
-    //    if (animCond[AnimationType.RecoveryFromHit])
-    //    {
-    //        animCond[AnimationType.RecoveryFromHit] = false;
-    //        return AnimationType.RecoveryFromHit;
-    //    }
-
-    //    if (animCond[AnimationType.DefendHit]) return AnimationType.DefendHit;
-    //    if (animCond[AnimationType.DefendEnd]) return AnimationType.DefendEnd;
-    //    if (animCond[AnimationType.DefendStart])
-    //    {
-    //        //character.OnBlockActive?.Invoke(this, EventArgs.Empty);
-    //        animCond[AnimationType.DefendStart] = false;
-    //        return AnimationType.DefendStart;
-    //    }
-    //    if (animCond[AnimationType.DefendLoop]) return AnimationType.DefendLoop;
-
-    //    if (animationData.optionIsHeld)
-    //    {
-    //        if (animCond[AnimationType.CharacterOptionEnd]) return AnimationType.CharacterOptionEnd;
-    //        if (animCond[AnimationType.CharacterOptionStart]) return AnimationType.CharacterOptionStart;
-    //        if (animCond[AnimationType.CharacterOptionLoop]) return AnimationType.CharacterOptionLoop;
-    //    }
-
-    //    if (animationData.optionIsTriggered)
-    //    {
-    //        if (animCond[AnimationType.CharacterOptionStart]) return AnimationType.CharacterOptionStart;
-    //    }
-
-    //    if (animCond[AnimationType.Roll]) return AnimationType.Roll;
-    //    if (animCond[AnimationType.JumpEnd]) return AnimationType.JumpEnd;
-    //    if (animCond[AnimationType.JumpStart]) return AnimationType.JumpStart;
-
-    //    if (animCond[AnimationType.Ultimate]) return AnimationType.Ultimate;
-    //    if (animCond[AnimationType.Attack1]) return AnimationType.Attack1;
-    //    if (animCond[AnimationType.Attack2]) return AnimationType.Attack2;
-    //    if (animCond[AnimationType.Attack3]) return AnimationType.Attack3;
-
-    //    //if (character.grounded) return character.Rb.velocity.x == 0 ? AnimationType.Idle : AnimationType.Run;
-    //    if (animCond[AnimationType.JumpAttack]) return AnimationType.JumpAttack;
-    //    if (character.Rb.velocity.y > 3f) return AnimationType.JumpRising;
-    //    if (character.Rb.velocity.y > 1f) return AnimationType.JumpPeak;
-    //    return character.Rb.velocity.y < -1f ? AnimationType.JumpFalling : AnimationType.JumpRising;
     //}
 
     void ChangeFaceDirection(Vector2 v)

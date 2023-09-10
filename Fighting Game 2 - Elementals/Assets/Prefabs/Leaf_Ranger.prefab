@@ -201,7 +201,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12243bd08137b3c409dafe3e627df513, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerInput: {fileID: 0}
 --- !u!114 &7012056060927738581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -233,7 +232,7 @@ MonoBehaviour:
   groundCheck1: {fileID: 8277289309325501125}
   groundCheck2: {fileID: 5705773771302666793}
   canMove: 1
-  pushbackForce: 8
+  pushbackForce: 3
 --- !u!114 &6409298291436382391
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -250,8 +249,6 @@ MonoBehaviour:
   centre: {fileID: 4424333736252540302}
   attacksData: {fileID: 11400000, guid: 5d691b723a082ee49ac4c5cd1fbd99bc, type: 2}
   hitboxes: {fileID: 6411290513960682326}
-  currentMeterValue: 0
-  currentMeterCount: 0
   arrowPrefab: {fileID: -345113762163150280, guid: e1b37aac3ee4501408b6823adbccc0b8, type: 3}
   ultimateBeamPrefab: {fileID: 6628246287202306316, guid: 5de746c521a23fe4790fd727e32523c0, type: 3}
   stormPrefab: {fileID: 7280461822294780868, guid: d3b51869dc49d994b87ae892a2340414, type: 3}
@@ -281,8 +278,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa112482902c3dd40b0115b3645bcac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
-  currentHealth: 0
 --- !u!114 &447917140995756773
 MonoBehaviour:
   m_ObjectHideFlags: 0

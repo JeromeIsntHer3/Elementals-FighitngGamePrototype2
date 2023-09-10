@@ -998,7 +998,8 @@ MonoBehaviour:
   <MovementData>k__BackingField: {fileID: 11400000, guid: e7e1eadd97a3c2142a5c5f024d5b3279, type: 2}
   <Rb>k__BackingField: {fileID: 1762032567}
   <MaxHealth>k__BackingField: 0
-  Jumps: 1
+  <DelayBetweenJumps>k__BackingField: 0
+  maxJumps: 0
 --- !u!212 &1762032566
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2169,7 +2170,8 @@ MonoBehaviour:
   <MovementData>k__BackingField: {fileID: 11400000, guid: e7e1eadd97a3c2142a5c5f024d5b3279, type: 2}
   <Rb>k__BackingField: {fileID: 7168224616848222564}
   <MaxHealth>k__BackingField: 0
-  Jumps: 2
+  <DelayBetweenJumps>k__BackingField: 0.5
+  maxJumps: 2
 --- !u!114 &7168224616848222568
 MonoBehaviour:
   m_ObjectHideFlags: 0

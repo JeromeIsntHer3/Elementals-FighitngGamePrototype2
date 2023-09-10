@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CharacterAttackingState : CharacterState
@@ -8,7 +6,29 @@ public class CharacterAttackingState : CharacterState
 
     public override void EnterState()
     {
-
+        _ctx.P_Animator.ClearRecovery();
+        switch (_ctx.P_Character.CurrentAttack)
+        {
+            case 0:
+                _ctx.P_Animator.SetAnimation(AnimationType.Attack1);
+                break;
+            case 1:
+                _ctx.P_Animator.SetAnimation(AnimationType.Attack2);
+                break;
+            case 2:
+                _ctx.P_Animator.SetAnimation(AnimationType.Attack3);
+                break;
+            case 3:
+                _ctx.P_Animator.SetAnimation(AnimationType.Ultimate);
+                break; 
+            case 4:
+                _ctx.P_Animator.SetAnimation(AnimationType.JumpAttack);
+                break;
+            default:
+                Debug.Log("Attack Missing");
+                break;
+        }
+        _ctx.P_Animator.SetAttackDuration(_ctx.P_Character.CurrentAttack);
     }
 
     public override void ExitState()
@@ -31,20 +51,23 @@ public class CharacterAttackingState : CharacterState
         
     }
 
-    public override AnimationType UpdateAnimation()
+    public override void UpdateAnimation()
     {
-        return _ctx.P_Character.CurrentAttack switch
-        {
-            0 => AnimationType.Attack1,
-            1 => AnimationType.Attack2,
-            2 => AnimationType.Attack3,
-            3 => AnimationType.Ultimate,
-            _ => AnimationType.Idle,
-        };
+        
     }
 
     public override void CheckSwitchStates()
     {
-       
+        if (_ctx.P_Animator.IsAttackCompleted())
+        {
+            if(_ctx.P_Character.CurrentAttack != 4)
+            {
+                SwitchState(_factory.Grounded());
+            }
+            else
+            {
+                SwitchState(_factory.Jumping());
+            }
+        }
     }
 }

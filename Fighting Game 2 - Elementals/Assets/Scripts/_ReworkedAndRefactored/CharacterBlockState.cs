@@ -8,7 +8,7 @@ public class CharacterBlockState : CharacterState
 
     public override void EnterState()
     {
-        
+        _ctx.P_Animator.SetAnimation(AnimationType.DefendStart);
     }
 
     public override void ExitState()
@@ -26,14 +26,18 @@ public class CharacterBlockState : CharacterState
         
     }
 
-    public override AnimationType UpdateAnimation()
+    public override void UpdateAnimation()
     {
-        return AnimationType.DefendLoop;
+        _ctx.P_Animator.SetAnimation(AnimationType.DefendLoop);
     }
 
     public override void CheckSwitchStates()
     {
-
+        if (!_ctx.P_Character.IsBlockPressed)
+        {
+            _ctx.P_Animator.SetAnimation(AnimationType.DefendEnd);
+            SwitchState(_factory.Grounded());
+        }
     }
 
     public override void OnCollisionEnter2D(Collision2D collision)

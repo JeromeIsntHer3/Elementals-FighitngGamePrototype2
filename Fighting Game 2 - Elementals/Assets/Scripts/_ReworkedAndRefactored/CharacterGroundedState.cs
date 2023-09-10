@@ -10,7 +10,7 @@ public class CharacterGroundedState : CharacterState
 
     public override void EnterState()
     {
-        _ctx.P_Character.Jumps = 2;
+        _ctx.P_Character.ResetJumps();
     }
 
     public override void ExitState()
@@ -28,23 +28,23 @@ public class CharacterGroundedState : CharacterState
         HandleMovement();
     }
 
-    public override AnimationType UpdateAnimation()
+    public override void UpdateAnimation()
     {
         if (_ctx.P_Character.Movement.x > 0)
         {
             _ctx.P_Animator.Sr.flipX = false;
         }
-        else if(_ctx.P_Character.Movement.x < 0)
+        else if (_ctx.P_Character.Movement.x < 0)
         {
             _ctx.P_Animator.Sr.flipX = true;
         }
 
-        return _ctx.P_Character.Movement.x == 0 ? AnimationType.Idle : AnimationType.Run;
+        _ctx.P_Animator.SetAnimation(_ctx.P_Character.Movement.x == 0 ? AnimationType.Idle : AnimationType.Run);
     }
 
     public override void CheckSwitchStates()
     {
-        if(_ctx.P_Character.IsJumpPressed && _ctx.P_Character.Jumps > 0)
+        if(_ctx.P_Character.IsJumpPressed && _ctx.P_Character.CanJump())
         {
             SwitchState(_factory.Jumping());
         }
@@ -54,9 +54,9 @@ public class CharacterGroundedState : CharacterState
             SwitchState(_factory.Blocking());
         }
 
-        if (_ctx.P_Character.IsOptionPressed)
+        if (_ctx.P_Character.IsAttackPressed)
         {
-            //SwitchState(_factory.)
+            SwitchState(_factory.Attacking());
         }
     }
 

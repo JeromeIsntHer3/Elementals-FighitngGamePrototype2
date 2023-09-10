@@ -240,6 +240,7 @@ public class UIManager : MonoBehaviour
     void OnGameOver(object sender, EventArgs args)
     {
         gameOverUI.Show();
+        AudioManager.Instance.SetBGM(LevelBGM.GameOver);
         AnimateUIElementsTransition(gameUI.AnimatedElements, gameOverUI.AnimatedElements, sequence, () =>
         {
             gameUI.Hide();

@@ -1,18 +1,7 @@
-using UnityEngine;
-
-public class Beam : Hitbox
+public class Beam : BaseProjectile
 {
-    SpriteRenderer sr;
-
-    public void SetupBeam(DamageData data, BaseCharacter owner, bool flipX)
+    public void SetupBeam(BaseCharacter character, DamageData data, float deathTime, bool flipX)
     {
-        base.SetDamageData(data, owner);
-        sr = GetComponent<SpriteRenderer>();
-        sr.flipX = flipX;
-    }
-
-    public void Despawn()
-    {
-        Destroy(gameObject);
+        base.InitProjectile(character, data, deathTime, flipX);
     }
 }

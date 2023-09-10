@@ -147,7 +147,9 @@ public class BaseCharacterAttacks : MonoBehaviour
     void OnUltimate(object sender, EventArgs e)
     {
         if (inAir) return;
+        if (currentMeterCount == 0 && currentMeterValue < 100) return;
         Ultimate?.Invoke();
+        UseMeter(100, false);
         SetHitboxData(GetDamageData(AttackType.Ultimate));
     }
 

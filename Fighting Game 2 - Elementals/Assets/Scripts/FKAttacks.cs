@@ -35,7 +35,6 @@ public class FKAttacks : BaseCharacterAttacks
     public float MaxHeatValue { get { return maxHeatValue; } }
 
 
-
     protected override void OnEnable()
     {
         base.OnEnable();

@@ -17,11 +17,12 @@ public abstract class CharacterState
     public abstract void PhysicsUpdate();
     public abstract void CheckSwitchStates();
     public abstract void ExitState();
-    public abstract AnimationType UpdateAnimation();
+    public abstract void UpdateAnimation();
     public abstract void OnCollisionEnter2D(Collision2D collision);
 
     protected void SwitchState(CharacterState newState)
     {
+        _ctx.P_PreviousState = this;
         ExitState();
         newState.EnterState();
         _ctx.P_CurrentState = newState;

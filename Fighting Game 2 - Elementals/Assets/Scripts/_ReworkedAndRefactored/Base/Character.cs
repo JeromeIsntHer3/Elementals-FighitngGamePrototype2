@@ -13,13 +13,15 @@ public class Character : MonoBehaviour, ICharacter
     [field: SerializeField] public Rigidbody2D Rb {  get; set; }
     [field: SerializeField] public float MaxHealth { get; set; }
     public float CurrentHealth { get; set; }
+    [field: SerializeField] public float DelayBetweenJumps { get; set; }
 
-    public int Jumps = 1;
+    [SerializeField] int maxJumps;
+    int jumps = 1;
 
     CharacterStateMachine stateMachine;
     PlayerInputHandler input;
     Vector2 movement;
-    bool blockPressed, optionPressed, jumpPressed;
+    bool blockPressed, optionPressed, jumpPressed, attackPressed;
     int currentAttackIndex = -1;
 
 
@@ -29,7 +31,8 @@ public class Character : MonoBehaviour, ICharacter
     public bool IsBlockPressed { get { return blockPressed; } }
     public bool IsOptionPressed { get { return optionPressed; } }
     public bool IsJumpPressed { get { return jumpPressed; } }
-    public int CurrentAttack { get {  return currentAttackIndex; } }
+    public bool IsAttackPressed {  get { return attackPressed; } }
+    public int CurrentAttack { get {  return currentAttackIndex; } set { currentAttackIndex = value; } }
 
     #endregion
 
@@ -38,6 +41,7 @@ public class Character : MonoBehaviour, ICharacter
     {
         stateMachine = GetComponent<CharacterStateMachine>();
         input = GetComponent<PlayerInputHandler>();
+        jumps = maxJumps;
     }
 
     void OnEnable()
@@ -81,16 +85,32 @@ public class Character : MonoBehaviour, ICharacter
     void OnAttack(object sender, int index)
     {
         currentAttackIndex = index;
+        attackPressed = true;
     }
 
     void Update()
     {
-        
+        if (attackPressed) attackPressed = false;
     }
 
     public bool IsTouchingGround()
     {
         return Physics2D.OverlapArea(groundCheck1.position, groundCheck2.position, groundLayer);
+    }
+
+    public bool CanJump()
+    {
+        return jumps > 0;
+    }
+
+    public void ResetJumps()
+    {
+        jumps = maxJumps;
+    }
+
+    public void JumpUsed()
+    {
+        jumps--;
     }
 
     public void Damage(float dmgAmount)

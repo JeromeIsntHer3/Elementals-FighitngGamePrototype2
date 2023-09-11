@@ -52,7 +52,6 @@ public class CharacterSelectMenuUI : BaseMenuUI
     [SerializeField] List<PlayerMenuVariables> playerVariables = new();
 
     [Header("Multiplayer")]
-    [SerializeField] PlayerInputManager playerInputManager;
     [SerializeField] PlayerInputProxy playerInputPrefab;
     [SerializeField] float countdownDuration;
     [SerializeField] TextMeshProUGUI readyCountdownText;
@@ -84,7 +83,7 @@ public class CharacterSelectMenuUI : BaseMenuUI
         characterContainer.Add(PlayableCharacter.MetalBladekeeper, bladekeeperContainer);
         characterContainer.Add(PlayableCharacter.CrystalMauler, maulerContainer);
 
-        playerInputManager.playerPrefab = playerInputPrefab.gameObject;
+        GameInputManager.Instance.PlayerInputMgr.playerPrefab = playerInputPrefab.gameObject;
     }
 
     void OnEnable()
@@ -124,14 +123,14 @@ public class CharacterSelectMenuUI : BaseMenuUI
         GameManager.OnSelectCharacter += OnSelectCharacter;
         GameManager.OnConfirmCharacter += OnConfirmCharacter;
 
-        var inputOne = playerInputManager.JoinPlayer(0, default, "Keyboard");
-        var inputTwo = playerInputManager.JoinPlayer(1, default, "Controller");
+        var inputOne = GameInputManager.Instance.PlayerInputMgr.JoinPlayer(0, default, "Keyboard");
+        var inputTwo = GameInputManager.Instance.PlayerInputMgr.JoinPlayer(1, default, "Controller");
 
-        GameManager.Instance.SetupPlayerInputAndProxies(0, inputOne);
-        GameManager.Instance.SetupPlayerInputAndProxies(1, inputTwo);
+        GameInputManager.Instance.SetupPlayerInputAndProxies(0, inputOne);
+        GameInputManager.Instance.SetupPlayerInputAndProxies(1, inputTwo);
 
-        GameManager.Instance.GetPlayerProxy(0).OnDeselect += OnPlayerPressBack;
-        GameManager.Instance.GetPlayerProxy(1).OnDeselect += OnPlayerPressBack;
+        GameInputManager.Instance.GetPlayerProxy(0).OnDeselect += OnPlayerPressBack;
+        GameInputManager.Instance.GetPlayerProxy(1).OnDeselect += OnPlayerPressBack;
     }
 
     void ToMainMenu(object sender, EventArgs args)
@@ -143,8 +142,8 @@ public class CharacterSelectMenuUI : BaseMenuUI
 
         for(int i = 0; i < 2; i++)
         {
-            GameManager.Instance.GetPlayerProxy(i).OnDeselect -= OnPlayerPressBack;
-            GameManager.Instance.ClearPlayerInputAndProxies(i);
+            GameInputManager.Instance.GetPlayerProxy(i).OnDeselect -= OnPlayerPressBack;
+            GameInputManager.Instance.ClearPlayerInputAndProxies(i);
             playerVariables[i].SetPlayerReady(false);
             playerVariables[i].CurrentContainer.Deselect(i);
             playerVariables[i].SelectContainerUI(null);
@@ -162,7 +161,7 @@ public class CharacterSelectMenuUI : BaseMenuUI
             if(cr != null) StopCoroutine(cr);
             playerVariables[index].SetPlayerReady(false);
             playerVariables[index].PlayerReadyText.gameObject.SetActive(false);
-            GameManager.Instance.GetPlayerProxy(index).SetSelectionState(true);
+            GameInputManager.Instance.GetPlayerProxy(index).SetSelectionState(true);
             return;
         }
         GameManager.OnToMenu?.Invoke(this, EventArgs.Empty);
@@ -192,7 +191,7 @@ public class CharacterSelectMenuUI : BaseMenuUI
         if (GameManager.GameState != GameState.CharacterSelect) return;
         PlayerMenuVariables playerVar = playerVariables[args.PlayerIndex];
 
-        GameManager.Instance.GetPlayerProxy(args.PlayerIndex).SetSelectionState(false);
+        GameInputManager.Instance.GetPlayerProxy(args.PlayerIndex).SetSelectionState(false);
         playerVar.PlayerReadyText.gameObject.SetActive(true);
         playerVar.SetPlayerReady(true);
 
@@ -216,10 +215,10 @@ public class CharacterSelectMenuUI : BaseMenuUI
         readyCountdownText.gameObject.SetActive(false);
         GameManager.OnToGame?.Invoke(this, new GameManager.CharacterInfoArgs
         {
-            PlayerOneInput = GameManager.Instance.GetPlayerInput(0),
+            PlayerOneInput = GameInputManager.Instance.GetPlayerInput(0),
             PlayerOneInfo = playerVariables[0].CurrentContainer.Info,
 
-            PlayerTwoInput = GameManager.Instance.GetPlayerInput(1),
+            PlayerTwoInput = GameInputManager.Instance.GetPlayerInput(1),
             PlayerTwoInfo = playerVariables[1].CurrentContainer.Info
         });
 

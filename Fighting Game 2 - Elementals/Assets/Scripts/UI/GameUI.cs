@@ -160,13 +160,15 @@ public class GameUI : BaseMenuUI
         centreText.text = "FIGHT!";
         yield return new WaitForSeconds(1f);
         centreText.gameObject.SetActive(false);
-        GameManager.Instance.EnablePlayerInput(true);
+        GameInputManager.Instance.EnablePlayerInput(0, true, GameInputManager.GameScheme);
+        GameInputManager.Instance.EnablePlayerInput(1, true, GameInputManager.GameScheme);
         isGameRunning = true;
     }
 
     void RoundOver()
     {
-        GameManager.Instance.EnablePlayerInput(false);
+        GameInputManager.Instance.EnablePlayerInput(0, false, GameInputManager.GameScheme);
+        GameInputManager.Instance.EnablePlayerInput(1, false, GameInputManager.GameScheme);
         isGameRunning = false;
 
         Color color;

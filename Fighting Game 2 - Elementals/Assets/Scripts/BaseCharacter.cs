@@ -44,33 +44,30 @@ public class BaseCharacter : MonoBehaviour
 
     #region Events
 
-    public EventHandler<Vector2> OnMovement;
-    public EventHandler<Vector2> OnMovementPerformed;
-    public EventHandler<Vector2> OnMovementCanceled;
-    public EventHandler OnAttackOne;
-    public EventHandler OnAttackTwo;
-    public EventHandler OnAttackThree;
-    public EventHandler OnUltimate;
-    public EventHandler OnTryEnhance;
-    public EventHandler OnEnhanceAttack;
-    public EventHandler OnTryCancel;
-    public EventHandler OnCancelAnimation;
-    public EventHandler OnRoll;
-    public EventHandler OnOption;
-    public EventHandler OnOptionCanceled;
-    public EventHandler OnJump;
-    public EventHandler OnLand;
-    public EventHandler OnBlockPerformed;
-    public EventHandler OnBlockActive;
-    public EventHandler OnBlockCanceled;
-    public EventHandler<DamageData> OnHit;
-    public EventHandler<DamageData> OnBlockHit;
-    public EventHandler<bool> OnChangeFaceDirection;
-    public EventHandler<BaseCharacter> OnHitEnemy;
-    public EventHandler<BaseCharacter> OnHitBlocked;
-    public EventHandler<int> OnHitCombo;
-    public EventHandler<string> OnHitType;
-    public EventHandler OnDeath;
+    public EventHandler<Vector2> OnMovement { get; set; }
+    public EventHandler<Vector2> OnMovementPerformed { get; set;}
+    public EventHandler<Vector2> OnMovementCanceled { get; set;}
+    public EventHandler<int> OnAttackPressed { get; set;}
+    public EventHandler OnTryEnhance { get; set;}
+    public EventHandler OnEnhanceAttack { get; set;}
+    public EventHandler OnTryCancel { get; set;}
+    public EventHandler OnCancelAnimation { get; set;}
+    public EventHandler OnRoll { get; set;}
+    public EventHandler OnOption { get; set;}
+    public EventHandler OnOptionCanceled { get; set;}
+    public EventHandler OnJump { get; set;}
+    public EventHandler OnLand { get; set;}
+    public EventHandler OnBlockPerformed { get; set;}
+    public EventHandler OnBlockActive { get; set;}
+    public EventHandler OnBlockCanceled { get; set;}
+    public EventHandler<DamageData> OnHit { get; set;}
+    public EventHandler<DamageData> OnBlockHit { get; set;}
+    public EventHandler<bool> OnChangeFaceDirection { get; set;}
+    public EventHandler<BaseCharacter> OnHitEnemy { get; set;}
+    public EventHandler<BaseCharacter> OnHitBlocked { get; set;}
+    public EventHandler<int> OnHitCombo { get; set;}
+    public EventHandler<string> OnHitType { get; set;}
+    public EventHandler OnDeath { get; set;}
 
     #endregion
 

@@ -14,17 +14,20 @@ public class FKAttacks : BaseCharacterAttacks
     [Header("Attack 1 Enhance")]
     [SerializeField] FKFireballProjectile fireslashPrefab;
     [SerializeField] Transform slashSpawn;
-    [SerializeField] float attack1Drain;
+    [SerializeField] float attackOneDrain;
 
     [Header("Attack 2 Enhance")]
     [SerializeField] FKFireballProjectile firediscPrefab;
     [SerializeField] float discSpeed;
-    [SerializeField] float attack2Drain;
+    [SerializeField] float attackTwoDrain;
 
     [Header("Attack 3 Enhance")]
     [SerializeField] FKFireballProjectile explosionPrefab;
     [SerializeField] Transform explosionSpawn;
-    [SerializeField] float attack3Drain;
+    [SerializeField] float attackThreeDrain;
+
+    [Header("Ultimate")]
+    [SerializeField] float ultimateHeatDrain;
 
     bool option;
 
@@ -40,9 +43,11 @@ public class FKAttacks : BaseCharacterAttacks
         base.OnEnable();
 
         character.OnOption += OnOptionPressed;
-        character.OnAttackOne += OnAttack1;
-        character.OnAttackTwo += OnAttack2;
-        character.OnAttackThree += OnAttack3;
+        character.OnAttackPressed += OnAttack;
+
+        Attack1 = FireSlash;
+        Attack2 = FireDisc;
+        Attack3 = Fireball;
     }
 
     protected override void OnDisable()
@@ -50,9 +55,7 @@ public class FKAttacks : BaseCharacterAttacks
         base.OnDisable();
 
         character.OnOption -= OnOptionPressed;
-        character.OnAttackOne -= OnAttack1;
-        character.OnAttackTwo -= OnAttack2;
-        character.OnAttackThree -= OnAttack3;
+        character.OnAttackPressed -= OnAttack;
     }
 
     void OnOptionPressed(object sender, EventArgs args)
@@ -61,23 +64,26 @@ public class FKAttacks : BaseCharacterAttacks
         OnOptionStateChanged?.Invoke(this, option);
     }
 
-    void OnAttack1(object sender, EventArgs args)
-    {
-        AudioManager.Instance.PlayOneShot(FModEvents.Instance.FKSwordSlash, slashSpawn.position);
-        if (!option) return;
-        currentHeatValue -= attack1Drain;
-        OnHeatValueChanged?.Invoke(this, currentHeatValue);
-    }
-    void OnAttack2(object sender, EventArgs args)
+    void OnAttack(object sender, int index)
     {
         if (!option) return;
-        currentHeatValue -= attack2Drain;
-        OnHeatValueChanged?.Invoke(this, currentHeatValue);
-    }
-    void OnAttack3(object sender, EventArgs args)
-    {
-        if (!option) return;
-        currentHeatValue -= attack3Drain;
+
+        switch (index)
+        {
+            case 0:
+                currentHeatValue -= attackOneDrain;
+                break;
+            case 1:
+                currentHeatValue -= attackTwoDrain;
+                break;
+            case 2:
+                currentHeatValue -= attackThreeDrain;
+                break;
+            case 3:
+                currentHeatValue -= ultimateHeatDrain;
+                break;
+        }
+        
         OnHeatValueChanged?.Invoke(this, currentHeatValue);
     }
 
@@ -100,6 +106,7 @@ public class FKAttacks : BaseCharacterAttacks
         if (!option)
         {
             currentHeatValue += gainAmount * Time.deltaTime;
+            if (currentHeatValue > maxHeatValue) currentHeatValue = maxHeatValue;
         }
         else
         {
@@ -112,7 +119,7 @@ public class FKAttacks : BaseCharacterAttacks
         OnOptionStateChanged?.Invoke(this, option);
     }
 
-    public void FireSlash()
+    void FireSlash()
     {
         if (!enhance) return;
         var slash = Instantiate(fireslashPrefab, slashSpawn.position, Quaternion.identity);
@@ -126,7 +133,7 @@ public class FKAttacks : BaseCharacterAttacks
         enhance = false;
     }
 
-    public void FireDisc()
+    void FireDisc()
     {
         if (!enhance) return;
         var disc = Instantiate(firediscPrefab, slashSpawn.position, Quaternion.identity);
@@ -137,7 +144,7 @@ public class FKAttacks : BaseCharacterAttacks
         enhance = false;
     }
 
-    public void Fireball()
+    void Fireball()
     {
         if(!enhance) return;
         var explosion = Instantiate(explosionPrefab, explosionSpawn.position, Quaternion.identity);

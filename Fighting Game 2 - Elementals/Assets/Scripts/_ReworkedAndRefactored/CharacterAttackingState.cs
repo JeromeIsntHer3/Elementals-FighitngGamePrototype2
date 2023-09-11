@@ -4,6 +4,8 @@ public class CharacterAttackingState : CharacterState
 {
     public CharacterAttackingState(CharacterStateMachine context, CharacterStateFactory factory) : base(context, factory) { }
 
+    bool landed;
+
     public override void EnterState()
     {
         _ctx.P_Animator.ClearRecovery();
@@ -48,7 +50,11 @@ public class CharacterAttackingState : CharacterState
 
     public override void OnCollisionEnter2D(Collision2D collision)
     {
-        
+        if (_ctx.P_Character.IsTouchingGround())
+        {
+            _ctx.P_Animator.SetAnimation(AnimationType.JumpEnd);
+            landed = true;
+        }
     }
 
     public override void UpdateAnimation()
@@ -58,6 +64,15 @@ public class CharacterAttackingState : CharacterState
 
     public override void CheckSwitchStates()
     {
+        if (landed)
+        {
+            _ctx.P_Animator.ClearAttackRecovery();
+            _ctx.P_Animator.ClearRecovery();
+            _ctx.P_Animator.SetAnimation(AnimationType.JumpEnd);
+            SwitchState(_factory.Grounded());
+            return;
+        }
+
         if (_ctx.P_Animator.IsAttackCompleted())
         {
             if(_ctx.P_Character.CurrentAttack != 4)

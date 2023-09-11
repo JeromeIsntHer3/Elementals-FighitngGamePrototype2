@@ -118,28 +118,28 @@ public class CharacterInput : MonoBehaviour
     void AttackOnePerformed(Ctx obj)
     {
         if (!character.Recovered()) return;
-        character.OnAttackOne?.Invoke(this, EventArgs.Empty);
+        character.OnAttackPressed?.Invoke(this, 0);
         character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack1));
     }
 
     void AttackTwoPerformed(Ctx obj)
     {
         if (!character.Recovered()) return;
-        character.OnAttackTwo?.Invoke(this, EventArgs.Empty);
+        character.OnAttackPressed?.Invoke(this, 1);
         character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack2));
     }
 
     void AttackThreePerformed(Ctx obj)
     {
         if (!character.Recovered()) return;
-        character.OnAttackThree?.Invoke(this, EventArgs.Empty);
+        character.OnAttackPressed?.Invoke(this, 2);
         character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Attack3));
     }
 
     void UltimatePerformed(Ctx obj)
     {
         if (!character.Recovered()) return;
-        character.OnUltimate?.Invoke(this, EventArgs.Empty);
+        character.OnAttackPressed?.Invoke(this, 3);
         character.SetRecoveryDuration(character.GetAnimationDuration(AnimationType.Ultimate));
     }
 

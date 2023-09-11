@@ -66,10 +66,7 @@ public class BaseCharacterAttacks : MonoBehaviour
 
     protected virtual void OnEnable()
     {
-        character.OnAttackOne += OnAttack1;
-        character.OnAttackTwo += OnAttack2;
-        character.OnAttackThree += OnAttack3;
-        character.OnUltimate += OnUltimate;
+        character.OnAttackPressed += OnAttack;
 
         character.OnJump += OnJump;
         character.OnLand += OnLand;
@@ -87,10 +84,7 @@ public class BaseCharacterAttacks : MonoBehaviour
 
     protected virtual void OnDisable()
     {
-        character.OnAttackOne -= OnAttack1;
-        character.OnAttackTwo -= OnAttack2;
-        character.OnAttackThree -= OnAttack3;
-        character.OnUltimate -= OnUltimate;
+        character.OnAttackPressed -= OnAttack;
         character.OnJump -= OnJump;
         character.OnLand -= OnLand;
         character.OnChangeFaceDirection -= OnChangeFaceDir;
@@ -102,7 +96,7 @@ public class BaseCharacterAttacks : MonoBehaviour
         character.OnBlockHit -= OnEnemyBlockHit;
     }
 
-    void OnAttack1(object sender, EventArgs e)
+    void OnAttack(object sender, int index)
     {
         if (inAir)
         {
@@ -111,46 +105,28 @@ public class BaseCharacterAttacks : MonoBehaviour
             SetNewAttack(AnimationType.JumpAttack, AttackType.Jump);
             return;
         }
-        Attack1?.Invoke();
-        SetHitboxData(GetDamageData(AttackType.One));
-        SetNewAttack(AnimationType.Attack1, AttackType.One);
-    }
 
-    void OnAttack2(object sender, EventArgs e)
-    {
-        if (inAir)
+        switch (index)
         {
-            JumpAttack?.Invoke();
-            SetHitboxData(GetDamageData(AttackType.Jump));
-            SetNewAttack(AnimationType.JumpAttack, AttackType.Jump);
-            return;
+            case 0:
+                SetHitboxData(GetDamageData(AttackType.One));
+                SetNewAttack(AnimationType.Attack1, AttackType.One);
+                break;
+            case 1:
+                SetHitboxData(GetDamageData(AttackType.Two));
+                SetNewAttack(AnimationType.Attack2, AttackType.Two);
+                break;
+            case 2:
+                SetHitboxData(GetDamageData(AttackType.Three));
+                SetNewAttack(AnimationType.Attack3, AttackType.Three);
+                break;
+            case 3:
+                if (inAir) return;
+                if (currentMeterCount == 2 && currentMeterValue <= 50) return;
+                UseMeter(100, false);
+                SetHitboxData(GetDamageData(AttackType.Ultimate));
+                break;
         }
-        Attack2?.Invoke();
-        SetHitboxData(GetDamageData(AttackType.Two));
-        SetNewAttack(AnimationType.Attack2, AttackType.Two);
-    }
-
-    void OnAttack3(object sender, EventArgs e)
-    {
-        if (inAir)
-        {
-            JumpAttack?.Invoke();
-            SetHitboxData(GetDamageData(AttackType.Jump));
-            SetNewAttack(AnimationType.JumpAttack, AttackType.Jump);
-            return;
-        }
-        Attack3?.Invoke();
-        SetHitboxData(GetDamageData(AttackType.Three));
-        SetNewAttack(AnimationType.Attack3, AttackType.Three);
-    }
-
-    void OnUltimate(object sender, EventArgs e)
-    {
-        if (inAir) return;
-        if (currentMeterCount == 0 && currentMeterValue < 100) return;
-        Ultimate?.Invoke();
-        UseMeter(100, false);
-        SetHitboxData(GetDamageData(AttackType.Ultimate));
     }
 
     void OnJump(object sender, EventArgs e)
@@ -299,5 +275,25 @@ public class BaseCharacterAttacks : MonoBehaviour
 
         OnMeterValueChanged?.Invoke(this, new OnMeterUsedArgs(
             (float) currentMeterValue, currentMeterCount));
+    }
+
+    public void AttackOneActive()
+    {
+        Attack1?.Invoke();
+    }
+
+    public void AttackTwoActive()
+    {
+        Attack2?.Invoke();
+    }
+
+    public void AttackThreeActive()
+    {
+        Attack3?.Invoke();
+    }
+
+    public void UltimateActive()
+    {
+        Ultimate?.Invoke();
     }
 }

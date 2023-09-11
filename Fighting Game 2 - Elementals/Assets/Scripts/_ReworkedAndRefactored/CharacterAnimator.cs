@@ -63,6 +63,11 @@ public class CharacterAnimator : MonoBehaviour
         lockedTilTime = 0;
     }
 
+    public void ClearAttackRecovery()
+    {
+        attackTilTime = 0;
+    }
+
     public void SetAttackDuration(int index)
     {
         float duration = 0;

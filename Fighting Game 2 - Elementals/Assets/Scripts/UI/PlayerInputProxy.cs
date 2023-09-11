@@ -20,12 +20,12 @@ public class PlayerInputProxy : MonoBehaviour
 
     void OnEnable()
     {
-        playerInput.actions["Back"].performed += BackPressed;
+        playerInput.actions[GameInputManager.UIBackAction].performed += BackPressed;
     }
 
     void OnDisable()
     {
-        playerInput.actions["Back"].performed -= BackPressed;
+        playerInput.actions[GameInputManager.UIBackAction].performed -= BackPressed;
     }
 
     void BackPressed(InputAction.CallbackContext obj)

@@ -62,6 +62,7 @@ public class UIManager : MonoBehaviour
         GameManager.OnToGame += OnGoToGame;
         GameManager.OnGameOver += OnGameOver;
         GameManager.OnGameRematch += OnGoToGame;
+        GameManager.OnToSettings += OnGoToSettings;
     }
 
     void OnDisable()
@@ -71,7 +72,8 @@ public class UIManager : MonoBehaviour
         GameManager.OnGamePause -= GamePaused;
         GameManager.OnToGame -= OnGoToGame;
         GameManager.OnGameOver -= OnGameOver;
-        GameManager.OnGameRematch += OnGoToGame;
+        GameManager.OnGameRematch -= OnGoToGame;
+        GameManager.OnToSettings -= OnGoToSettings;
     }
 
     void OnGoToMainMenu(object sender, EventArgs args)
@@ -97,6 +99,7 @@ public class UIManager : MonoBehaviour
 
                     characterSelectUI.Hide();
                     GameManager.Instance.SetGameState(GameState.Menu);
+                    GameInputManager.Instance.SetMenuInputState(true);
                 });
 
                 break;
@@ -106,8 +109,8 @@ public class UIManager : MonoBehaviour
                 GameUI.Instance.StopGame();
                 ClosePauseMenu();
                 GameManager.Instance.RemovePlayerGameObjects();
-                GameManager.Instance.ClearPlayerInputAndProxies(0);
-                GameManager.Instance.ClearPlayerInputAndProxies(1);
+                GameInputManager.Instance.ClearPlayerInputAndProxies(0);
+                GameInputManager.Instance.ClearPlayerInputAndProxies(1);
                 AnimateUIElementsTransition(gameUI.AnimatedElements, mainMenuUI.AnimatedElements, sequence, () =>
                 {
                     menuEventSystem.gameObject.SetActive(true);
@@ -119,7 +122,7 @@ public class UIManager : MonoBehaviour
                         gameUI.Hide();
                         GameManager.Instance.SetGameState(GameState.Menu);
                     }));
-                    
+                    GameInputManager.Instance.SetMenuInputState(true);
                 });
 
                 break;
@@ -127,8 +130,8 @@ public class UIManager : MonoBehaviour
             case GameState.GameOver:
 
                 GameManager.Instance.RemovePlayerGameObjects();
-                GameManager.Instance.ClearPlayerInputAndProxies(0);
-                GameManager.Instance.ClearPlayerInputAndProxies(1);
+                GameInputManager.Instance.ClearPlayerInputAndProxies(0);
+                GameInputManager.Instance.ClearPlayerInputAndProxies(1);
                 AnimateUIElementsTransition(gameOverUI.AnimatedElements, mainMenuUI.AnimatedElements, sequence, () =>
                 {
                     menuEventSystem.gameObject.SetActive(true);
@@ -140,6 +143,17 @@ public class UIManager : MonoBehaviour
                         gameUI.Hide();
                         GameManager.Instance.SetGameState(GameState.Menu);
                     }));
+                    GameInputManager.Instance.SetMenuInputState(true);
+                });
+
+                break;
+
+            case GameState.Settings:
+
+                AnimateUIElementsTransition(settingsUI.AnimatedElements, mainMenuUI.AnimatedElements, sequence, () =>
+                {
+                    GameManager.Instance.SetGameState(GameState.Menu);
+                    settingsUI.Hide();
                 });
 
                 break;
@@ -157,6 +171,7 @@ public class UIManager : MonoBehaviour
         {
             case GameState.Menu:
 
+                GameInputManager.Instance.SetMenuInputState(false);
                 AnimateUIElementsTransition(mainMenuUI.AnimatedElements, characterSelectUI.AnimatedElements, sequence, () =>
                 {
                     StartCoroutine(Utils.DelayEndFrame(() =>
@@ -167,7 +182,8 @@ public class UIManager : MonoBehaviour
 
                     mainMenuUI.Hide();
                     GameManager.OnEnterCharacterSelect?.Invoke(this, EventArgs.Empty);
-                    GameManager.Instance.SetSelectionStateOfPlayers(true);
+                    GameInputManager.Instance.SetPlayerSelectionState(0, true);
+                    GameInputManager.Instance.SetPlayerSelectionState(1, true);
                     GameManager.Instance.SetGameState(GameState.CharacterSelect);
                 });
 
@@ -178,8 +194,8 @@ public class UIManager : MonoBehaviour
                 GameUI.Instance.StopGame();
                 ClosePauseMenu();
                 GameManager.Instance.RemovePlayerGameObjects();
-                GameManager.Instance.ClearPlayerInputAndProxies(0);
-                GameManager.Instance.ClearPlayerInputAndProxies(1);
+                GameInputManager.Instance.ClearPlayerInputAndProxies(0);
+                GameInputManager.Instance.ClearPlayerInputAndProxies(1);
 
                 AnimateUIElementsTransition(gameUI.AnimatedElements, characterSelectUI.AnimatedElements, sequence, () =>
                 {
@@ -193,8 +209,8 @@ public class UIManager : MonoBehaviour
             case GameState.GameOver:
 
                 GameManager.Instance.RemovePlayerGameObjects();
-                GameManager.Instance.ClearPlayerInputAndProxies(0);
-                GameManager.Instance.ClearPlayerInputAndProxies(1);
+                GameInputManager.Instance.ClearPlayerInputAndProxies(0);
+                GameInputManager.Instance.ClearPlayerInputAndProxies(1);
 
                 AnimateUIElementsTransition(gameOverUI.AnimatedElements, characterSelectUI.AnimatedElements, sequence, () =>
                 {
@@ -237,6 +253,23 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    void OnGoToSettings(object sender, EventArgs args)
+    {
+        settingsUI.Show();
+        switch (GameManager.GameState)
+        {
+            case GameState.Menu:
+
+                GameManager.Instance.SetGameState(GameState.Settings);
+                AnimateUIElementsTransition(mainMenuUI.AnimatedElements, settingsUI.AnimatedElements, sequence, () =>
+                {
+                    mainMenuUI.Hide();
+                });
+
+                break;
+        }
+    }
+
     void OnGameOver(object sender, EventArgs args)
     {
         gameOverUI.Show();
@@ -244,15 +277,15 @@ public class UIManager : MonoBehaviour
         AnimateUIElementsTransition(gameUI.AnimatedElements, gameOverUI.AnimatedElements, sequence, () =>
         {
             gameUI.Hide();
-            GameManager.Instance.EnablePlayerInput(true);
-            GameManager.Instance.SwitchMapsTo(GameManager.UIInput);
+            GameInputManager.Instance.EnablePlayerInput(0, true, GameInputManager.UIScheme);
+            GameInputManager.Instance.EnablePlayerInput(1, true, GameInputManager.UIScheme);
             //Setup Proxies to select their canvases
-            
-            for(int i = 0; i < 2; i++)
+
+            for (int i = 0; i < 2; i++)
             {
                 GameOverUISide playerOneSide = gameOverUI.GetUISide(i);
-                GameManager.Instance.GetPlayerProxy(i).SetRootObject(playerOneSide.RootObject);
-                GameManager.Instance.GetPlayerProxy(i).SetSelectedObject(playerOneSide.SelectObject);
+                GameInputManager.Instance.GetPlayerProxy(i).SetRootObject(playerOneSide.RootObject);
+                GameInputManager.Instance.GetPlayerProxy(i).SetSelectedObject(playerOneSide.SelectObject);
             }
         });
     }
@@ -265,12 +298,12 @@ public class UIManager : MonoBehaviour
     public void OpenPauseMenu(int index)
     {
         CanvasGroup group = pauseUI.GetComponent<CanvasGroup>();
-        GameManager.Instance.SwitchMapsTo(GameManager.UIInput);
+        GameInputManager.Instance.SwitchPlayerMapTo(index,GameInputManager.UIScheme);
         pauseUI.Show();
         group.DOFade(1, .3f);
         menuEventSystem.gameObject.SetActive(true);
-        GameManager.Instance.GetPlayerProxy(index).SetEventSystem(menuEventSystem);
-        GameManager.Instance.GetPlayerProxy(index).SetSelectedObject(pauseUI.ResumeButton.gameObject);
+        GameInputManager.Instance.GetPlayerProxy(index).SetEventSystem(menuEventSystem);
+        GameInputManager.Instance.GetPlayerProxy(index).SetSelectedObject(pauseUI.ResumeButton.gameObject);
         pauseIndex = index;
         GameManager.Instance.SetGameState(GameState.Pause);
     }
@@ -283,8 +316,8 @@ public class UIManager : MonoBehaviour
             {
                 pauseUI.Hide();
             }); 
-            GameManager.Instance.SwitchMapsTo(GameManager.PlayerInput);
-            GameManager.Instance.GetPlayerProxy(pauseIndex).SetDefaultEventSystem();
+            GameInputManager.Instance.SwitchPlayerMapTo(pauseIndex,GameInputManager.GameScheme);
+            GameInputManager.Instance.GetPlayerProxy(pauseIndex).SetDefaultEventSystem();
             GameManager.Instance.SetGameState(GameState.Game);
             menuEventSystem.gameObject.SetActive(false);
         }

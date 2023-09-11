@@ -72,14 +72,8 @@ public class GameManager : MonoBehaviour
     public static float OnHitShakeStrengthY = .01f;
     public static int OnHitVibrato = 15;
 
-    //Input Variables
-    public static string UIInput = "UI";
-    public static string PlayerInput = "Player";
-
     #endregion
 
-    readonly Dictionary<int, PlayerInput> playerInputOfPlayer = new();
-    readonly Dictionary<int, PlayerInputProxy> playerProxyOfPlayer = new();
     readonly Dictionary<int, GameObject> playerGameObjectOfPlayer = new();
     readonly Dictionary<int, Vector2> playerSpawnPosition = new();
 
@@ -93,8 +87,6 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < 2; i++)
         {
-            playerInputOfPlayer.Add(i, null);
-            playerProxyOfPlayer.Add(i, null);
             playerGameObjectOfPlayer.Add(i, null);
             playerSpawnPosition.Add(i, Vector2.zero);
         }
@@ -118,6 +110,7 @@ public class GameManager : MonoBehaviour
 
     void OnGoToGame(object sender, CharacterInfoArgs args)
     {
+        
         //Spawn Characters
         SetupCharacter(args.PlayerOneInput, args.PlayerOneInfo.RelativeSpawn, args.PlayerOneInfo.GamePrefab);
         Vector3 playerTwoSpawn = new(-args.PlayerTwoInfo.RelativeSpawn.x, args.PlayerTwoInfo.RelativeSpawn.y);
@@ -125,7 +118,8 @@ public class GameManager : MonoBehaviour
 
         //Add Characters to Camera and Disable Input First
         CameraManager.Instance.SetTargetGroup(playerGameObjectOfPlayer[0].transform, playerGameObjectOfPlayer[1].transform);
-        EnablePlayerInput(false);
+        GameInputManager.Instance.EnablePlayerInput(0,false,GameInputManager.GameScheme);
+        GameInputManager.Instance.EnablePlayerInput(1, false, GameInputManager.GameScheme);
 
         //Sub Events of Characters
         GameUI.Instance.SubscribeGameEvents(playerGameObjectOfPlayer[0].GetComponent<BaseCharacter>(),
@@ -179,47 +173,6 @@ public class GameManager : MonoBehaviour
         playerSpawnPosition[input.playerIndex] = spawnPos;
     }
 
-    public void SetupPlayerInputAndProxies(int playerIndex, PlayerInput input)
-    {
-        playerInputOfPlayer[playerIndex] = input;
-        playerProxyOfPlayer[playerIndex] = input.GetComponent<PlayerInputProxy>();
-        playerProxyOfPlayer[playerIndex].SetupProxy(playerIndex);
-    }
-
-    public void ClearPlayerInputAndProxies(int playerIndex)
-    {
-        playerProxyOfPlayer[playerIndex].SetSelectedObject(null);
-
-        StartCoroutine(Utils.DelayEndFrame(() =>
-        {
-            Destroy(playerInputOfPlayer[playerIndex].gameObject);
-            playerInputOfPlayer[playerIndex] = null;
-            playerProxyOfPlayer[playerIndex] = null;
-        }));
-    }
-
-    public PlayerInput GetPlayerInput(int index)
-    {
-        return playerInputOfPlayer[index];
-    }
-
-    public PlayerInputProxy GetPlayerProxy(int index)
-    {
-        return playerProxyOfPlayer[index];
-    }
-
-    public void SwitchMapsTo(string mapName)
-    {
-        playerInputOfPlayer[0].SwitchCurrentActionMap(mapName);
-        playerInputOfPlayer[1].SwitchCurrentActionMap(mapName);
-    }
-
-    public void SetSelectionStateOfPlayers(bool state)
-    {
-        playerProxyOfPlayer[0].SetSelectionState(state);
-        playerProxyOfPlayer[1].SetSelectionState(state);
-    }
-
     public void RemovePlayerGameObjects()
     {
         Destroy(playerGameObjectOfPlayer[0]);
@@ -230,18 +183,6 @@ public class GameManager : MonoBehaviour
     {
         GameState = state;
         gameStateText.text = state.ToString();
-    }
-
-    public void EnablePlayerInput(bool state)
-    {
-        playerInputOfPlayer[0].enabled = state;
-        playerInputOfPlayer[1].enabled = state;
-        if (state) SwitchMapsTo(PlayerInput);
-    }
-
-    public void SwapPlayerInputControlScheme(PlayerInput player, string schemeName, params InputDevice[] devices)
-    {
-        player.SwitchCurrentControlScheme(schemeName, devices);
     }
 
     public void ResetPlayers()
@@ -278,5 +219,5 @@ public class GameManager : MonoBehaviour
 
 public enum GameState
 {
-    Menu, CharacterSelect, Game, GameOver, Pause
+    Menu, CharacterSelect, Game, GameOver, Pause, Settings
 }

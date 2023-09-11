@@ -1,25 +1,31 @@
-using DG.Tweening;
 using UnityEngine;
-using UnityEngine.InputSystem.UI;
+using UnityEngine.InputSystem;
 
 public class Test : MonoBehaviour
 {
-    [SerializeField] PauseMenuUI pauseUI;
-    [SerializeField] MultiplayerEventSystem system;
- 
-    void Start()
+    PlayerInput playerInput;
+
+    void Awake()
     {
-        Invoke(nameof(DelayedStart), 1f);
+        playerInput = GetComponent<PlayerInput>();
     }
 
-    void DelayedStart()
+    void Start()
     {
-        pauseUI.Show();
-        system.playerRoot = pauseUI.gameObject;
-        system.SetSelectedGameObject(null);
-        StartCoroutine(Utils.DelayEndFrame(()=>
-        {
-            system.SetSelectedGameObject(pauseUI.ResumeButton.gameObject);
-        }));
+        playerInput.onControlsChanged += PlayerInput_onControlsChanged;
+
+        InputSystem.AddDevice<Gamepad>();
+
+        InputSystem.onDeviceChange += InputSystem_onDeviceChange;
+    }
+
+    private void InputSystem_onDeviceChange(InputDevice arg1, InputDeviceChange arg2)
+    {
+        Debug.Log(arg1 + " changed to " + arg2);
+    }
+
+    private void PlayerInput_onControlsChanged(PlayerInput obj)
+    {
+        Debug.Log(obj.currentControlScheme);
     }
 }

@@ -27,7 +27,8 @@ public class MainMenuUI : BaseMenuUI
 
     void SettingsPressed()
     {
-
+        if (GameManager.GameState != GameState.Menu) return;
+        GameManager.OnToSettings?.Invoke(this, System.EventArgs.Empty);
     }
 
     void QuitPressed()

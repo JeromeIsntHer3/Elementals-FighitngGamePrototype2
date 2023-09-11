@@ -18,7 +18,6 @@ public class BaseCharacterAnimator : MonoBehaviour
 
     Animator animator;
     AnimationType currentState;
-    AnimationType previousState;
     bool attacking = false;
     bool grounded = true;
     float lockedTilTime;
@@ -54,10 +53,7 @@ public class BaseCharacterAnimator : MonoBehaviour
         character.OnJump += OnJump;
         character.OnLand += OnLand;
 
-        character.OnAttackOne += OnAttack1;
-        character.OnAttackTwo += OnAttack2;
-        character.OnAttackThree += OnAttack3;
-        character.OnUltimate += OnUltimate;
+        character.OnAttackPressed += OnAttack;
 
         character.OnRoll += OnRoll;
 
@@ -87,10 +83,7 @@ public class BaseCharacterAnimator : MonoBehaviour
         character.OnMovement -= OnMovement;
         character.OnJump -= OnJump;
         character.OnLand -= OnLand;
-        character.OnAttackOne -= OnAttack1;
-        character.OnAttackTwo -= OnAttack2;
-        character.OnAttackThree -= OnAttack3;
-        character.OnUltimate -= OnUltimate;
+        character.OnAttackPressed -= OnAttack;
         character.OnRoll -= OnRoll;
         character.OnHit -= OnHit;
         character.OnBlockPerformed -= OnBlock;
@@ -117,11 +110,10 @@ public class BaseCharacterAnimator : MonoBehaviour
         movement = args;
     }
 
-    void OnAttack1(object sender, EventArgs args)
+    void OnAttack(object sender, int index)
     {
         if (!grounded)
         {
-            
             CancelAnimation();
             animCond[AnimationType.JumpAttack] = true;
             attacking = true;
@@ -129,35 +121,27 @@ public class BaseCharacterAnimator : MonoBehaviour
             return;
         }
 
-        CancelAnimation();
-        animCond[AnimationType.Attack1] = true;
-        attacking = true;
-        attackingTilTime = Time.time + character.GetAnimationDuration(AnimationType.Attack1);
-    }
-
-    void OnAttack2(object sender, EventArgs args)
-    {
-        if (!grounded) return;
-        CancelAnimation();
-        animCond[AnimationType.Attack2] = true;
-        attacking = true;
-        attackingTilTime = Time.time + character.GetAnimationDuration(AnimationType.Attack2);
-    }
-
-    void OnAttack3(object sender, EventArgs args)
-    {
-        if (!grounded) return;
-        CancelAnimation();
-        animCond[AnimationType.Attack3] = true;
-        attacking = true;
-        attackingTilTime = Time.time + character.GetAnimationDuration(AnimationType.Attack3);
-    }
-
-    void OnUltimate(object sender, EventArgs args)
-    {
-        if (!grounded) return;
-        CancelAnimation();
-        animCond[AnimationType.Ultimate] = true;
+        switch (index)
+        {
+            case 0:
+                animCond[AnimationType.Attack1] = true;
+                attacking = true;
+                attackingTilTime = Time.time + character.GetAnimationDuration(AnimationType.Attack1);
+                break;
+            case 1:
+                animCond[AnimationType.Attack2] = true;
+                attacking = true;
+                attackingTilTime = Time.time + character.GetAnimationDuration(AnimationType.Attack2);
+                break;
+            case 2:
+                animCond[AnimationType.Attack3] = true;
+                attacking = true;
+                attackingTilTime = Time.time + character.GetAnimationDuration(AnimationType.Attack3);
+                break;
+            case 3:
+                animCond[AnimationType.Ultimate] = true;
+                break;
+        }
     }
 
     void OnRoll(object sender, EventArgs args)
@@ -318,7 +302,6 @@ public class BaseCharacterAnimator : MonoBehaviour
 
         SetAnimationConditionsFalse();
 
-        previousState = currentState;
         if (SameState(newState)) return;
         animator.CrossFade(GetHashAndSetLockTime(newState), 0, 0);
         currentState = newState;

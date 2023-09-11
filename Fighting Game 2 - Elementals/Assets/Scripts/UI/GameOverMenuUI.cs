@@ -45,8 +45,8 @@ public class GameOverMenuUI : BaseMenuUI
         for(int i = 0; i < 2; i++)
         {
             playerSelected[i] = false;
-            GameManager.Instance.GetPlayerProxy(i).OnDeselect -= OnBackPress;
-            GameManager.Instance.GetPlayerProxy(i).SetEventSystemState(true);
+            GameInputManager.Instance.GetPlayerProxy(i).OnDeselect -= OnBackPress;
+            GameInputManager.Instance.GetPlayerProxy(i).SetEventSystemState(true);
         }
     }
 
@@ -54,8 +54,8 @@ public class GameOverMenuUI : BaseMenuUI
     {
         playerSelected[index] = true;
 
-        GameManager.Instance.GetPlayerProxy(index).OnDeselect += OnBackPress;
-        GameManager.Instance.GetPlayerProxy(index).SetEventSystemState(false);
+        GameInputManager.Instance.GetPlayerProxy(index).OnDeselect += OnBackPress;
+        GameInputManager.Instance.GetPlayerProxy(index).SetEventSystemState(false);
 
         foreach (var check in playerSelected)
         {
@@ -78,8 +78,8 @@ public class GameOverMenuUI : BaseMenuUI
     void OnBackPress(object sender, int index)
     {
         playerSelected[index] = false;
-        GameManager.Instance.GetPlayerProxy(index).SetEventSystemState(true);
-        GameManager.Instance.GetPlayerProxy(index).OnDeselect -= OnBackPress;
+        GameInputManager.Instance.GetPlayerProxy(index).SetEventSystemState(true);
+        GameInputManager.Instance.GetPlayerProxy(index).OnDeselect -= OnBackPress;
     }
 
     public GameOverUISide GetUISide(int index)

@@ -14,8 +14,6 @@ public class LRMovement : BaseCharacterMovement
     {
         base.OnEnable();
 
-        character.OnUltimate += OnUltimate;
-
         OptionPerformedDelegate += Slide;
         OptionPerformCond += CanSlide;
 
@@ -28,8 +26,6 @@ public class LRMovement : BaseCharacterMovement
     protected override void OnDisable()
     {
         base.OnDisable();
-
-        character.OnUltimate -= OnUltimate;
 
         OptionPerformedDelegate -= Slide;
         OptionPerformCond -= CanSlide;
@@ -65,17 +61,5 @@ public class LRMovement : BaseCharacterMovement
     bool CanSlide()
     {
         return Mathf.Abs(rb.velocity.x) > 4;
-    }
-
-    void OnUltimate(object sender, EventArgs e)
-    {
-        if (!character.Recovered()) return;
-        Invoke(nameof(UltimatePushBack), character.GetAnimationDuration(AnimationType.Ultimate) / 2);
-    }
-
-    void UltimatePushBack()
-    {
-        Vector2 dir = isFacingLeft ? Vector2.right : Vector2.left;
-        rb.AddForce(dir * pushbackForce, ForceMode2D.Impulse);
     }
 }

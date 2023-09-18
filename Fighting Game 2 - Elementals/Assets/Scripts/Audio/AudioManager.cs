@@ -8,11 +8,6 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
 
-    [Range(0f, 1f)] public float masterVolume;
-    [Range(0f, 1f)] public float sfxVolume;
-    [Range(0f, 1f)] public float musicVolume;
-    [Range(0f, 1f)] public float ambienceVolume;
-
     Bus masterBus;
     Bus sfxBus;
     Bus ambienceBus;
@@ -66,6 +61,24 @@ public class AudioManager : MonoBehaviour
     public void SetBGM(LevelBGM bgm)
     {
         musicEventInstance.setParameterByName("GameState", (float) bgm);
+    }
+
+    public void SetMasterVolume(float level)
+    {
+        masterBus.setVolume(level);
+    }
+
+    public void SetSfxVolume(float level)
+    {
+        sfxBus.setVolume(level);
+    }
+    public void SetAmbienceVolume(float level)
+    {
+        ambienceBus.setVolume(level);
+    }
+    public void SetMusicVolume(float level)
+    {
+        musicBus.setVolume(level);
     }
 
     public void CleanUp()

@@ -1,17 +1,40 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class SelectionUI : MonoBehaviour, ISelectHandler, IDeselectHandler
+public class SelectionUI : MonoBehaviour
 {
     [SerializeField] GameObject go;
 
-    public void OnSelect(BaseEventData eventData)
+    Button button;
+
+    void Awake()
     {
-        go.SetActive(true);
+        button = GetComponent<Button>();
     }
 
-    public void OnDeselect(BaseEventData eventData)
+    public virtual void OnSelect()
+    {
+        go.SetActive(true);
+        button.colors = new ColorBlock
+        {
+            normalColor = Color.white,
+            colorMultiplier = 1f,
+            disabledColor = button.colors.disabledColor,
+            selectedColor = button.colors.selectedColor,
+            fadeDuration = button.colors.fadeDuration
+        };
+    }
+
+    public virtual void OnDeselect()
     {
         go.SetActive(false);
+        button.colors = new ColorBlock
+        {
+            normalColor = button.colors.disabledColor,
+            colorMultiplier = 1f,
+            disabledColor = button.colors.disabledColor,
+            selectedColor = button.colors.selectedColor,
+            fadeDuration = button.colors.fadeDuration
+        };
     }
 }

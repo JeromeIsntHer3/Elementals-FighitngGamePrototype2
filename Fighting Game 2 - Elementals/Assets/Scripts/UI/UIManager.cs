@@ -25,6 +25,7 @@ public class UIManager : MonoBehaviour
     public CharacterSelectMenuUI CharacterSelect { get {  return characterSelectUI; } }
     public GameUI GamUI { get {  return gameUI; } }
     public PauseMenuUI PauseUI { get { return pauseUI; } }
+    public SettingsUI SettingsUI { get { return settingsUI; } }
 
     #endregion
 
@@ -152,6 +153,8 @@ public class UIManager : MonoBehaviour
 
                 AnimateUIElementsTransition(settingsUI.AnimatedElements, mainMenuUI.AnimatedElements, sequence, () =>
                 {
+                    UserInterfaceUtils.Instance.SelectNew(mainMenuUI.PlayButton.gameObject, menuEventSystem, 
+                        mainMenuUI.gameObject);
                     GameManager.Instance.SetGameState(GameState.Menu);
                     settingsUI.Hide();
                 });

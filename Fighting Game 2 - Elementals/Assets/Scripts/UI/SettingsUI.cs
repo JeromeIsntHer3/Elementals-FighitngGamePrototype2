@@ -9,7 +9,7 @@ public class SettingsUI : BaseMenuUI
     [SerializeField] SelectionUI[] selections;
 
     PlayerInput playerInput;
-    int show = 0;
+    int currentSelectedIndex;
 
     void OnEnable()
     {
@@ -17,8 +17,7 @@ public class SettingsUI : BaseMenuUI
         playerInput.actions[GameInputManager.UIBackAction].performed += BackPressed;
         playerInput.actions[GameInputManager.UIChangeTabAction].performed += ChangeTab;
 
-        if(show > 0)GameInputManager.Instance.SetEventSystemSelection(gameObject, selections[0].gameObject);
-        show++;
+        selections[0].OnSelect();
     }
 
     void OnDisable()
@@ -27,16 +26,32 @@ public class SettingsUI : BaseMenuUI
         {
             playerInput.actions[GameInputManager.UIBackAction].performed -= BackPressed;
             playerInput.actions[GameInputManager.UIChangeTabAction].performed -= ChangeTab;
+            selections[0].OnDeselect();
+            selections[1].OnDeselect();
         }
     }
 
     void BackPressed(InputAction.CallbackContext obj)
     {
+        if (GameManager.GameState != GameState.Settings) return;
         GameManager.OnToMenu?.Invoke(this, EventArgs.Empty);
     }
 
     void ChangeTab(InputAction.CallbackContext obj)
     {
-        Debug.Log(obj.ReadValue<float>());
+        selections[currentSelectedIndex].OnDeselect();
+
+        currentSelectedIndex += (int) obj.ReadValue<float>();
+
+        if(currentSelectedIndex < 0)
+        {
+            currentSelectedIndex = selections.Length - 1;
+        }
+        else if(currentSelectedIndex > selections.Length - 1)
+        {
+            currentSelectedIndex = 0;
+        }
+
+        selections[currentSelectedIndex].OnSelect();
     }
 }

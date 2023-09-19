@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,7 +19,6 @@ public class Character : MonoBehaviour, ICharacter
     [SerializeField] int maxJumps;
     int jumps = 1;
 
-    CharacterStateMachine stateMachine;
     PlayerInputHandler input;
     Vector2 movement;
     bool blockPressed, optionPressed, jumpPressed, attackPressed;
@@ -36,10 +36,11 @@ public class Character : MonoBehaviour, ICharacter
 
     #endregion
 
+    public EventHandler<int> OnTriggerAttack;
+
 
     void Awake()
     {
-        stateMachine = GetComponent<CharacterStateMachine>();
         input = GetComponent<PlayerInputHandler>();
         jumps = maxJumps;
     }
@@ -111,6 +112,11 @@ public class Character : MonoBehaviour, ICharacter
     public void JumpUsed()
     {
         jumps--;
+    }
+
+    public void TriggerAttack(int index)
+    {
+        OnTriggerAttack?.Invoke(this, index);
     }
 
     public void Damage(float dmgAmount)

@@ -1,16 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class CharacterStunnedState : CharacterState
+public class CharacterIdleState : CharacterState
 {
-    public CharacterStunnedState(CharacterStateMachine ctx, CharacterStateFactory factory) : base(ctx, factory)
+    public CharacterIdleState(CharacterStateMachine ctx, CharacterStateFactory factory) : base(ctx, factory)
     {
     }
 
     public override void EnterState()
     {
-        
+
     }
 
     public override void ExitState()
@@ -25,15 +23,23 @@ public class CharacterStunnedState : CharacterState
 
     public override void PhysicsUpdate()
     {
-        
+
     }
 
     public override void UpdateAnimation()
     {
-        //return AnimationType.Hit;
+        Ctx.P_Animator.SetAnimation(AnimationType.Idle);
     }
 
     public override void CheckSwitchStates()
+    {
+        if(Mathf.Abs(Ctx.P_Character.Movement.x) > 0)
+        {
+            SwitchState(Factory.Running());
+        }
+    }
+
+    public override void InitializeSubStates()
     {
 
     }

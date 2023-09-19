@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CharacterAnimator : MonoBehaviour
@@ -48,7 +47,6 @@ public class CharacterAnimator : MonoBehaviour
 
         if (newAnimation.IsFullyAnimated) SetDelay(GetDuration(type));
 
-        Debug.Log(type);
         animator.CrossFade(newAnimation.AnimationHash, 0, 0);
         currentAnimation = newAnimation;
     }
@@ -61,6 +59,11 @@ public class CharacterAnimator : MonoBehaviour
     public void ClearRecovery()
     {
         lockedTilTime = 0;
+    }
+
+    public bool Recovered()
+    {
+        return Time.time > lockedTilTime;
     }
 
     public void ClearAttackRecovery()

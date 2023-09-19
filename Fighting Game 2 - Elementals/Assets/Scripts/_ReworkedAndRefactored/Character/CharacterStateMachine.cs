@@ -5,7 +5,8 @@ using UnityEngine;
 
 public class CharacterStateMachine : MonoBehaviour
 {
-    public TextMeshProUGUI currentStateText;
+    public TextMeshProUGUI currentSuperStateText;
+    public TextMeshProUGUI currentSubStateText;
 
     Character character;
     CharacterAnimator animator;
@@ -31,13 +32,12 @@ public class CharacterStateMachine : MonoBehaviour
 
     void Update()
     {
-        currentState?.FrameUpdate();
-        currentState?.UpdateAnimation();
+        currentState?.FrameUpdateStates();
     }
 
     void FixedUpdate()
     {
-        currentState?.PhysicsUpdate();    
+        currentState?.PhysicsUpdateStates();    
     }
 
     void OnCollisionEnter2D(Collision2D collision)

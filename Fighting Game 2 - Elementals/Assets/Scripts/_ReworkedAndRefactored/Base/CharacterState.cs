@@ -1,11 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class CharacterState
 {
-    protected CharacterStateMachine _ctx;
-    protected CharacterStateFactory _factory;
+    bool _isRootState = false;
+    CharacterStateMachine _ctx;
+    CharacterStateFactory _factory;
+    CharacterState _currSuperState;
+    CharacterState _currSubState;
+
+    protected bool IsRootState { get { return _isRootState; } set { _isRootState = value; } }
+    protected CharacterStateMachine Ctx { get { return _ctx; } }
+    protected CharacterStateFactory Factory { get { return _factory; } }
+
     public CharacterState(CharacterStateMachine ctx, CharacterStateFactory factory)
     {
         _ctx = ctx;
@@ -16,26 +22,64 @@ public abstract class CharacterState
     public abstract void FrameUpdate();
     public abstract void PhysicsUpdate();
     public abstract void CheckSwitchStates();
+    public abstract void InitializeSubStates();
     public abstract void ExitState();
     public abstract void UpdateAnimation();
     public abstract void OnCollisionEnter2D(Collision2D collision);
 
+    public void FrameUpdateStates()
+    {
+        FrameUpdate();
+        UpdateAnimation();
+        _currSubState?.FrameUpdate();
+        _currSubState?.UpdateAnimation();
+
+        _ctx.currentSuperStateText.text = _ctx.P_CurrentState.ToString();
+        if (_currSubState == null)
+        {
+            _ctx.currentSubStateText.text = "Empty";
+        }
+        else
+        {
+            _ctx.currentSubStateText.text = _currSubState.ToString();
+        }
+    }
+
+    public void PhysicsUpdateStates()
+    {
+        PhysicsUpdate();
+        _currSubState?.PhysicsUpdate();
+    }
+
     protected void SwitchState(CharacterState newState)
     {
-        _ctx.P_PreviousState = this;
+        if (_ctx.P_CurrentState.IsRootState)
+        {
+            _ctx.P_PreviousState = _ctx.P_CurrentState;
+        }
         ExitState();
-        newState.EnterState();
-        _ctx.P_CurrentState = newState;
-        _ctx.currentStateText.text = _ctx.P_CurrentState.ToString();
+        if (newState.IsRootState)
+        {
+            _currSubState?.ExitState();
+            _currSubState = null;
+            _ctx.P_CurrentState = newState;
+            _ctx.P_CurrentState.EnterState();
+        }
+        else if(_currSuperState != null)
+        {
+            _currSuperState.SetSubState(newState);
+        }
     }
 
-    protected void SetSuperState()
+    protected void SetSuperState(CharacterState newSuperState)
     {
-
+        _currSuperState = newSuperState;
     }
 
-    protected void SetSubState()
+    protected void SetSubState(CharacterState newSubState)
     {
-
+        _currSubState = newSubState;
+        _currSubState.EnterState();
+        newSubState.SetSuperState(this);
     }
 }

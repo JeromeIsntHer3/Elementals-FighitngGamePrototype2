@@ -1,14 +1,16 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class CharacterBlockState : CharacterState
+public class CharacterStunnedState : CharacterState
 {
-    public CharacterBlockState(CharacterStateMachine ctx, CharacterStateFactory factory) : base(ctx, factory)
+    public CharacterStunnedState(CharacterStateMachine ctx, CharacterStateFactory factory) : base(ctx, factory)
     {
     }
 
     public override void EnterState()
     {
-        _ctx.P_Animator.SetAnimation(AnimationType.DefendStart);
+        
     }
 
     public override void ExitState()
@@ -28,16 +30,17 @@ public class CharacterBlockState : CharacterState
 
     public override void UpdateAnimation()
     {
-        _ctx.P_Animator.SetAnimation(AnimationType.DefendLoop);
+        //return AnimationType.Hit;
     }
 
     public override void CheckSwitchStates()
     {
-        if (!_ctx.P_Character.IsBlockPressed)
-        {
-            _ctx.P_Animator.SetAnimation(AnimationType.DefendEnd);
-            SwitchState(_factory.Grounded());
-        }
+
+    }
+
+    public override void InitializeSubStates()
+    {
+
     }
 
     public override void OnCollisionEnter2D(Collision2D collision)

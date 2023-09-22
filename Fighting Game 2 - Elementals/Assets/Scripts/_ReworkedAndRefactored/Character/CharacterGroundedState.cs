@@ -47,7 +47,8 @@ public class CharacterGroundedState : CharacterState
             SwitchState(Factory.Jumping());
         }
 
-        if (Ctx.P_Character.IsBlockPressed || Ctx.P_Character.IsAttackPressed)
+        if (Ctx.P_Character.IsBlockPressed || Ctx.P_Character.IsAttackPressed ||
+            Ctx.P_Character.IsOptionPressed || Ctx.P_Character.IsRollPressed)
         {
             SwitchState(Factory.Action());
         }

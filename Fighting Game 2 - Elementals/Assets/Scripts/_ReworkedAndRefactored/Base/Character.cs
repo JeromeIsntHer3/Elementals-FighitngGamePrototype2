@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 
@@ -21,7 +22,7 @@ public class Character : MonoBehaviour, ICharacter
 
     PlayerInputHandler input;
     Vector2 movement;
-    bool blockPressed, optionPressed, jumpPressed, attackPressed;
+    bool blockPressed, optionPressed, jumpPressed, attackPressed, rollPressed, facingLeft;
     int currentAttackIndex = -1;
 
 
@@ -30,8 +31,10 @@ public class Character : MonoBehaviour, ICharacter
     public Vector2 Movement { get { return movement; } }
     public bool IsBlockPressed { get { return blockPressed; } }
     public bool IsOptionPressed { get { return optionPressed; } }
+    public bool IsRollPressed { get { return rollPressed; } }
     public bool IsJumpPressed { get { return jumpPressed; } }
     public bool IsAttackPressed {  get { return attackPressed; } }
+    public bool IsFacingLeft {  get { return facingLeft; } }
     public int CurrentAttack { get {  return currentAttackIndex; } set { currentAttackIndex = value; } }
 
     #endregion
@@ -52,6 +55,7 @@ public class Character : MonoBehaviour, ICharacter
         input.OnOption += OnOption;
         input.OnJump += OnJump;
         input.OnAttackPressed += OnAttack;
+        input.OnRoll += OnRoll;
     }
 
     void OnDisable()
@@ -61,11 +65,20 @@ public class Character : MonoBehaviour, ICharacter
         input.OnOption -= OnOption;
         input.OnJump -= OnJump;
         input.OnAttackPressed -= OnAttack;
+        input.OnRoll -= OnRoll;
     }
 
     void OnMovement(object sender, Vector2 direction)
     {
         movement = direction;
+
+        if(direction.x < 0)
+        {
+            facingLeft = true;
+        }else if(direction.x > 0)
+        {
+            facingLeft = false;
+        }
     }
 
     void OnBlock(object sender, bool state)
@@ -89,8 +102,14 @@ public class Character : MonoBehaviour, ICharacter
         attackPressed = true;
     }
 
+    void OnRoll(object sender, bool state)
+    {
+        rollPressed = state;
+    }
+
     void Update()
     {
+        if(rollPressed) rollPressed = false;
         if (attackPressed) attackPressed = false;
     }
 

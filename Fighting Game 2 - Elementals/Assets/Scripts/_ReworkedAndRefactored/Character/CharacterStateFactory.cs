@@ -13,6 +13,8 @@ public class CharacterStateFactory
     public  CharacterRunningState Running() {  return new CharacterRunningState(_context, this); }
     public CharacterJumpingState Jumping() { return new CharacterJumpingState(_context, this); }
     public CharacterStunnedState Stunned() { return new CharacterStunnedState(_context, this); }
+    public CharacterRollState Roll() { return new CharacterRollState(_context, this); }
+    public CharacterOptionState Option() {  return new CharacterOptionState(_context, this); }
     public CharacterBlockState Blocking() { return new CharacterBlockState(_context, this); }
     public CharacterActionState Action() {  return new CharacterActionState(_context, this); }
 }

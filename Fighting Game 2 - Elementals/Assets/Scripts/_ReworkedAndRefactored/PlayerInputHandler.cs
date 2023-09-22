@@ -24,7 +24,7 @@ public class PlayerInputHandler : MonoBehaviour
     //i.e. Pressing and Letting Go of the related key
 
     public EventHandler<Vector2> OnMovementPressed;
-    public EventHandler OnRollPressed;
+    public EventHandler<bool> OnRoll;
     public EventHandler<bool> OnJump;
     public EventHandler OnCancelPressed;
     public EventHandler<bool> OnBlock;
@@ -97,7 +97,7 @@ public class PlayerInputHandler : MonoBehaviour
 
     void RollPerformed(Ctx callbackContext)
     {
-        OnRollPressed?.Invoke(this, EventArgs.Empty);
+        OnRoll?.Invoke(this, callbackContext.ReadValueAsButton());
     }
 
     void Jump(Ctx callbackContext)

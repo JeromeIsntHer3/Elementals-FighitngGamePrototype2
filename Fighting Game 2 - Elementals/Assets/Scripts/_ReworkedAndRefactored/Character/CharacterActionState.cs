@@ -44,10 +44,17 @@ public class CharacterActionState : CharacterState
         {
             SetSubState(Factory.Attacking());
         }
-
-        if (Ctx.P_Character.IsBlockPressed)
+        else if (Ctx.P_Character.IsBlockPressed)
         {
             SetSubState(Factory.Blocking());
+        }
+        else if (Ctx.P_Character.IsRollPressed)
+        {
+            SetSubState(Factory.Roll());
+        }
+        else if (Ctx.P_Character.IsOptionPressed)
+        {
+            SetSubState(Factory.Option());
         }
     }
 

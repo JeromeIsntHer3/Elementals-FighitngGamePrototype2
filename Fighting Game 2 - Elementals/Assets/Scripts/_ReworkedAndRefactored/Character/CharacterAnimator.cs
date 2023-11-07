@@ -9,6 +9,7 @@ public class CharacterAnimator : MonoBehaviour
     readonly Dictionary<AnimationType, CharacterAnimation> animations = new();
     readonly Dictionary<AnimationType, bool> animationCondition = new();
     readonly Dictionary<AnimationType, float> animationDuration = new();
+    readonly Dictionary<AnimationType, bool> animationCanInterrupt = new();
 
     SpriteRenderer spriteRenderer;
     Animator animator;
@@ -24,6 +25,7 @@ public class CharacterAnimator : MonoBehaviour
         animationData.AddToCanChangeDirectionDict(animationCanChangeFaceDirection);
         animationData.AddToConditionList(animationCondition);
         animationData.AddToDuration(animationDuration);
+        animationData.AddToInterruptable(animationCanInterrupt);
 
         foreach(var animation in animationData.CharacterAnimations)
         {
@@ -41,6 +43,7 @@ public class CharacterAnimator : MonoBehaviour
 
     public void SetAnimation(AnimationType type)
     {
+        if (animationCanInterrupt[type]) { lockedTilTime = 0; }
         if (lockedTilTime > Time.time) return;
         var newAnimation = animations[type];
         if (currentAnimation == newAnimation) return;

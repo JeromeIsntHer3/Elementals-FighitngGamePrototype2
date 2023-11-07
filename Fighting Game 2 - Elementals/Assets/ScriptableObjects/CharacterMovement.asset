@@ -17,5 +17,5 @@ MonoBehaviour:
   JumpForce: 12
   JumpDelay: 0.1
   DashForce: 12
-  JumpsAllowed: 2
+  JumpsAllowed: 3
   SlideMultiplier: 0.65

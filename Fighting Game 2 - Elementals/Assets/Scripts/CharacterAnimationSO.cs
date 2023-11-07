@@ -57,4 +57,12 @@ public class CharacterAnimationSO : ScriptableObject
             animTimes.Add(animation.Type, animation.Clip.averageDuration);
         }
     }
+
+    public void AddToInterruptable(Dictionary<AnimationType, bool> interruptableDict)
+    {
+        foreach (CharacterAnimation animation in CharacterAnimations)
+        {
+            interruptableDict.Add(animation.Type, animation.CanInterrupt);
+        }
+    }
 }

@@ -9,8 +9,8 @@ public class CharacterRollState : CharacterState
     public override void EnterState()
     {
         Vector2 dir = Ctx.P_Character.IsFacingLeft ? Vector2.left : Vector2.right;
-        Ctx.P_Character.Rb.velocity = new Vector2(0, Ctx.P_Character.Rb.velocity.y);
-        Ctx.P_Character.Rb.AddForce(dir * Ctx.P_Character.MovementData.DashForce, ForceMode2D.Impulse);
+        Ctx.P_Character.ObjectRigidbody.velocity = new Vector2(0, Ctx.P_Character.ObjectRigidbody.velocity.y);
+        Ctx.P_Character.ObjectRigidbody.AddForce(dir * Ctx.P_Character.MovementData.DashForce, ForceMode2D.Impulse);
         Ctx.P_Animator.SetAnimation(AnimationType.Roll);
     }
 

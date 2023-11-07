@@ -74,8 +74,8 @@ public class CharacterGroundedState : CharacterState
     void HandleMovement()
     {
         float targetSpeed = Ctx.P_Character.MovementData.PlayerSpeed * Ctx.P_Character.Movement.x;
-        float speedDiff = targetSpeed - Ctx.P_Character.Rb.velocity.x;
+        float speedDiff = targetSpeed - Ctx.P_Character.ObjectRigidbody.velocity.x;
         float movementRate = speedDiff * Ctx.P_Character.MovementData.AccelerationSpeed;
-        Ctx.P_Character.Rb.AddForce(Vector2.right * movementRate, ForceMode2D.Force);
+        Ctx.P_Character.ObjectRigidbody.AddForce(Vector2.right * movementRate, ForceMode2D.Force);
     }
 }

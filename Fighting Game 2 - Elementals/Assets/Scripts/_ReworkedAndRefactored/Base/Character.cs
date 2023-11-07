@@ -1,30 +1,26 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
-public class Character : MonoBehaviour, ICharacter
+public class Character : MonoBehaviour, ICharacter, IKnockable
 {
     [SerializeField] LayerMask groundLayer;
+    [SerializeField] Transform rotateObject;
     [SerializeField] protected Transform groundCheck1;
     [SerializeField] protected Transform groundCheck2;
 
     [field: SerializeField] public CharacterMovementSO MovementData { get; set; }
-    [field: SerializeField] public Rigidbody2D Rb {  get; set; }
+    [field: SerializeField] public Rigidbody2D ObjectRigidbody {  get; set; }
     [field: SerializeField] public float MaxHealth { get; set; }
     public float CurrentHealth { get; set; }
+    [field: SerializeField] public bool HasOptionAnimation { get; set; }
     [field: SerializeField] public float DelayBetweenJumps { get; set; }
 
-    [SerializeField] int maxJumps;
     int jumps = 1;
 
     PlayerInputHandler input;
     Vector2 movement;
     bool blockPressed, optionPressed, jumpPressed, attackPressed, rollPressed, facingLeft;
     int currentAttackIndex = -1;
-
 
     #region Getter And Setters
 
@@ -45,7 +41,7 @@ public class Character : MonoBehaviour, ICharacter
     void Awake()
     {
         input = GetComponent<PlayerInputHandler>();
-        jumps = maxJumps;
+        jumps = MovementData.JumpsAllowed;
     }
 
     void OnEnable()
@@ -75,9 +71,11 @@ public class Character : MonoBehaviour, ICharacter
         if(direction.x < 0)
         {
             facingLeft = true;
+            rotateObject.localScale = new Vector3(-1, 1, 1);
         }else if(direction.x > 0)
         {
             facingLeft = false;
+            rotateObject.localScale = new Vector3(1, 1, 1);
         }
     }
 
@@ -125,7 +123,7 @@ public class Character : MonoBehaviour, ICharacter
 
     public void ResetJumps()
     {
-        jumps = maxJumps;
+        jumps = MovementData.JumpsAllowed;
     }
 
     public void JumpUsed()
@@ -141,5 +139,10 @@ public class Character : MonoBehaviour, ICharacter
     public void Damage(float dmgAmount)
     {
         
+    }
+
+    public void Knockback(Vector2 direction, float force)
+    {
+        ObjectRigidbody.AddForce(direction * force, ForceMode2D.Impulse);
     }
 }

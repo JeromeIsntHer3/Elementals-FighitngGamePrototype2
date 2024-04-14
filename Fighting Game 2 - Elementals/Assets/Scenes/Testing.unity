@@ -169,7 +169,6 @@ GameObject:
   m_Component:
   - component: {fileID: 257521617}
   - component: {fileID: 257521619}
-  - component: {fileID: 257521618}
   m_Layer: 7
   m_Name: SwordTipHitbox
   m_TagString: Untagged
@@ -192,22 +191,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 626239020}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &257521618
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 257521616}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02804262ec3d06b44a111e622456b5d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  drawBox: 1
-  boxDrawnColor: {r: 1, g: 0, b: 0.019788265, a: 1}
-  OwnerObject: {fileID: 1396154676227237034}
-  hitboxCollider: {fileID: 257521619}
 --- !u!61 &257521619
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -523,7 +506,6 @@ GameObject:
   m_Component:
   - component: {fileID: 516903491}
   - component: {fileID: 516903493}
-  - component: {fileID: 516903492}
   m_Layer: 7
   m_Name: SwordBodyHitbox
   m_TagString: Untagged
@@ -546,22 +528,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 626239020}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &516903492
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 516903490}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02804262ec3d06b44a111e622456b5d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  drawBox: 1
-  boxDrawnColor: {r: 1, g: 0, b: 0.019788265, a: 1}
-  OwnerObject: {fileID: 1396154676227237034}
-  hitboxCollider: {fileID: 516903493}
 --- !u!61 &516903493
 BoxCollider2D:
   m_ObjectHideFlags: 0

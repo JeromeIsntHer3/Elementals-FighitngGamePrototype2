@@ -38,17 +38,14 @@ public class Hitbox : GameBox
                 if (FacingSameDirection(hurtbox))
                 {
                     hurtbox.Hit(DamageData);
-                    AudioManager.Instance.PlayOneShot(FModEvents.Instance.Hit,spawnPoint);
                     hurtbox.BoxOwner.OnBlockCanceled?.Invoke(this, EventArgs.Empty);
                     return;
                 }
 
-                AudioManager.Instance.PlayOneShot(FModEvents.Instance.BlockHit, spawnPoint);
                 hurtbox.BlockHit(DamageData);
                 HitBlock(hurtbox);
                 return;
             }
-            AudioManager.Instance.PlayOneShot(FModEvents.Instance.Hit, spawnPoint);
             hurtbox.Hit(DamageData);
             HitSuccessful(hurtbox);
         }

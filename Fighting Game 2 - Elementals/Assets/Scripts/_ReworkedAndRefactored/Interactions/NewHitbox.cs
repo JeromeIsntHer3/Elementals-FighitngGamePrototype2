@@ -25,10 +25,10 @@ public class NewHitbox : MonoBehaviour
             Gizmos.color = boxDrawnColor;
             points = new Vector3[]
             {
-                new Vector3 (hitboxCollider.bounds.min.x, hitboxCollider.bounds.max.y, 0),
-                new Vector3 (hitboxCollider.bounds.max.x, hitboxCollider.bounds.max.y, 0),
-                new Vector3 (hitboxCollider.bounds.max.x, hitboxCollider.bounds.min.y, 0),
-                new Vector3 (hitboxCollider.bounds.min.x, hitboxCollider.bounds.min.y, 0)
+                new(hitboxCollider.bounds.min.x, hitboxCollider.bounds.max.y, 0),
+                new (hitboxCollider.bounds.max.x, hitboxCollider.bounds.max.y, 0),
+                new  (hitboxCollider.bounds.max.x, hitboxCollider.bounds.min.y, 0),
+                new (hitboxCollider.bounds.min.x, hitboxCollider.bounds.min.y, 0)
             };
 
             Gizmos.DrawLine(points[0], points[1]);

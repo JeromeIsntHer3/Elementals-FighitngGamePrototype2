@@ -36,7 +36,7 @@ public class MBKnife : BaseProjectile
 
     void FixedUpdate()
     {
-        float angle = Mathf.Atan2(rb.velocity.y,rb.velocity.x) * Mathf.Rad2Deg;
+        float angle = Mathf.Atan2(rb.linearVelocity.y,rb.linearVelocity.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 
@@ -68,8 +68,8 @@ public class MBKnife : BaseProjectile
 
             if(hitbox.CanDeflect)
             {
-                Vector2 currVel = rb.velocity;
-                rb.velocity = Vector2.zero;
+                Vector2 currVel = rb.linearVelocity;
+                rb.linearVelocity = Vector2.zero;
                 Vector2 dir = currVel.x > 0 ? Vector2.left : Vector2.right;
                 rb.AddForce(dir * currVel * 3, ForceMode2D.Impulse);
                 hitSomething = false;

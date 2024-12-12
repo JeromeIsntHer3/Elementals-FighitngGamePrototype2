@@ -34,7 +34,7 @@ public class CMCrystalProjectile : BaseProjectile
 
         if (isParent)
         {
-            rb.velocity = direction * speed;
+            rb.linearVelocity = direction * speed;
             transform.localScale = new Vector2(1.5f, 1.5f);
             anim.CrossFade(LoopHash, 0, 0);
             spawnedPosition = transform.position;
@@ -62,7 +62,7 @@ public class CMCrystalProjectile : BaseProjectile
         {
             if (!collision.transform.root.TryGetComponent(out CMRockProjectile rock)) return;
             anim.CrossFade(EndHash, 0, 0);
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
             transform.localScale = new Vector2(1f, 1f);
 
             rock.Explode();

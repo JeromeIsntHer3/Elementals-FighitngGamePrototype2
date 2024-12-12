@@ -158,14 +158,14 @@ public class BaseCharacterMovement : MonoBehaviour
         if (!character.Recovered() || !canMove) return;
             
         float targetSpeed = (jumping ? data.PlayerSpeed * 4/5f : data.PlayerSpeed) * movement.x;
-        float speedDiff = targetSpeed - rb.velocity.x;
+        float speedDiff = targetSpeed - rb.linearVelocity.x;
         float movementRate = speedDiff * data.AccelerationSpeed;
         rb.AddForce(Vector2.right * movementRate, ForceMode2D.Force);
     }
 
     void Jump()
     {
-        rb.velocity = new Vector2(rb.velocity.x, 0);
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
         rb.AddForce(Vector2.up * data.JumpForce, ForceMode2D.Impulse);
         rb.AddForce(movement * data.JumpForce/2, ForceMode2D.Impulse);
         character.SetGroundedState(false);
@@ -174,7 +174,7 @@ public class BaseCharacterMovement : MonoBehaviour
     void Roll()
     {
         Vector2 dir = isFacingLeft ? Vector2.left : Vector2.right;
-        rb.velocity = new Vector2(0, rb.velocity.y);
+        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         rb.AddForce(dir * data.DashForce, ForceMode2D.Impulse);
     }
 

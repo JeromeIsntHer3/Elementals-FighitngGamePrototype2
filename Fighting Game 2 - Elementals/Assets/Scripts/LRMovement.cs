@@ -39,13 +39,13 @@ public class LRMovement : BaseCharacterMovement
     void Slide()
     {
         Vector2 dir = isFacingLeft ? Vector2.left : Vector2.right;
-        rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y);
-        rb.AddForce(Mathf.Abs(rb.velocity.x) * data.SlideMultiplier * dir, ForceMode2D.Impulse);
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y);
+        rb.AddForce(Mathf.Abs(rb.linearVelocity.x) * data.SlideMultiplier * dir, ForceMode2D.Impulse);
     }
 
     void SlideCancel()
     {
-        rb.velocity = new Vector2(rb.velocity.x / 2, rb.velocity.y);
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x / 2, rb.linearVelocity.y);
     }
 
     void Recovery()
@@ -55,11 +55,11 @@ public class LRMovement : BaseCharacterMovement
 
     bool StopSliding()
     {
-        return Mathf.Abs(rb.velocity.x) < .4f;
+        return Mathf.Abs(rb.linearVelocity.x) < .4f;
     }
 
     bool CanSlide()
     {
-        return Mathf.Abs(rb.velocity.x) > 4;
+        return Mathf.Abs(rb.linearVelocity.x) > 4;
     }
 }

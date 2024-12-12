@@ -23,14 +23,14 @@ public class CMRockProjectile : BaseProjectile
         InitProjectile(owner, data, lifespan, false);
         anim = GetComponent<Animator>();
         transform.eulerAngles = new Vector3(transform.eulerAngles.x, 180, transform.eulerAngles.z);
-        rb.velocity = dir.normalized * speed;
+        rb.linearVelocity = dir.normalized * speed;
         Invoke(nameof(Expand), dist/speed);
         return this;
     }
 
     void Expand()
     {
-        rb.velocity = Vector2.zero;
+        rb.linearVelocity = Vector2.zero;
         rb.constraints = RigidbodyConstraints2D.FreezeAll;
     }
 
@@ -56,7 +56,7 @@ public class CMRockProjectile : BaseProjectile
 
     void BeforeGuard(Collider2D col)
     {
-        rb.velocity = Vector2.zero;
+        rb.linearVelocity = Vector2.zero;
         rb.constraints = RigidbodyConstraints2D.FreezeAll;
         gameObject.layer = LayerMask.NameToLayer("Ground");
         rockCol.gameObject.layer = gameObject.layer;

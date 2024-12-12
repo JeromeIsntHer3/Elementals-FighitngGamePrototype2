@@ -200,7 +200,7 @@ public class BaseCharacterAnimator : MonoBehaviour
 
     void OnBlock(object sender, EventArgs e)
     {
-        rb.velocity = Vector2.zero;
+        rb.linearVelocity = Vector2.zero;
         //blockTrigger = true;
         animCond[AnimationType.DefendStart] = true;
         animCond[AnimationType.DefendLoop] = true;
@@ -423,9 +423,9 @@ public class BaseCharacterAnimator : MonoBehaviour
 #endif
         if (grounded) return movement.x == 0 ? AnimationType.Idle : AnimationType.Run;
         if (animCond[AnimationType.JumpAttack]) return AnimationType.JumpAttack;
-        if (rb.velocity.y > 3f) return AnimationType.JumpRising;
-        if (rb.velocity.y > 1f) return AnimationType.JumpPeak;
-        return rb.velocity.y < -1f ? AnimationType.JumpFalling : AnimationType.JumpRising;
+        if (rb.linearVelocity.y > 3f) return AnimationType.JumpRising;
+        if (rb.linearVelocity.y > 1f) return AnimationType.JumpPeak;
+        return rb.linearVelocity.y < -1f ? AnimationType.JumpFalling : AnimationType.JumpRising;
     }
 
     void CancelAnimation()

@@ -48,15 +48,15 @@ public class CharacterJumpingState : CharacterState
 
     public override void UpdateAnimation()
     {
-        if (rb.velocity.y > 3f)
+        if (rb.linearVelocity.y > 3f)
         {
             Ctx.P_Animator.SetAnimation(AnimationType.JumpRising);
         }
-        else if (rb.velocity.y > 0f)
+        else if (rb.linearVelocity.y > 0f)
         {
             Ctx.P_Animator.SetAnimation(AnimationType.JumpPeak);
         }
-        if (rb.velocity.y < -3f) Ctx.P_Animator.SetAnimation(AnimationType.JumpFalling);
+        if (rb.linearVelocity.y < -3f) Ctx.P_Animator.SetAnimation(AnimationType.JumpFalling);
     }
 
     public override void CheckSwitchStates()
@@ -98,7 +98,7 @@ public class CharacterJumpingState : CharacterState
     void HandleJump()
     {
         canJumpTime = Time.time + Ctx.P_Character.DelayBetweenJumps;
-        rb.velocity = new Vector2(rb.velocity.x, 0);
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
         rb.AddForce(Vector2.up * data.JumpForce, ForceMode2D.Impulse);
         rb.AddForce(Ctx.P_Character.Movement * data.JumpForce / 2, ForceMode2D.Impulse);
         Ctx.P_Character.JumpUsed();
@@ -107,7 +107,7 @@ public class CharacterJumpingState : CharacterState
     void HandleMovement()
     {
         float targetSpeed = Ctx.P_Character.MovementData.PlayerSpeed * .65f * Ctx.P_Character.Movement.x;
-        float speedDiff = targetSpeed - Ctx.P_Character.ObjectRigidbody.velocity.x;
+        float speedDiff = targetSpeed - Ctx.P_Character.ObjectRigidbody.linearVelocity.x;
         float movementRate = speedDiff * Ctx.P_Character.MovementData.AccelerationSpeed;
         Ctx.P_Character.ObjectRigidbody.AddForce(Vector2.right * movementRate, ForceMode2D.Force);
     }

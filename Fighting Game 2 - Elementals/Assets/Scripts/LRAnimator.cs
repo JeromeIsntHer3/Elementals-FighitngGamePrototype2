@@ -10,11 +10,11 @@ public class LRAnimator : BaseCharacterAnimator
 
     bool SlideCondition()
     {
-        return Mathf.Abs(rb.velocity.x) > 4;
+        return Mathf.Abs(rb.linearVelocity.x) > 4;
     }
 
     bool StopSliding()
     {
-        return Mathf.Abs(rb.velocity.x) < 2;
+        return Mathf.Abs(rb.linearVelocity.x) < 2;
     }
 }

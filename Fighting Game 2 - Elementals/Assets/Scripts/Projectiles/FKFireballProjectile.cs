@@ -23,7 +23,7 @@ public class FKFireballProjectile : BaseProjectile
     {
         base.InitProjectile(owner, data, lifespan, flipX);
         if (!rb) return;
-        rb.velocity = dir * speed;
+        rb.linearVelocity = dir * speed;
         onHit = removeOnHit;
     }
 }
